@@ -1,7 +1,7 @@
-import AppLayout from "./layouts/AppLayout.tsx";
+import AppRouter from "./routes/AppRouter";
 
 function App() {
-  return <AppLayout />;
+  return <AppRouter />;
 }
 
 export default App;
