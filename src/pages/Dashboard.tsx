@@ -1,4 +1,4 @@
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from "../hooks/useAuth";
 
 const Dashboard = () => {
   const { user } = useAuth();
@@ -12,6 +12,7 @@ const Dashboard = () => {
         <p><strong>Nombre:</strong> {user.nombre} {user.apellidos}</p>
         <p><strong>Correo:</strong> {user.email}</p>
         <p><strong>Cargo:</strong> {user.cargo}</p>
+        <p><strong>Área:</strong> {user.area}</p> 
         <p><strong>Rol:</strong> {user.rol}</p>
       </div>
     </div>
@@ -19,3 +20,4 @@ const Dashboard = () => {
 };
 
 export default Dashboard;
+
