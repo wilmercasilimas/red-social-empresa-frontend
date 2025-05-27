@@ -1,4 +1,5 @@
 import { useAuth } from "../hooks/useAuth";
+import Topbar from "../components/common/Topbar";
 
 const Dashboard = () => {
   const { user } = useAuth();
@@ -6,18 +7,20 @@ const Dashboard = () => {
   if (!user) return null;
 
   return (
-    <div className="min-h-screen bg-gray-100 p-8">
-      <div className="max-w-xl mx-auto bg-white shadow-md rounded p-6">
-        <h1 className="text-2xl font-bold mb-4">Bienvenido al Dashboard</h1>
-        <p><strong>Nombre:</strong> {user.nombre} {user.apellidos}</p>
-        <p><strong>Correo:</strong> {user.email}</p>
-        <p><strong>Cargo:</strong> {user.cargo}</p>
-        <p><strong>Área:</strong> {user.area}</p> 
-        <p><strong>Rol:</strong> {user.rol}</p>
+    <>
+      <Topbar />
+      <div className="min-h-screen bg-gray-100 p-8 fade-in">
+        <div className="card-panel animate-slide-up">
+          <h1 className="title-main mb-4 animate-slide-up">Bienvenido al Dashboard</h1>
+          <p><strong>Nombre:</strong> {user.nombre} {user.apellidos}</p>
+          <p><strong>Correo:</strong> {user.email}</p>
+          <p><strong>Cargo:</strong> {user.cargo}</p>
+          <p><strong>Área:</strong> {user.area}</p> 
+          <p><strong>Rol:</strong> <span className="badge bg-blue-100 text-blue-700">{user.rol}</span></p>
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 
 export default Dashboard;
-

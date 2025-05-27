@@ -1,20 +1,19 @@
 import React from "react";
 
-const AppLayout: React.FC = () => {
+interface Props {
+  children: React.ReactNode;
+}
+
+const AppLayout: React.FC<Props> = ({ children }) => {
   return (
-    <div className="min-h-screen bg-gray-100 flex items-center justify-center p-6">
-      <div className="text-center space-y-4">
-        <h1 className="text-3xl font-bold text-gray-800">
-          Red Social Empresarial
-        </h1>
-        <p className="text-gray-600">
-          Bienvenido al sistema de gestión interna de empleados, tareas e incidencias.
-        </p>
-        <h1 className="text-4xl font-bold text-blue-600">¡Funciona Tailwind!</h1>
-        <p className="text-sm text-gray-400">
-          Usa el menú o las rutas para comenzar.
-        </p>
-      </div>
+    <div className="min-h-screen bg-gray-100">
+      {/* Header común */}
+      <header className="bg-blue-600 text-white py-4 px-6 shadow-md">
+        <h1 className="text-xl font-bold">Red Social Empresarial</h1>
+      </header>
+
+      {/* Contenido principal */}
+      <main className="p-6">{children}</main>
     </div>
   );
 };

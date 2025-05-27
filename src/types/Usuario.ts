@@ -6,4 +6,5 @@ export type Usuario = {
   cargo: string;
   area: string;
   rol: string;
+  imagen?: string;
 };

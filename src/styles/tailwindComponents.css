@@ -1,0 +1,99 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+  .btn-primary {
+    @apply bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded transition duration-300;
+  }
+
+  .btn-danger {
+    @apply bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-4 rounded transition duration-300;
+  }
+
+  .input-field {
+    @apply w-full px-4 py-2 border rounded focus:outline-none focus:ring focus:border-blue-400;
+  }
+
+  .card-panel {
+    @apply bg-white shadow-md rounded p-6;
+  }
+
+  .card-warning {
+    @apply bg-yellow-100 border border-yellow-300 text-yellow-800 rounded p-4;
+  }
+
+  .form-label {
+    @apply block text-sm text-gray-600 mb-1;
+  }
+
+  .title-main {
+    @apply text-2xl font-bold text-gray-800;
+  }
+
+  .badge {
+    @apply inline-block px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-700;
+  }
+
+  .fade-in {
+    @apply animate-fade-in;
+  }
+
+  .slide-up {
+    @apply animate-slide-up;
+  }
+
+  .slide-right {
+    @apply animate-slide-right;
+  }
+
+  .bounce-slow {
+    @apply animate-bounce-slow;
+  }
+
+  .pulse {
+    @apply animate-pulse;
+  }
+}
+
+@layer utilities {
+  @keyframes fade-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  @keyframes slide-up {
+    from { transform: translateY(30px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+  }
+
+  @keyframes slide-right {
+    from { transform: translateX(-30px); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+  }
+
+  @keyframes bounce-slow {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+  }
+
+  .animate-fade-in {
+    animation: fade-in 0.5s ease-in-out forwards;
+  }
+
+  .animate-slide-up {
+    animation: slide-up 0.6s ease-out forwards;
+  }
+
+  .animate-slide-up-slow {
+    animation: slide-up 1s ease-out forwards;
+  }
+
+  .animate-slide-right {
+    animation: slide-right 0.5s ease-out forwards;
+  }
+
+  .animate-bounce-slow {
+    animation: bounce-slow 2s infinite;
+  }
+}
