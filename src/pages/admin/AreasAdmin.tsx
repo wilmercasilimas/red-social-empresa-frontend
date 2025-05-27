@@ -1,0 +1,75 @@
+import React, { useEffect, useState } from "react";
+import type { Area } from "../../types/Area";
+
+const AreasAdmin: React.FC = () => {
+  const [areas, setAreas] = useState<Area[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  const obtenerAreas = async () => {
+    try {
+      const token = localStorage.getItem("token");
+
+      const response = await fetch(
+        "https://red-social-empresa-backend.onrender.com/api/area/listar",
+        {
+          headers: {
+            Authorization: token || "",
+          },
+        }
+      );
+
+      const data = await response.json();
+
+      if (data.status === "success") {
+        setAreas(data.areas);
+      }
+    } catch (error) {
+      console.error("Error al obtener áreas:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    obtenerAreas();
+  }, []);
+
+  return (
+    <div className="card-panel animate-slide-up">
+      <h2 className="title-main mb-4 animate-slide-right">Gestión de Áreas</h2>
+      <p className="text-gray-600 mb-4">
+        Aquí puedes ver, editar y eliminar las áreas registradas.
+      </p>
+
+      {loading ? (
+        <p className="text-center text-gray-500">Cargando áreas...</p>
+      ) : (
+        <div className="overflow-x-auto">
+          <table className="min-w-full text-left border border-gray-200 shadow rounded">
+            <thead className="bg-blue-600 text-white">
+              <tr>
+                <th className="py-2 px-4">Nombre del Área</th>
+                <th className="py-2 px-4">Descripción</th>
+                <th className="py-2 px-4 text-center">Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              {areas.map((area) => (
+                <tr key={area._id} className="hover:bg-gray-100 transition">
+                  <td className="py-2 px-4">{area.nombre}</td>
+                  <td className="py-2 px-4">{area.descripcion}</td>
+                  <td className="py-2 px-4 text-center space-x-2">
+                    <button className="btn-primary text-sm">Editar</button>
+                    <button className="btn-danger text-sm">Eliminar</button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default AreasAdmin;

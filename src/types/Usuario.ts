@@ -1,10 +1,14 @@
 export type Usuario = {
-  id: string;
+  _id: string;
   nombre: string;
   apellidos: string;
   email: string;
   cargo: string;
-  area: string;
+  area: {
+    _id: string;
+    nombre: string;
+    descripcion?: string;
+  };
   rol: string;
   imagen?: string;
 };

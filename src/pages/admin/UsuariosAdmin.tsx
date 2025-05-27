@@ -1,51 +1,123 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import avatarDefault from "../../assets/user.png";
+import type { Usuario } from "../../types/Usuario";
+import AgregarUsuario from "./AgregarUsuario";
 
 const UsuariosAdmin: React.FC = () => {
+  const [usuarios, setUsuarios] = useState<Usuario[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [mostrarFormulario, setMostrarFormulario] = useState(false);
+
+  const obtenerUsuarios = async () => {
+    try {
+      const token = localStorage.getItem("token");
+
+      const response = await fetch(
+        "https://red-social-empresa-backend.onrender.com/api/user/usuarios",
+        {
+          headers: {
+            Authorization: token || "",
+          },
+        }
+      );
+
+      const data = await response.json();
+
+      if (data.status === "success") {
+        setUsuarios(data.usuarios);
+      }
+    } catch (error) {
+      console.error("Error al obtener usuarios:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    obtenerUsuarios();
+  }, []);
+
   return (
     <div className="card-panel animate-slide-up">
-      <h2 className="title-main mb-4 animate-slide-right">Gestión de usuarios</h2>
-      <p className="text-gray-600 mb-4">
-        Aquí puedes ver, editar y eliminar usuarios registrados.
-      </p>
-
-      <div className="overflow-x-auto">
-        <table className="min-w-full text-left border border-gray-200 shadow rounded">
-          <thead className="bg-blue-600 text-white">
-            <tr>
-              <th className="py-2 px-4">Usuario</th>
-              <th className="py-2 px-4">Correo</th>
-              <th className="py-2 px-4">Cargo</th>
-              <th className="py-2 px-4">Área</th>
-              <th className="py-2 px-4">Rol</th>
-              <th className="py-2 px-4 text-center">Acciones</th>
-            </tr>
-          </thead>
-          <tbody>
-            {/* Ejemplo estático - se reemplazará con datos reales luego */}
-            <tr className="hover:bg-gray-100 transition">
-              <td className="py-2 px-4 flex items-center gap-3">
-                <img
-                  src={avatarDefault}
-                  alt="Avatar"
-                  className="w-10 h-10 rounded-full object-cover border"
-                />
-                <span>Juan Pérez</span>
-              </td>
-              <td className="py-2 px-4">juan@empresa.com</td>
-              <td className="py-2 px-4">Diseñador</td>
-              <td className="py-2 px-4">Marketing</td>
-              <td className="py-2 px-4">
-                <span className="badge bg-green-100 text-green-700">Empleado</span>
-              </td>
-              <td className="py-2 px-4 text-center space-x-2">
-                <button className="btn-primary text-sm">Editar</button>
-                <button className="btn-danger text-sm">Eliminar</button>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+      <div className="flex justify-between items-center mb-4">
+        <div>
+          <h2 className="title-main animate-slide-right">Gestión de usuarios</h2>
+          <p className="text-gray-600">
+            Aquí puedes ver, editar y eliminar usuarios registrados.
+          </p>
+        </div>
+        <button
+          className="btn-primary animate-bounce-slow"
+          onClick={() => setMostrarFormulario(!mostrarFormulario)}
+        >
+          {mostrarFormulario ? "Cancelar" : "Agregar usuario"}
+        </button>
       </div>
+
+      {mostrarFormulario && (
+        <div className="mb-6">
+          <AgregarUsuario onUsuarioAgregado={obtenerUsuarios} />
+        </div>
+      )}
+
+      {loading ? (
+        <p className="text-center text-gray-500">Cargando usuarios...</p>
+      ) : (
+        <div className="overflow-x-auto">
+          <table className="min-w-full text-left border border-gray-200 shadow rounded">
+            <thead className="bg-blue-600 text-white">
+              <tr>
+                <th className="py-2 px-4">Usuario</th>
+                <th className="py-2 px-4">Correo</th>
+                <th className="py-2 px-4">Cargo</th>
+                <th className="py-2 px-4">Área</th>
+                <th className="py-2 px-4">Rol</th>
+                <th className="py-2 px-4 text-center">Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              {usuarios.map((usuario) => (
+                <tr key={usuario._id} className="hover:bg-gray-100 transition">
+                  <td className="py-2 px-4 flex items-center gap-3">
+                    <img
+                      src={
+                        usuario.imagen && usuario.imagen !== "default.png"
+                          ? `https://red-social-empresa-backend.onrender.com/api/user/avatar/${usuario.imagen}`
+                          : avatarDefault
+                      }
+                      alt="Avatar"
+                      className="w-10 h-10 rounded-full object-cover border"
+                    />
+                    <span>
+                      {usuario.nombre} {usuario.apellidos}
+                    </span>
+                  </td>
+                  <td className="py-2 px-4">{usuario.email}</td>
+                  <td className="py-2 px-4">{usuario.cargo}</td>
+                  <td className="py-2 px-4">
+                    {usuario.area?.nombre || "Sin área"}
+                  </td>
+                  <td className="py-2 px-4">
+                    <span
+                      className={`badge ${
+                        usuario.rol === "admin"
+                          ? "bg-blue-100 text-blue-700"
+                          : "bg-green-100 text-green-700"
+                      }`}
+                    >
+                      {usuario.rol}
+                    </span>
+                  </td>
+                  <td className="py-2 px-4 text-center space-x-2">
+                    <button className="btn-primary text-sm">Editar</button>
+                    <button className="btn-danger text-sm">Eliminar</button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
     </div>
   );
 };
