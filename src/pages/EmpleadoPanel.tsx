@@ -22,11 +22,26 @@ const EmpleadoPanel: React.FC = () => {
 
           {/* Información */}
           <div>
-            <h1 className="title-main mb-4 animate-slide-up-slow">Panel del Empleado</h1>
-            <p><strong>Bienvenido:</strong> {user.nombre} {user.apellidos}</p>
-            <p><strong>Cargo:</strong> {user.cargo}</p>
-            <p><strong>Área:</strong> {user.area}</p>
-            <p><strong>Rol:</strong> <span className="badge bg-green-100 text-green-700">{user.rol}</span></p>
+            <h1 className="title-main mb-4 animate-slide-up-slow">
+              Panel del Empleado
+            </h1>
+            <p>
+              <strong>Bienvenido:</strong> {user.nombre} {user.apellidos}
+            </p>
+            <p>
+              <strong>Cargo:</strong> {user.cargo}
+            </p>
+            <p>
+              <strong>Área:</strong>{" "}
+              {typeof user.area === "object" ? user.area.nombre : user.area}
+            </p>
+
+            <p>
+              <strong>Rol:</strong>{" "}
+              <span className="badge bg-green-100 text-green-700">
+                {user.rol}
+              </span>
+            </p>
           </div>
         </div>
       </div>

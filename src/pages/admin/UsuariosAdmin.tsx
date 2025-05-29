@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
-import avatarDefault from "../../assets/user.png";
 import type { Usuario } from "../../types/Usuario";
 import AgregarUsuario from "./AgregarUsuario";
+import { getAvatarUrl } from "../../helpers/getAvatarUrl";
 
 const UsuariosAdmin: React.FC = () => {
   const [usuarios, setUsuarios] = useState<Usuario[]>([]);
@@ -80,13 +80,13 @@ const UsuariosAdmin: React.FC = () => {
                 <tr key={usuario._id} className="hover:bg-gray-100 transition">
                   <td className="py-2 px-4 flex items-center gap-3">
                     <img
-                      src={
-                        usuario.imagen && usuario.imagen !== "default.png"
-                          ? `https://red-social-empresa-backend.onrender.com/api/user/avatar/${usuario.imagen}`
-                          : avatarDefault
-                      }
+                      src={getAvatarUrl(usuario.imagen)}
                       alt="Avatar"
                       className="w-10 h-10 rounded-full object-cover border"
+                      onError={(e) => {
+                        console.error("ERROR: Usuario avatar falló:", usuario.imagen);
+                        e.currentTarget.src = "/img/user.png";
+                      }}
                     />
                     <span>
                       {usuario.nombre} {usuario.apellidos}
@@ -94,9 +94,7 @@ const UsuariosAdmin: React.FC = () => {
                   </td>
                   <td className="py-2 px-4">{usuario.email}</td>
                   <td className="py-2 px-4">{usuario.cargo}</td>
-                  <td className="py-2 px-4">
-                    {usuario.area?.nombre || "Sin área"}
-                  </td>
+                  <td className="py-2 px-4">{usuario.area?.nombre || "Sin área"}</td>
                   <td className="py-2 px-4">
                     <span
                       className={`badge ${

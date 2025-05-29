@@ -1,15 +1,20 @@
+// src/components/common/Topbar.tsx
 import React from "react";
 import { useLocation } from "react-router-dom";
 import { useAuth } from "../../hooks/useAuth";
 import logo from "../../assets/logo.jpg";
-import avatarDefault from "../../assets/user.png";
+import { getAvatarUrl } from "../../helpers/getAvatarUrl";
 
 const Topbar: React.FC = () => {
   const { user } = useAuth();
   const location = useLocation();
 
-  // Mostrar solo logo en login
   const isLogin = location.pathname === "/";
+
+  const handleAvatarError = (e: React.SyntheticEvent<HTMLImageElement>) => {
+    console.error("Topbar avatar falló:", e.currentTarget.src);
+    e.currentTarget.src = "/img/user.png"; // ✅ Ruta corregida
+  };
 
   return (
     <header className="w-full bg-blue-600 text-white shadow-md">
@@ -31,8 +36,9 @@ const Topbar: React.FC = () => {
               {user.nombre} {user.apellidos}
             </span>
             <img
-              src={user.imagen ? user.imagen : avatarDefault}
+              src={getAvatarUrl(user.imagen)}
               alt="avatar"
+              onError={handleAvatarError}
               className="h-10 w-10 rounded-full border border-white shadow"
             />
           </div>

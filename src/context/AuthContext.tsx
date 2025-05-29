@@ -1,37 +1,36 @@
 import React, { useEffect, useState } from "react";
-import type { Usuario } from "../types/Usuario"; // Importación solo de tipo
-import { AuthContext } from "./AuthContextDef"; // Importación del contexto
+import { AuthContext } from "./AuthContextDef";
+import type { Usuario } from "../types/Usuario";
 
-interface AuthProviderProps {
-  children: React.ReactNode;
-}
-
-export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
+// Componente AuthProvider
+export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<Usuario | null>(null);
-  const [token, setToken] = useState<string | null>(null);
+  const [token, setToken] = useState<string>("");
 
+  // Verificar si hay datos en localStorage
   useEffect(() => {
-    const storedToken = localStorage.getItem("token");
     const storedUser = localStorage.getItem("user");
+    const storedToken = localStorage.getItem("token");
 
-    if (storedToken && storedUser) {
+    if (storedUser && storedToken) {
+      const parsedUser = JSON.parse(storedUser) as Usuario;
+      setUser(parsedUser);
       setToken(storedToken);
-      setUser(JSON.parse(storedUser));
     }
   }, []);
 
   const login = (token: string, user: Usuario) => {
-    setToken(token);
-    setUser(user);
-    localStorage.setItem("token", token);
     localStorage.setItem("user", JSON.stringify(user));
+    localStorage.setItem("token", token);
+    setUser(user);
+    setToken(token);
   };
 
   const logout = () => {
-    setToken(null);
-    setUser(null);
-    localStorage.removeItem("token");
     localStorage.removeItem("user");
+    localStorage.removeItem("token");
+    setUser(null);
+    setToken("");
   };
 
   return (

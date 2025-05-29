@@ -25,8 +25,14 @@ const Login = () => {
     const data = await response.json();
 
     if (data.status === "success") {
-      const user: Usuario = data.user;
       const token: string = data.token;
+
+      const user: Usuario = {
+        ...data.user,
+        imagen: data.user.imagen
+          ? `${Global.url}avatar/${data.user.imagen}`
+          : "",
+      };
 
       login(token, user);
       setEmail("");
