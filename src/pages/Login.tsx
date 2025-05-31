@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import Global from "../helpers/Global";
-import type { Usuario } from "../types/Usuario";
 import { useAuth } from "../hooks/useAuth";
+import { loginService } from "../services/authService";
+import type { Usuario } from "../types/Usuario";
 import Topbar from "../components/common/Topbar";
 
 const Login = () => {
@@ -16,23 +16,22 @@ const Login = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    const response = await fetch(Global.url + "user/login", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, password }),
-    });
+    const data = await loginService({ email, password });
 
-    const data = await response.json();
-
-    if (data.status === "success") {
-      const token: string = data.token;
+    if (data.status === "success" && data.token && data.user) {
+      const backendUser = data.user;
 
       const user: Usuario = {
-        ...data.user,
-        imagen: data.user.imagen ?? "",
+        ...backendUser,
+        imagen: backendUser.imagen ?? "",
+        cargo: backendUser.cargo ?? "Sin definir",
+        area:
+          typeof backendUser.area === "string"
+            ? { _id: "", nombre: backendUser.area }
+            : backendUser.area ?? { _id: "", nombre: "Sin definir" },
       };
 
-      login(token, user);
+      login(data.token, user);
       setEmail("");
       setPassword("");
 
@@ -93,10 +92,7 @@ const Login = () => {
             </div>
           </div>
 
-          <button
-            type="submit"
-            className="btn-primary w-full animate-bounce-slow"
-          >
+          <button type="submit" className="btn-primary w-full animate-bounce-slow">
             Entrar
           </button>
         </form>
