@@ -1,12 +1,14 @@
 import React, { useEffect, useState } from "react";
 import type { Usuario } from "../../types/Usuario";
 import AgregarUsuario from "./AgregarUsuario";
+import EditarUsuario from "./EditarUsuario";
 import { getAvatarUrl } from "../../helpers/getAvatarUrl";
 
 const UsuariosAdmin: React.FC = () => {
   const [usuarios, setUsuarios] = useState<Usuario[]>([]);
   const [loading, setLoading] = useState(true);
   const [mostrarFormulario, setMostrarFormulario] = useState(false);
+  const [usuarioEditando, setUsuarioEditando] = useState<Usuario | null>(null);
 
   const obtenerUsuarios = async () => {
     try {
@@ -33,6 +35,42 @@ const UsuariosAdmin: React.FC = () => {
     }
   };
 
+  const handleEliminarUsuario = async (id: string) => {
+    const confirmar = window.confirm("¿Estás seguro de eliminar este usuario?");
+    if (!confirmar) return;
+
+    try {
+      const token = localStorage.getItem("token");
+
+      const response = await fetch(
+        `https://red-social-empresa-backend.onrender.com/api/user/usuario/${id}`,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: token || "",
+          },
+        }
+      );
+
+      const data = await response.json();
+
+      if (data.status === "success") {
+        setUsuarios((prevUsuarios) =>
+          prevUsuarios.filter((usuario) => usuario._id !== id)
+        );
+        console.log("✅ Usuario eliminado correctamente");
+      } else {
+        console.error("❌ Error al eliminar usuario:", data.message);
+      }
+    } catch (error) {
+      console.error("❌ Error en la solicitud DELETE:", error);
+    }
+  };
+
+  const cerrarEdicion = () => {
+    setUsuarioEditando(null);
+  };
+
   useEffect(() => {
     obtenerUsuarios();
   }, []);
@@ -57,6 +95,19 @@ const UsuariosAdmin: React.FC = () => {
       {mostrarFormulario && (
         <div className="mb-6">
           <AgregarUsuario onUsuarioAgregado={obtenerUsuarios} />
+        </div>
+      )}
+
+      {usuarioEditando && (
+        <div className="mb-6">
+          <EditarUsuario
+            usuario={usuarioEditando}
+            onUsuarioActualizado={() => {
+              cerrarEdicion();
+              obtenerUsuarios();
+            }}
+            onCancelar={cerrarEdicion}
+          />
         </div>
       )}
 
@@ -106,8 +157,18 @@ const UsuariosAdmin: React.FC = () => {
                     </span>
                   </td>
                   <td className="py-2 px-4 text-center space-x-2">
-                    <button className="btn-primary text-sm">Editar</button>
-                    <button className="btn-danger text-sm">Eliminar</button>
+                    <button
+                      className="btn-primary text-sm"
+                      onClick={() => setUsuarioEditando(usuario)}
+                    >
+                      Editar
+                    </button>
+                    <button
+                      className="btn-danger text-sm"
+                      onClick={() => handleEliminarUsuario(usuario._id)}
+                    >
+                      Eliminar
+                    </button>
                   </td>
                 </tr>
               ))}
