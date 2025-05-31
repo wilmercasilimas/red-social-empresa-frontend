@@ -3,7 +3,6 @@ import React from "react";
 import { useLocation } from "react-router-dom";
 import { useAuth } from "../../hooks/useAuth";
 import logo from "../../assets/logo.jpg";
-import { getAvatarUrl } from "../../helpers/getAvatarUrl";
 
 const Topbar: React.FC = () => {
   const { user } = useAuth();
@@ -35,8 +34,9 @@ const Topbar: React.FC = () => {
             <span className="font-medium">
               {user.nombre} {user.apellidos}
             </span>
+            {/* ✅ Usar directamente el valor ya normalizado */}
             <img
-              src={getAvatarUrl(user.imagen)}
+              src={user.imagen}
               alt="avatar"
               onError={handleAvatarError}
               className="h-10 w-10 rounded-full border border-white shadow"

@@ -1,171 +1,135 @@
 import React, { useState } from "react";
-import Global from "../../helpers/Global";
 import { useAuth } from "../../hooks/useAuth";
+import { getAvatarUrl } from "../../helpers/getAvatarUrl";
+import { toast } from "react-toastify";
 
-
-interface Props {
+interface EditarPerfilProps {
   salirEdicion: () => void;
 }
 
-const EditarPerfil: React.FC<Props> = ({ salirEdicion }) => {
-  const { token, actualizarAvatar } = useAuth();
-
-  const [formPassword, setFormPassword] = useState({
-    password_actual: "",
-    password_nueva: "",
-  });
-
+const EditarPerfil: React.FC<EditarPerfilProps> = ({ salirEdicion }) => {
+  const { user, token, actualizarAvatar } = useAuth();
+  const [avatarFile, setAvatarFile] = useState<File | null>(null);
+  const [passwordActual, setPasswordActual] = useState("");
+  const [passwordNueva, setPasswordNueva] = useState("");
   const [mostrarPassword, setMostrarPassword] = useState(false);
-  const [avatar, setAvatar] = useState<File | null>(null);
-  const [mensaje, setMensaje] = useState<string | null>(null);
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormPassword({
-      ...formPassword,
-      [e.target.name]: e.target.value,
-    });
-  };
 
   const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
-      setAvatar(e.target.files[0]);
-    }
-  };
-
-  const cambiarPassword = async () => {
-    try {
-      const response = await fetch(`${Global.url}user/cambiar-password`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: token || "",
-        },
-        body: JSON.stringify(formPassword),
-      });
-
-      const data = await response.json();
-
-      if (data.status === "success") {
-        setMensaje("✅ Contraseña actualizada correctamente.");
-      } else {
-        setMensaje(`❌ ${data.message || "No se pudo cambiar la contraseña."}`);
-      }
-    } catch {
-      setMensaje("❌ Error al conectar con el servidor.");
-    }
-  };
-
-  const subirAvatar = async () => {
-    if (!avatar) return;
-
-    const formData = new FormData();
-    formData.append("file0", avatar);
-
-    try {
-      const response = await fetch(`${Global.url}user/subir`, {
-        method: "POST",
-        headers: {
-          Authorization: token || "",
-        },
-        body: formData,
-      });
-
-      const data = await response.json();
-
-      if (data.status === "success") {
-        setMensaje("✅ Avatar actualizado correctamente.");
-
-        // ✅ Actualizar avatar globalmente usando el nombre devuelto
-        if (actualizarAvatar) {
-          actualizarAvatar(data.user.imagen);
-        }
-      } else {
-        setMensaje(`❌ ${data.message || "No se pudo actualizar el avatar."}`);
-      }
-    } catch {
-      setMensaje("❌ Error al subir el avatar.");
+      setAvatarFile(e.target.files[0]);
     }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (formPassword.password_actual && formPassword.password_nueva) {
-      await cambiarPassword();
-    }
+    try {
+      // Subir avatar si hay archivo
+      if (avatarFile) {
+        const formData = new FormData();
+        formData.append("file0", avatarFile);
 
-    if (avatar) {
-      await subirAvatar();
-    }
+        const res = await fetch("https://red-social-empresa-backend.onrender.com/api/user/subir", {
+          method: "POST",
+          headers: {
+            Authorization: token ?? "", // ✅ Corregido
+          },
+          body: formData,
+        });
 
-    setTimeout(() => salirEdicion(), 4000);
+        const data = await res.json();
+        if (data.status === "success") {
+          actualizarAvatar?.(data.user.imagen);
+          toast.success("Avatar actualizado correctamente");
+        } else {
+          toast.error("Error al subir el avatar");
+        }
+      }
+
+      // Cambiar contraseña si ambas están presentes
+      if (passwordActual && passwordNueva) {
+        const res = await fetch("https://red-social-empresa-backend.onrender.com/api/user/cambiar-password", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: token ?? "", // ✅ Corregido
+          },
+          body: JSON.stringify({
+            password_actual: passwordActual,
+            password_nueva: passwordNueva,
+          }),
+        });
+
+        const data = await res.json();
+        if (data.status === "success") {
+          toast.success("Contraseña actualizada correctamente");
+        } else {
+          toast.error(data.message || "Error al cambiar la contraseña");
+        }
+      }
+
+      // Esperar y salir
+      setTimeout(() => salirEdicion(), 4000);
+    } catch {
+      toast.error("Hubo un error al actualizar el perfil"); // ✅ 'err' eliminado
+    }
   };
 
   return (
-    <div className="card-panel animate-slide-up p-4 max-w-md mx-auto mt-8 shadow-lg rounded-2xl bg-white">
-      <h2 className="text-xl font-bold mb-4 text-center">Editar Perfil</h2>
+    <form onSubmit={handleSubmit} className="card-panel animate-slide-up space-y-6">
+      {/* Avatar actual */}
+      <div className="flex items-center gap-4">
+        <img
+          src={getAvatarUrl(user?.imagen)}
+          alt="Avatar actual"
+          className="w-16 h-16 rounded-full object-cover border"
+        />
+        <input type="file" accept="image/*" onChange={handleAvatarChange} />
+      </div>
 
-      <form onSubmit={handleSubmit}>
-        <div className="mb-4">
-          <label className="block mb-1 font-medium">Contraseña actual:</label>
-          <input
-            type={mostrarPassword ? "text" : "password"}
-            name="password_actual"
-            value={formPassword.password_actual}
-            onChange={handleChange}
-            className="input-field w-full"
-            placeholder="Tu contraseña actual"
-            required
-          />
-        </div>
+      {/* Contraseña actual */}
+      <div>
+        <label className="block font-medium">Contraseña actual</label>
+        <input
+          type={mostrarPassword ? "text" : "password"}
+          className="input-field w-full"
+          value={passwordActual}
+          onChange={(e) => setPasswordActual(e.target.value)}
+        />
+      </div>
 
-        <div className="mb-4">
-          <label className="block mb-1 font-medium">Nueva contraseña:</label>
-          <input
-            type={mostrarPassword ? "text" : "password"}
-            name="password_nueva"
-            value={formPassword.password_nueva}
-            onChange={handleChange}
-            className="input-field w-full"
-            placeholder="Nueva contraseña"
-            required
-          />
-        </div>
+      {/* Nueva contraseña */}
+      <div>
+        <label className="block font-medium">Nueva contraseña</label>
+        <input
+          type={mostrarPassword ? "text" : "password"}
+          className="input-field w-full"
+          value={passwordNueva}
+          onChange={(e) => setPasswordNueva(e.target.value)}
+        />
+      </div>
 
-        <div className="mb-2">
-          <label className="inline-flex items-center">
-            <input
-              type="checkbox"
-              className="mr-2"
-              checked={mostrarPassword}
-              onChange={() => setMostrarPassword(!mostrarPassword)}
-            />
-            Mostrar contraseñas
-          </label>
-        </div>
+      {/* Mostrar / Ocultar contraseña */}
+      <div className="flex items-center gap-2">
+        <input
+          type="checkbox"
+          id="ver-password"
+          checked={mostrarPassword}
+          onChange={() => setMostrarPassword(!mostrarPassword)}
+        />
+        <label htmlFor="ver-password" className="text-sm">Mostrar contraseñas</label>
+      </div>
 
-        <div className="mb-4">
-          <label className="block mb-1 font-medium">Cambiar Avatar:</label>
-          <input
-            type="file"
-            name="file0"
-            accept="image/*"
-            onChange={handleAvatarChange}
-            className="input-field w-full"
-          />
-        </div>
-
-        {mensaje && (
-          <div className="text-center mb-4 text-sm text-blue-600 animate-pulse">
-            {mensaje}
-          </div>
-        )}
-
-        <button type="submit" className="btn-primary w-full">
+      {/* Botones */}
+      <div className="flex gap-4">
+        <button type="submit" className="btn-primary">
           Guardar cambios
         </button>
-      </form>
-    </div>
+        <button type="button" className="btn-secondary" onClick={salirEdicion}>
+          Cancelar
+        </button>
+      </div>
+    </form>
   );
 };
 

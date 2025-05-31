@@ -1,7 +1,7 @@
 import React from "react";
 import { useAuth } from "../hooks/useAuth";
 import Topbar from "../components/common/Topbar";
-import avatarDefault from "../assets/user.png";
+import { getAvatarUrl } from "../helpers/getAvatarUrl"; // ✅ función reutilizable
 
 const EmpleadoPanel: React.FC = () => {
   const { user } = useAuth();
@@ -15,7 +15,7 @@ const EmpleadoPanel: React.FC = () => {
         <div className="card-panel animate-slide-up flex items-center gap-6">
           {/* Avatar del usuario */}
           <img
-            src={user.imagen ? user.imagen : avatarDefault}
+            src={getAvatarUrl(user.imagen)}
             alt="Avatar"
             className="w-20 h-20 rounded-full object-cover border border-gray-300 shadow"
           />

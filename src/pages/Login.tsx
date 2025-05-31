@@ -29,9 +29,7 @@ const Login = () => {
 
       const user: Usuario = {
         ...data.user,
-        imagen: data.user.imagen
-          ? `${Global.url}avatar/${data.user.imagen}`
-          : "",
+        imagen: data.user.imagen ?? "",
       };
 
       login(token, user);
@@ -95,7 +93,10 @@ const Login = () => {
             </div>
           </div>
 
-          <button type="submit" className="btn-primary w-full animate-bounce-slow">
+          <button
+            type="submit"
+            className="btn-primary w-full animate-bounce-slow"
+          >
             Entrar
           </button>
         </form>

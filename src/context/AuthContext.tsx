@@ -2,12 +2,10 @@ import React, { useEffect, useState } from "react";
 import { AuthContext } from "./AuthContextDef";
 import type { Usuario } from "../types/Usuario";
 
-// Componente AuthProvider
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<Usuario | null>(null);
   const [token, setToken] = useState<string>("");
 
-  // Verificar si hay datos en localStorage
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
     const storedToken = localStorage.getItem("token");
@@ -33,9 +31,20 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     setToken("");
   };
 
+  const actualizarAvatar = (nuevaImagen: string) => {
+    if (!user) return;
+    const userActualizado = { ...user, imagen: nuevaImagen };
+    setUser(userActualizado);
+    localStorage.setItem("user", JSON.stringify(userActualizado));
+  };
+
   return (
-    <AuthContext.Provider value={{ user, token, login, logout }}>
+    <AuthContext.Provider
+      value={{ user, token, login, logout, actualizarAvatar }}
+    >
       {children}
     </AuthContext.Provider>
   );
 };
+
+export default AuthProvider;

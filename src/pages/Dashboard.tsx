@@ -1,3 +1,4 @@
+// src/pages/Dashboard.tsx
 import { useState } from "react";
 import { useAuth } from "../hooks/useAuth";
 import Topbar from "../components/common/Topbar";
@@ -10,6 +11,8 @@ const Dashboard = () => {
 
   if (!user) return null;
 
+  const avatarUrl = getAvatarUrl(user.imagen); // ✅ normaliza la URL correctamente
+
   return (
     <>
       <Topbar />
@@ -18,11 +21,12 @@ const Dashboard = () => {
           <div className="card-panel animate-slide-up flex flex-col md:flex-row items-start md:items-center gap-6">
             {/* Avatar */}
             <img
-              src={getAvatarUrl(user.imagen)}
+              src={avatarUrl}
               alt="Avatar"
               className="w-20 h-20 rounded-full object-cover border border-gray-300 shadow"
               onError={(e) => {
                 console.error("ERROR: Avatar falló al cargar:", e.currentTarget.src);
+                e.currentTarget.src = "/img/user.png";
               }}
             />
 

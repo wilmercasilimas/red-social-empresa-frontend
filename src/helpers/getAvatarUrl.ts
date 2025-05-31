@@ -1,20 +1,11 @@
-// src/helpers/getAvatarUrl.ts
-import Global from "./Global";
+export const getAvatarUrl = (nombreArchivo?: string): string => {
+  if (!nombreArchivo) return "";
 
-export const getAvatarUrl = (imagen?: string): string => {
-  console.log("🟡 getAvatarUrl INPUT:", imagen);
-
-  if (!imagen || imagen === "default.png") {
-    console.log("🟡 getAvatarUrl RESULT: avatar por defecto");
-    return "/img/user.png"; // ✅ nueva ruta desde public
+  // Si ya es una URL válida, devolverla tal cual
+  if (/^https?:\/\//i.test(nombreArchivo)) {
+    return nombreArchivo;
   }
 
-  if (imagen.startsWith("http")) {
-    console.log("🟡 getAvatarUrl RESULT: ya es URL completa:", imagen);
-    return imagen;
-  }
-
-  const url = `${Global.url}avatar/${imagen}`;
-  console.log("🟡 getAvatarUrl RESULT:", url);
-  return url;
+  // Si es un nombre de archivo, generar URL del backend
+  return `https://red-social-empresa-backend.onrender.com/api/avatar/${nombreArchivo}`;
 };

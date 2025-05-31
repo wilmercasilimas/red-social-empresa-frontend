@@ -84,7 +84,6 @@ const UsuariosAdmin: React.FC = () => {
                       alt="Avatar"
                       className="w-10 h-10 rounded-full object-cover border"
                       onError={(e) => {
-                        console.error("ERROR: Usuario avatar falló:", usuario.imagen);
                         e.currentTarget.src = "/img/user.png";
                       }}
                     />
