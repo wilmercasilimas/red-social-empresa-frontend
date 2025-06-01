@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from "react";
 import type { Area } from "../../types/Area";
+import CrearArea from "./CrearArea";
 
 const AreasAdmin: React.FC = () => {
   const [areas, setAreas] = useState<Area[]>([]);
   const [loading, setLoading] = useState(true);
+  const [mostrarFormulario, setMostrarFormulario] = useState(false);
 
   const obtenerAreas = async () => {
     try {
@@ -36,10 +38,26 @@ const AreasAdmin: React.FC = () => {
 
   return (
     <div className="card-panel animate-slide-up">
-      <h2 className="title-main mb-4 animate-slide-right">Gestión de Áreas</h2>
-      <p className="text-gray-600 mb-4">
-        Aquí puedes ver, editar y eliminar las áreas registradas.
-      </p>
+      <div className="flex justify-between items-center mb-4">
+        <div>
+          <h2 className="title-main animate-slide-right">Gestión de Áreas</h2>
+          <p className="text-gray-600">
+            Aquí puedes ver, editar y eliminar las áreas registradas.
+          </p>
+        </div>
+        <button
+          className="btn-primary animate-bounce-slow"
+          onClick={() => setMostrarFormulario(!mostrarFormulario)}
+        >
+          {mostrarFormulario ? "Cancelar" : "Agregar área"}
+        </button>
+      </div>
+
+      {mostrarFormulario && (
+        <div className="mb-6">
+          <CrearArea onAreaCreada={obtenerAreas} />
+        </div>
+      )}
 
       {loading ? (
         <p className="text-center text-gray-500">Cargando áreas...</p>
