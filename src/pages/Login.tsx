@@ -4,12 +4,12 @@ import { useAuth } from "../hooks/useAuth";
 import { loginService } from "../services/authService";
 import type { Usuario } from "../types/Usuario";
 import Topbar from "../components/common/Topbar";
+import { showToast } from "../helpers/showToast";
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [errorMsg, setErrorMsg] = useState("");
   const navigate = useNavigate();
   const { login } = useAuth();
 
@@ -32,6 +32,7 @@ const Login = () => {
       };
 
       login(data.token, user);
+      showToast("Inicio de sesión exitoso");
       setEmail("");
       setPassword("");
 
@@ -41,7 +42,7 @@ const Login = () => {
         navigate("/dashboard");
       }
     } else {
-      setErrorMsg(data.message || "Error al iniciar sesión");
+      showToast(data.message || "Error al iniciar sesión", "error");
     }
   };
 
@@ -56,10 +57,6 @@ const Login = () => {
           <h2 className="text-2xl font-bold mb-6 text-center animate-slide-right">
             Iniciar sesión
           </h2>
-
-          {errorMsg && (
-            <p className="text-red-500 text-sm text-center mb-4">{errorMsg}</p>
-          )}
 
           <div className="mb-4">
             <label className="form-label">Correo</label>

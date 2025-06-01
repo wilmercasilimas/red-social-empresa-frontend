@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import Global from "../../helpers/Global";
+import { showToast } from "../../helpers/showToast";
 
 interface Props {
   onAreaCreada: () => void;
@@ -10,8 +11,6 @@ const CrearArea: React.FC<Props> = ({ onAreaCreada }) => {
     nombre: "",
     descripcion: "",
   });
-  const [mensaje, setMensaje] = useState("");
-  const [status, setStatus] = useState<"success" | "error" | "">("");
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -20,12 +19,9 @@ const CrearArea: React.FC<Props> = ({ onAreaCreada }) => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setMensaje("");
-    setStatus("");
 
     if (!formData.nombre.trim()) {
-      setStatus("error");
-      setMensaje("El nombre del área es obligatorio.");
+      showToast("El nombre del área es obligatorio.", "error");
       return;
     }
 
@@ -47,30 +43,21 @@ const CrearArea: React.FC<Props> = ({ onAreaCreada }) => {
       const data = await response.json();
 
       if (data.status === "success") {
-        setStatus("success");
-        setMensaje("Área creada correctamente.");
+        showToast("Área creada correctamente");
         setFormData({ nombre: "", descripcion: "" });
-        onAreaCreada(); // ← Recargar lista
+        onAreaCreada();
       } else {
-        setStatus("error");
-        setMensaje(data.message || "Error al crear el área.");
+        showToast(data.message || "Error al crear el área", "error");
       }
     } catch (error) {
       console.error("Error al crear área:", error);
-      setStatus("error");
-      setMensaje("Ocurrió un error inesperado.");
+      showToast("Ocurrió un error inesperado al crear el área", "error");
     }
   };
 
   return (
     <form onSubmit={handleSubmit} className="card-panel p-4 shadow animate-fade-in">
       <h3 className="text-lg font-semibold mb-4">Crear nueva área</h3>
-
-      {mensaje && (
-        <div className={`mb-4 ${status === "success" ? "text-green-600" : "text-red-600"}`}>
-          {mensaje}
-        </div>
-      )}
 
       <div className="grid grid-cols-1 gap-4">
         <input
@@ -82,7 +69,6 @@ const CrearArea: React.FC<Props> = ({ onAreaCreada }) => {
           onChange={handleChange}
           required
         />
-
         <textarea
           name="descripcion"
           placeholder="Descripción (opcional)"
@@ -90,7 +76,7 @@ const CrearArea: React.FC<Props> = ({ onAreaCreada }) => {
           value={formData.descripcion}
           onChange={handleChange}
           rows={3}
-        ></textarea>
+        />
       </div>
 
       <div className="mt-4 flex justify-end">

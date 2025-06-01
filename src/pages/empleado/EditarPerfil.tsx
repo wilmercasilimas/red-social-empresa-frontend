@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useAuth } from "../../hooks/useAuth";
 import { getAvatarUrl } from "../../helpers/getAvatarUrl";
-import { toast } from "react-toastify";
+import { showToast } from "../../helpers/showToast";
 
 interface EditarPerfilProps {
   salirEdicion: () => void;
@@ -24,7 +24,6 @@ const EditarPerfil: React.FC<EditarPerfilProps> = ({ salirEdicion }) => {
     e.preventDefault();
 
     try {
-      // Subir avatar si hay archivo
       if (avatarFile) {
         const formData = new FormData();
         formData.append("file0", avatarFile);
@@ -32,7 +31,7 @@ const EditarPerfil: React.FC<EditarPerfilProps> = ({ salirEdicion }) => {
         const res = await fetch("https://red-social-empresa-backend.onrender.com/api/user/subir", {
           method: "POST",
           headers: {
-            Authorization: token ?? "", // ✅ Corregido
+            Authorization: token ?? "",
           },
           body: formData,
         });
@@ -40,19 +39,18 @@ const EditarPerfil: React.FC<EditarPerfilProps> = ({ salirEdicion }) => {
         const data = await res.json();
         if (data.status === "success") {
           actualizarAvatar?.(data.user.imagen);
-          toast.success("Avatar actualizado correctamente");
+          showToast("Avatar actualizado correctamente");
         } else {
-          toast.error("Error al subir el avatar");
+          showToast("Error al subir el avatar", "error");
         }
       }
 
-      // Cambiar contraseña si ambas están presentes
       if (passwordActual && passwordNueva) {
         const res = await fetch("https://red-social-empresa-backend.onrender.com/api/user/cambiar-password", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            Authorization: token ?? "", // ✅ Corregido
+            Authorization: token ?? "",
           },
           body: JSON.stringify({
             password_actual: passwordActual,
@@ -60,24 +58,22 @@ const EditarPerfil: React.FC<EditarPerfilProps> = ({ salirEdicion }) => {
           }),
         });
 
-        const data = await res.json();
+        const data = await res.json(); // ← esta línea causaba el error
         if (data.status === "success") {
-          toast.success("Contraseña actualizada correctamente");
+          showToast("Contraseña actualizada correctamente");
         } else {
-          toast.error(data.message || "Error al cambiar la contraseña");
+          showToast(data.message || "Error al cambiar la contraseña", "error");
         }
       }
 
-      // Esperar y salir
       setTimeout(() => salirEdicion(), 4000);
     } catch {
-      toast.error("Hubo un error al actualizar el perfil"); // ✅ 'err' eliminado
+      showToast("Hubo un error al actualizar el perfil", "error");
     }
   };
 
   return (
     <form onSubmit={handleSubmit} className="card-panel animate-slide-up space-y-6">
-      {/* Avatar actual */}
       <div className="flex items-center gap-4">
         <img
           src={getAvatarUrl(user?.imagen)}
@@ -87,7 +83,6 @@ const EditarPerfil: React.FC<EditarPerfilProps> = ({ salirEdicion }) => {
         <input type="file" accept="image/*" onChange={handleAvatarChange} />
       </div>
 
-      {/* Contraseña actual */}
       <div>
         <label className="block font-medium">Contraseña actual</label>
         <input
@@ -98,7 +93,6 @@ const EditarPerfil: React.FC<EditarPerfilProps> = ({ salirEdicion }) => {
         />
       </div>
 
-      {/* Nueva contraseña */}
       <div>
         <label className="block font-medium">Nueva contraseña</label>
         <input
@@ -109,7 +103,6 @@ const EditarPerfil: React.FC<EditarPerfilProps> = ({ salirEdicion }) => {
         />
       </div>
 
-      {/* Mostrar / Ocultar contraseña */}
       <div className="flex items-center gap-2">
         <input
           type="checkbox"
@@ -120,7 +113,6 @@ const EditarPerfil: React.FC<EditarPerfilProps> = ({ salirEdicion }) => {
         <label htmlFor="ver-password" className="text-sm">Mostrar contraseñas</label>
       </div>
 
-      {/* Botones */}
       <div className="flex gap-4">
         <button type="submit" className="btn-primary">
           Guardar cambios

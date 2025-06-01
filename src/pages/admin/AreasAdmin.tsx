@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from "react";
 import type { Area } from "../../types/Area";
 import CrearArea from "./CrearArea";
+import EditarArea from "./EditarArea";
 
 const AreasAdmin: React.FC = () => {
   const [areas, setAreas] = useState<Area[]>([]);
   const [loading, setLoading] = useState(true);
   const [mostrarFormulario, setMostrarFormulario] = useState(false);
+  const [areaSeleccionada, setAreaSeleccionada] = useState<Area | null>(null);
 
   const obtenerAreas = async () => {
     try {
@@ -73,7 +75,10 @@ const AreasAdmin: React.FC = () => {
         </div>
         <button
           className="btn-primary animate-bounce-slow"
-          onClick={() => setMostrarFormulario(!mostrarFormulario)}
+          onClick={() => {
+            setMostrarFormulario(!mostrarFormulario);
+            setAreaSeleccionada(null);
+          }}
         >
           {mostrarFormulario ? "Cancelar" : "Agregar área"}
         </button>
@@ -82,6 +87,19 @@ const AreasAdmin: React.FC = () => {
       {mostrarFormulario && (
         <div className="mb-6">
           <CrearArea onAreaCreada={obtenerAreas} />
+        </div>
+      )}
+
+      {areaSeleccionada && (
+        <div className="mb-6">
+          <EditarArea
+            area={areaSeleccionada}
+            onAreaActualizada={() => {
+              setAreaSeleccionada(null);
+              obtenerAreas();
+            }}
+            onCancelar={() => setAreaSeleccionada(null)}
+          />
         </div>
       )}
 
@@ -103,7 +121,15 @@ const AreasAdmin: React.FC = () => {
                   <td className="py-2 px-4">{area.nombre}</td>
                   <td className="py-2 px-4">{area.descripcion}</td>
                   <td className="py-2 px-4 text-center space-x-2">
-                    <button className="btn-primary text-sm">Editar</button>
+                    <button
+                      className="btn-primary text-sm"
+                      onClick={() => {
+                        setAreaSeleccionada(area);
+                        setMostrarFormulario(false);
+                      }}
+                    >
+                      Editar
+                    </button>
                     <button
                       className="btn-danger text-sm"
                       onClick={() => handleEliminarArea(area._id)}

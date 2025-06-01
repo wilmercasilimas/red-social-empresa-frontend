@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import Global from "../../helpers/Global";
-import { toast } from "react-toastify";
+import { showToast } from "../../helpers/showToast";
 
 interface Area {
   _id: string;
@@ -82,18 +82,18 @@ const EditarUsuario: React.FC<Props> = ({ usuario, onUsuarioActualizado, onCance
       if (data.status === "success") {
         setStatus("success");
         setMensaje("Usuario actualizado correctamente.");
-        toast.success("Usuario actualizado correctamente");
+        showToast("Usuario actualizado correctamente");
         onUsuarioActualizado();
       } else {
         setStatus("error");
         setMensaje(data.message || "Error al actualizar usuario.");
-        toast.error(data.message || "Error al actualizar usuario.");
+        showToast(data.message || "Error al actualizar usuario", "error");
       }
     } catch (error) {
       console.error("Error al actualizar:", error);
       setStatus("error");
       setMensaje("Ocurrió un error inesperado.");
-      toast.error("Error inesperado al actualizar");
+      showToast("Error inesperado al actualizar", "error");
     }
   };
 

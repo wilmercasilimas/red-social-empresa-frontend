@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import Global from "../../helpers/Global";
+import { showToast } from "../../helpers/showToast";
 
 interface Area {
   _id: string;
@@ -23,8 +24,6 @@ const AgregarUsuario: React.FC<Props> = ({ onUsuarioAgregado }) => {
 
   const [areas, setAreas] = useState<Area[]>([]);
   const [mostrarPassword, setMostrarPassword] = useState(false);
-  const [mensaje, setMensaje] = useState("");
-  const [status, setStatus] = useState<"success" | "error" | "">("");
 
   useEffect(() => {
     const obtenerAreas = async () => {
@@ -41,6 +40,7 @@ const AgregarUsuario: React.FC<Props> = ({ onUsuarioAgregado }) => {
         }
       } catch (error) {
         console.error("Error al cargar áreas:", error);
+        showToast("Error al cargar las áreas", "error");
       }
     };
 
@@ -54,8 +54,6 @@ const AgregarUsuario: React.FC<Props> = ({ onUsuarioAgregado }) => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setMensaje("");
-    setStatus("");
 
     try {
       const token = localStorage.getItem("token");
@@ -72,8 +70,7 @@ const AgregarUsuario: React.FC<Props> = ({ onUsuarioAgregado }) => {
       const data = await response.json();
 
       if (data.status === "success") {
-        setStatus("success");
-        setMensaje("Usuario registrado exitosamente.");
+        showToast("Usuario registrado exitosamente");
         setFormData({
           nombre: "",
           apellidos: "",
@@ -85,25 +82,17 @@ const AgregarUsuario: React.FC<Props> = ({ onUsuarioAgregado }) => {
         });
         onUsuarioAgregado();
       } else {
-        setStatus("error");
-        setMensaje(data.message || "Error al registrar usuario.");
+        showToast(data.message || "Error al registrar usuario", "error");
       }
     } catch (error) {
       console.error("Error en el registro:", error);
-      setStatus("error");
-      setMensaje("Ocurrió un error inesperado.");
+      showToast("Ocurrió un error inesperado", "error");
     }
   };
 
   return (
     <form onSubmit={handleSubmit} className="card-panel p-4 shadow animate-fade-in">
       <h3 className="text-lg font-semibold mb-4">Agregar nuevo usuario</h3>
-
-      {mensaje && (
-        <div className={`mb-4 ${status === "success" ? "text-green-600" : "text-red-600"}`}>
-          {mensaje}
-        </div>
-      )}
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <input
