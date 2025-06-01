@@ -32,6 +32,32 @@ const AreasAdmin: React.FC = () => {
     }
   };
 
+  const handleEliminarArea = async (id: string) => {
+    const confirmar = window.confirm("¿Estás seguro de eliminar esta área?");
+    if (!confirmar) return;
+
+    try {
+      const token = localStorage.getItem("token");
+      const response = await fetch(
+        `https://red-social-empresa-backend.onrender.com/api/area/eliminar/${id}`,
+        {
+          method: "DELETE",
+          headers: { Authorization: token || "" },
+        }
+      );
+      const data = await response.json();
+
+      if (data.status === "success") {
+        setAreas((prev) => prev.filter((a) => a._id !== id));
+        console.log("✅ Área eliminada correctamente");
+      } else {
+        console.error("❌ Error al eliminar área:", data.message);
+      }
+    } catch (error) {
+      console.error("❌ Error en la solicitud DELETE:", error);
+    }
+  };
+
   useEffect(() => {
     obtenerAreas();
   }, []);
@@ -78,7 +104,12 @@ const AreasAdmin: React.FC = () => {
                   <td className="py-2 px-4">{area.descripcion}</td>
                   <td className="py-2 px-4 text-center space-x-2">
                     <button className="btn-primary text-sm">Editar</button>
-                    <button className="btn-danger text-sm">Eliminar</button>
+                    <button
+                      className="btn-danger text-sm"
+                      onClick={() => handleEliminarArea(area._id)}
+                    >
+                      Eliminar
+                    </button>
                   </td>
                 </tr>
               ))}
