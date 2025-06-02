@@ -7,6 +7,8 @@ import EditarPerfil from "./empleado/EditarPerfil";
 
 const Dashboard = () => {
   const { user } = useAuth();
+  console.log("🟢 Imagen recibida del backend (Dashboard):", user?.imagen);
+
   const [modoEdicion, setModoEdicion] = useState(false);
 
   if (!user) return null;
@@ -44,7 +46,11 @@ const Dashboard = () => {
               </p>
               <p>
                 <strong>Área:</strong>{" "}
-                {typeof user.area === "object" ? user.area.nombre : user.area}
+                {user.area && typeof user.area === "object"
+                  ? user.area.nombre
+                  : typeof user.area === "string"
+                  ? user.area
+                  : "Sin área"}
               </p>
               <p>
                 <strong>Rol:</strong>{" "}

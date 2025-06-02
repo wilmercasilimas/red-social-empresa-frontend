@@ -79,18 +79,19 @@ const UsuariosAdmin: React.FC = () => {
         </button>
       </div>
 
-      {/* Formulario de agregar nuevo */}
       {mostrarFormulario && (
         <div className="mb-6">
           <AgregarUsuario onUsuarioAgregado={obtenerUsuarios} />
         </div>
       )}
 
-      {/* Formulario de edición */}
       {usuarioEditando && (
         <div className="mb-6">
           <EditarUsuario
-            usuario={usuarioEditando}
+            usuario={{
+              ...usuarioEditando,
+              area: usuarioEditando.area ?? { _id: "", nombre: "Sin área" },
+            }}
             onUsuarioActualizado={() => {
               setUsuarioEditando(null);
               obtenerUsuarios();
@@ -112,60 +113,90 @@ const UsuariosAdmin: React.FC = () => {
                 <th className="py-2 px-4">Cargo</th>
                 <th className="py-2 px-4">Área</th>
                 <th className="py-2 px-4">Rol</th>
+                <th className="py-2 px-4">Activo</th>
+                <th className="py-2 px-4">Ingreso</th>
+                <th className="py-2 px-4">Creado</th>
                 <th className="py-2 px-4 text-center">Acciones</th>
               </tr>
             </thead>
             <tbody>
-              {usuarios.map((usuario) => (
-                <tr key={usuario._id} className="hover:bg-gray-100 transition">
-                  <td className="py-2 px-4 flex items-center gap-3">
-                    <img
-                      src={getAvatarUrl(usuario.imagen)}
-                      alt="Avatar"
-                      className="w-10 h-10 rounded-full object-cover border"
-                      onError={(e) => {
-                        e.currentTarget.src = "/img/user.png";
-                      }}
-                    />
-                    <span>
-                      {usuario.nombre} {usuario.apellidos}
-                    </span>
-                  </td>
-                  <td className="py-2 px-4">{usuario.email}</td>
-                  <td className="py-2 px-4">{usuario.cargo}</td>
-                  <td className="py-2 px-4">
-                    {usuario.area?.nombre || "Sin área"}
-                  </td>
-                  <td className="py-2 px-4">
-                    <span
-                      className={`badge ${
-                        usuario.rol === "admin"
-                          ? "bg-blue-100 text-blue-700"
-                          : "bg-green-100 text-green-700"
-                      }`}
-                    >
-                      {usuario.rol}
-                    </span>
-                  </td>
-                  <td className="py-2 px-4 text-center space-x-2">
-                    <button
-                      className="btn-primary text-sm"
-                      onClick={() => {
-                        setUsuarioEditando(usuario);
-                        setMostrarFormulario(false);
-                      }}
-                    >
-                      Editar
-                    </button>
-                    <button
-                      className="btn-danger text-sm"
-                      onClick={() => handleEliminarUsuario(usuario._id)}
-                    >
-                      Eliminar
-                    </button>
-                  </td>
-                </tr>
-              ))}
+              {usuarios.map((usuario) => {
+                console.log("🟡 Usuario recibido:", usuario); // 👈 Diagnóstico
+                return (
+                  <tr
+                    key={usuario._id}
+                    className="hover:bg-gray-100 transition"
+                  >
+                    <td className="py-2 px-4 flex items-center gap-3">
+                      <img
+                        src={getAvatarUrl(usuario.imagen ?? "")}
+                        alt="Avatar"
+                        className="w-10 h-10 rounded-full object-cover border"
+                        onError={(e) => {
+                          e.currentTarget.src = "/img/user.png";
+                        }}
+                      />
+                      <span>
+                        {usuario.nombre} {usuario.apellidos}
+                      </span>
+                    </td>
+                    <td className="py-2 px-4">{usuario.email}</td>
+                    <td className="py-2 px-4">{usuario.cargo}</td>
+                    <td className="py-2 px-4">
+                      {usuario.area?.nombre || "Sin área"}
+                    </td>
+                    <td className="py-2 px-4">
+                      <span
+                        className={`badge ${
+                          usuario.rol === "admin"
+                            ? "bg-blue-100 text-blue-700"
+                            : "bg-green-100 text-green-700"
+                        }`}
+                      >
+                        {usuario.rol}
+                      </span>
+                    </td>
+                    <td className="py-2 px-4">
+                      <span
+                        className={`badge ${
+                          usuario.activo
+                            ? "bg-green-100 text-green-700"
+                            : "bg-red-100 text-red-700"
+                        }`}
+                      >
+                        {usuario.activo ? "Activo" : "Inactivo"}
+                      </span>
+                    </td>
+                    <td className="py-2 px-4">
+                      {usuario.fecha_ingreso
+                        ? new Date(usuario.fecha_ingreso).toLocaleDateString()
+                        : "No disponible"}
+                    </td>
+                    <td className="py-2 px-4">
+                      {usuario.creado_en
+                        ? new Date(usuario.creado_en).toLocaleDateString()
+                        : "No disponible"}
+                    </td>
+                    <td className="py-2 px-4 text-center space-x-2">
+                      <button
+                        className="btn-primary text-sm"
+                        onClick={() => {
+                          setUsuarioEditando(usuario);
+                          setMostrarFormulario(false);
+                        }}
+                      >
+                        Editar
+                      </button>
+                      <button
+                        className="btn-danger text-sm"
+                        onClick={() => handleEliminarUsuario(usuario._id)}
+                      >
+                        Eliminar
+                      </button>
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>

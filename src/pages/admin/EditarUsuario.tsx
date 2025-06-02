@@ -16,6 +16,8 @@ interface Usuario {
   cargo: string;
   area: Area;
   rol: string;
+  activo?: boolean;
+  fecha_ingreso?: string;
 }
 
 interface Props {
@@ -25,7 +27,11 @@ interface Props {
 }
 
 const EditarUsuario: React.FC<Props> = ({ usuario, onUsuarioActualizado, onCancelar }) => {
-  const [formData, setFormData] = useState({ ...usuario });
+  const [formData, setFormData] = useState({
+    ...usuario,
+    activo: usuario.activo ?? true,
+    fecha_ingreso: usuario.fecha_ingreso ?? "",
+  });
   const [areas, setAreas] = useState<Area[]>([]);
   const [mensaje, setMensaje] = useState("");
   const [status, setStatus] = useState<"success" | "error" | "">("");
@@ -48,8 +54,13 @@ const EditarUsuario: React.FC<Props> = ({ usuario, onUsuarioActualizado, onCance
   }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
+    const { name, value, type } = e.target;
+
+    if (type === "checkbox") {
+      setFormData({ ...formData, [name]: (e.target as HTMLInputElement).checked });
+    } else {
+      setFormData({ ...formData, [name]: value });
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -65,6 +76,8 @@ const EditarUsuario: React.FC<Props> = ({ usuario, onUsuarioActualizado, onCance
         cargo: formData.cargo,
         area: formData.area?._id || "",
         rol: formData.rol,
+        activo: formData.activo,
+        fecha_ingreso: formData.fecha_ingreso,
       };
 
       const token = localStorage.getItem("token");
@@ -171,6 +184,22 @@ const EditarUsuario: React.FC<Props> = ({ usuario, onUsuarioActualizado, onCance
           <option value="gerente">Gerente</option>
           <option value="admin">Administrador</option>
         </select>
+        <input
+          type="date"
+          name="fecha_ingreso"
+          className="input-field"
+          value={formData.fecha_ingreso?.substring(0, 10) || ""}
+          onChange={handleChange}
+        />
+        <label className="flex items-center gap-2">
+          <input
+            type="checkbox"
+            name="activo"
+            checked={formData.activo}
+            onChange={handleChange}
+          />
+          Activo
+        </label>
       </div>
 
       <div className="mt-4 flex justify-between">

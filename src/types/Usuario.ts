@@ -8,7 +8,10 @@ export type Usuario = {
     _id: string;
     nombre: string;
     descripcion?: string;
-  };
+  } | null;
   rol: string;
   imagen?: string;
+  activo?: boolean;
+  fecha_ingreso?: string; // ISO string (ej. "2025-06-01T15:00:00.000Z")
+  creado_en?: string;     // Fecha de creación automática
 };

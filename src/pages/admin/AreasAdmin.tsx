@@ -2,28 +2,35 @@ import React, { useEffect, useState } from "react";
 import type { Area } from "../../types/Area";
 import CrearArea from "./CrearArea";
 import EditarArea from "./EditarArea";
+import { showToast } from "../../helpers/showToast";
+
+interface Empleado {
+  _id: string;
+  nombre: string;
+  apellidos: string;
+  email: string;
+  cargo?: string;
+}
 
 const AreasAdmin: React.FC = () => {
   const [areas, setAreas] = useState<Area[]>([]);
   const [loading, setLoading] = useState(true);
   const [mostrarFormulario, setMostrarFormulario] = useState(false);
   const [areaSeleccionada, setAreaSeleccionada] = useState<Area | null>(null);
+  const [areaExpandidaId, setAreaExpandidaId] = useState<string | null>(null);
+  const [detalleEmpleados, setDetalleEmpleados] = useState<Empleado[]>([]);
+  const [loadingDetalle, setLoadingDetalle] = useState(false);
 
   const obtenerAreas = async () => {
     try {
       const token = localStorage.getItem("token");
-
       const response = await fetch(
         "https://red-social-empresa-backend.onrender.com/api/area/listar",
         {
-          headers: {
-            Authorization: token || "",
-          },
+          headers: { Authorization: token || "" },
         }
       );
-
       const data = await response.json();
-
       if (data.status === "success") {
         setAreas(data.areas);
       }
@@ -31,6 +38,30 @@ const AreasAdmin: React.FC = () => {
       console.error("Error al obtener áreas:", error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const obtenerDetalleArea = async (id: string) => {
+    try {
+      setLoadingDetalle(true);
+      const token = localStorage.getItem("token");
+      const response = await fetch(
+        `https://red-social-empresa-backend.onrender.com/api/area/detalle/${id}`,
+        {
+          headers: { Authorization: token || "" },
+        }
+      );
+      const data = await response.json();
+      if (data.status === "success") {
+        setDetalleEmpleados(data.empleados || []);
+        setAreaExpandidaId(id);
+      } else {
+        showToast(data.message || "Error al obtener detalle del área", "error");
+      }
+    } catch (error) {
+      console.error("Error al obtener detalle del área:", error);
+    } finally {
+      setLoadingDetalle(false);
     }
   };
 
@@ -51,12 +82,22 @@ const AreasAdmin: React.FC = () => {
 
       if (data.status === "success") {
         setAreas((prev) => prev.filter((a) => a._id !== id));
-        console.log("✅ Área eliminada correctamente");
+        showToast("Área eliminada correctamente");
+        if (areaExpandidaId === id) setAreaExpandidaId(null);
       } else {
-        console.error("❌ Error al eliminar área:", data.message);
+        showToast(data.message || "Error al eliminar área", "error");
       }
     } catch (error) {
-      console.error("❌ Error en la solicitud DELETE:", error);
+      console.error("Error al eliminar área:", error);
+    }
+  };
+
+  const toggleExpand = (id: string) => {
+    if (areaExpandidaId === id) {
+      setAreaExpandidaId(null);
+      setDetalleEmpleados([]);
+    } else {
+      obtenerDetalleArea(id);
     }
   };
 
@@ -110,34 +151,75 @@ const AreasAdmin: React.FC = () => {
           <table className="min-w-full text-left border border-gray-200 shadow rounded">
             <thead className="bg-blue-600 text-white">
               <tr>
-                <th className="py-2 px-4">Nombre del Área</th>
+                <th className="py-2 px-4">Nombre</th>
                 <th className="py-2 px-4">Descripción</th>
+                <th className="py-2 px-4">Creado en</th>
+                <th className="py-2 px-4">Estado</th>
                 <th className="py-2 px-4 text-center">Acciones</th>
               </tr>
             </thead>
             <tbody>
               {areas.map((area) => (
-                <tr key={area._id} className="hover:bg-gray-100 transition">
-                  <td className="py-2 px-4">{area.nombre}</td>
-                  <td className="py-2 px-4">{area.descripcion}</td>
-                  <td className="py-2 px-4 text-center space-x-2">
-                    <button
-                      className="btn-primary text-sm"
-                      onClick={() => {
-                        setAreaSeleccionada(area);
-                        setMostrarFormulario(false);
-                      }}
-                    >
-                      Editar
-                    </button>
-                    <button
-                      className="btn-danger text-sm"
-                      onClick={() => handleEliminarArea(area._id)}
-                    >
-                      Eliminar
-                    </button>
-                  </td>
-                </tr>
+                <React.Fragment key={area._id}>
+                  <tr
+                    onClick={() => toggleExpand(area._id)}
+                    className="hover:bg-gray-100 transition cursor-pointer"
+                  >
+                    <td className="py-2 px-4">{area.nombre}</td>
+                    <td className="py-2 px-4">{area.descripcion}</td>
+                    <td className="py-2 px-4 text-sm text-gray-600">
+                      {new Date(area.creado_en).toLocaleDateString()}
+                    </td>
+                    <td className="py-2 px-4">
+                      {area.activa ? (
+                        <span className="text-green-600 font-semibold">Activa</span>
+                      ) : (
+                        <span className="text-red-500 font-semibold">Inactiva</span>
+                      )}
+                    </td>
+                    <td className="py-2 px-4 text-center space-x-2">
+                      <button
+                        className="btn-primary text-sm"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setAreaSeleccionada(area);
+                          setMostrarFormulario(false);
+                        }}
+                      >
+                        Editar
+                      </button>
+                      <button
+                        className="btn-danger text-sm"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleEliminarArea(area._id);
+                        }}
+                      >
+                        Eliminar
+                      </button>
+                    </td>
+                  </tr>
+
+                  {areaExpandidaId === area._id && (
+                    <tr>
+                      <td colSpan={5} className="bg-gray-50 px-4 py-2">
+                        {loadingDetalle ? (
+                          <p className="text-sm text-gray-500">Cargando empleados...</p>
+                        ) : detalleEmpleados.length > 0 ? (
+                          <ul className="list-disc ml-6">
+                            {detalleEmpleados.map((emp) => (
+                              <li key={emp._id}>
+                                {emp.nombre} {emp.apellidos} – {emp.email} ({emp.cargo || "Sin cargo"})
+                              </li>
+                            ))}
+                          </ul>
+                        ) : (
+                          <p className="text-sm text-gray-500">No hay empleados en esta área.</p>
+                        )}
+                      </td>
+                    </tr>
+                  )}
+                </React.Fragment>
               ))}
             </tbody>
           </table>
