@@ -168,13 +168,17 @@ const AreasAdmin: React.FC = () => {
                     <td className="py-2 px-4">{area.nombre}</td>
                     <td className="py-2 px-4">{area.descripcion}</td>
                     <td className="py-2 px-4 text-sm text-gray-600">
-                      {new Date(area.creado_en).toLocaleDateString()}
+                      {new Date(area.creado_en).toLocaleDateString("es-ES")}
                     </td>
                     <td className="py-2 px-4">
                       {area.activa ? (
-                        <span className="text-green-600 font-semibold">Activa</span>
+                        <span className="text-green-600 font-semibold">
+                          Activa
+                        </span>
                       ) : (
-                        <span className="text-red-500 font-semibold">Inactiva</span>
+                        <span className="text-red-500 font-semibold">
+                          Inactiva
+                        </span>
                       )}
                     </td>
                     <td className="py-2 px-4 text-center space-x-2">
@@ -204,17 +208,22 @@ const AreasAdmin: React.FC = () => {
                     <tr>
                       <td colSpan={5} className="bg-gray-50 px-4 py-2">
                         {loadingDetalle ? (
-                          <p className="text-sm text-gray-500">Cargando empleados...</p>
+                          <p className="text-sm text-gray-500">
+                            Cargando empleados...
+                          </p>
                         ) : detalleEmpleados.length > 0 ? (
                           <ul className="list-disc ml-6">
                             {detalleEmpleados.map((emp) => (
                               <li key={emp._id}>
-                                {emp.nombre} {emp.apellidos} – {emp.email} ({emp.cargo || "Sin cargo"})
+                                {emp.nombre} {emp.apellidos} – {emp.email} (
+                                {emp.cargo || "Sin cargo"})
                               </li>
                             ))}
                           </ul>
                         ) : (
-                          <p className="text-sm text-gray-500">No hay empleados en esta área.</p>
+                          <p className="text-sm text-gray-500">
+                            No hay empleados en esta área.
+                          </p>
                         )}
                       </td>
                     </tr>

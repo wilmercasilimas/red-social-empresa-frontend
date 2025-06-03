@@ -5,6 +5,7 @@ import AgregarUsuario from "./AgregarUsuario";
 import EditarUsuario from "./EditarUsuario";
 import { getAvatarUrl } from "../../helpers/getAvatarUrl";
 import { Info } from "lucide-react";
+import { formatFecha } from "../../helpers/formatFecha";
 
 const UsuariosAdmin: React.FC = () => {
   const [usuarios, setUsuarios] = useState<Usuario[]>([]);
@@ -163,21 +164,29 @@ const UsuariosAdmin: React.FC = () => {
                           <span className="badge bg-yellow-100 text-yellow-800">
                             Ausente
                           </span>
-                          <div className="relative group cursor-pointer">
-                            <Info className="w-4 h-4 text-gray-500" />
+                          <span
+                            className="relative group cursor-pointer"
+                            aria-hidden="true"
+                          >
+                            <Info
+                              className="w-4 h-4 text-gray-500"
+                              focusable="false"
+                            />
                             <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 hidden group-hover:block bg-white text-gray-800 border border-gray-300 rounded p-2 shadow text-xs z-10 whitespace-nowrap">
-                              {usuario.incidencias_activas
-                                ?.map(
-                                  (i) =>
-                                    `${i.tipo}: ${new Date(
-                                      i.fecha_inicio
-                                    ).toLocaleDateString()} - ${new Date(
-                                      i.fecha_fin
-                                    ).toLocaleDateString()}`
-                                )
-                                .join(", ")}
+                              {usuario.incidencias_activas?.map((i, idx) => (
+                                <div key={idx}>
+                                  <span className="font-semibold">
+                                    {i.tipo}
+                                  </span>
+                                  :{" "}
+                                  <span>
+                                    {formatFecha(i.fecha_inicio)} -{" "}
+                                    {formatFecha(i.fecha_fin)}
+                                  </span>
+                                </div>
+                              ))}
                             </div>
-                          </div>
+                          </span>
                         </div>
                       ) : (
                         <span
@@ -191,14 +200,15 @@ const UsuariosAdmin: React.FC = () => {
                         </span>
                       )}
                     </td>
+
                     <td className="py-2 px-4">
                       {usuario.fecha_ingreso
-                        ? new Date(usuario.fecha_ingreso).toLocaleDateString()
+                        ? formatFecha(usuario.fecha_ingreso)
                         : "No disponible"}
                     </td>
                     <td className="py-2 px-4">
                       {usuario.creado_en
-                        ? new Date(usuario.creado_en).toLocaleDateString()
+                        ? formatFecha(usuario.creado_en)
                         : "No disponible"}
                     </td>
                     <td className="py-2 px-4 text-center space-x-2">

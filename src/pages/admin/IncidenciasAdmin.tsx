@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { showToast } from "../../components/common/ui/showToast";
 import FormularioIncidencia from "../../components/common/incidencias/FormularioIncidencia";
+import { formatFecha } from "../../helpers/formatFecha"; // ✅ Importar helper
 
 interface Usuario {
   nombre: string;
@@ -120,12 +121,8 @@ const IncidenciasAdmin: React.FC = () => {
                   {incidencia.usuario?.nombre} {incidencia.usuario?.apellidos}
                 </td>
                 <td className="p-2 border capitalize">{incidencia.tipo}</td>
-                <td className="p-2 border">
-                  {new Date(incidencia.fecha_inicio).toLocaleDateString()}
-                </td>
-                <td className="p-2 border">
-                  {new Date(incidencia.fecha_fin).toLocaleDateString()}
-                </td>
+                <td className="p-2 border">{formatFecha(incidencia.fecha_inicio)}</td>
+                <td className="p-2 border">{formatFecha(incidencia.fecha_fin)}</td>
                 <td className="p-2 border">
                   {incidencia.asignada_por?.nombre} {incidencia.asignada_por?.apellidos}
                 </td>

@@ -42,14 +42,23 @@ const FormularioIncidencia: React.FC<Props> = ({ onIncidenciaCreada }) => {
     e.preventDefault();
     try {
       const token = localStorage.getItem("token");
+
+      const payload = {
+        ...form,
+        // ✅ Evitar toISOString: usar string con hora fija
+        fecha_inicio: `${form.fecha_inicio}T12:00:00`,
+        fecha_fin: `${form.fecha_fin}T23:59:59`,
+      };
+
       const response = await fetch("https://red-social-empresa-backend.onrender.com/api/incidencia/crear", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           Authorization: token || "",
         },
-        body: JSON.stringify(form),
+        body: JSON.stringify(payload),
       });
+
       const data = await response.json();
       if (data.status === "success") {
         showToast("Incidencia registrada", "success");
@@ -94,17 +103,34 @@ const FormularioIncidencia: React.FC<Props> = ({ onIncidenciaCreada }) => {
 
       <div>
         <label className="block font-medium">Descripción:</label>
-        <textarea name="descripcion" value={form.descripcion} onChange={handleChange} className="w-full p-2 border rounded" />
+        <textarea
+          name="descripcion"
+          value={form.descripcion}
+          onChange={handleChange}
+          className="w-full p-2 border rounded"
+        />
       </div>
 
       <div>
         <label className="block font-medium">Fecha inicio:</label>
-        <input type="date" name="fecha_inicio" value={form.fecha_inicio} onChange={handleChange} className="w-full p-2 border rounded" />
+        <input
+          type="date"
+          name="fecha_inicio"
+          value={form.fecha_inicio}
+          onChange={handleChange}
+          className="w-full p-2 border rounded"
+        />
       </div>
 
       <div>
         <label className="block font-medium">Fecha fin:</label>
-        <input type="date" name="fecha_fin" value={form.fecha_fin} onChange={handleChange} className="w-full p-2 border rounded" />
+        <input
+          type="date"
+          name="fecha_fin"
+          value={form.fecha_fin}
+          onChange={handleChange}
+          className="w-full p-2 border rounded"
+        />
       </div>
 
       <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
