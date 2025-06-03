@@ -1,10 +1,13 @@
-import React from "react";
+// ✅ src/pages/EmpleadoPanel.tsx completamente corregido
+import React, { useState } from "react";
 import { useAuth } from "../hooks/useAuth";
 import Topbar from "../components/common/Topbar";
-import { getAvatarUrl } from "../helpers/getAvatarUrl"; // ✅ función reutilizable
+import { getAvatarUrl } from "../helpers/getAvatarUrl";
+import EditarPerfil from "./empleado/EditarPerfil";
 
 const EmpleadoPanel: React.FC = () => {
   const { user } = useAuth();
+  const [modoEdicion, setModoEdicion] = useState(false);
 
   if (!user) return null;
 
@@ -12,38 +15,37 @@ const EmpleadoPanel: React.FC = () => {
     <>
       <Topbar />
       <div className="min-h-screen bg-gray-100 p-8 fade-in">
-        <div className="card-panel animate-slide-up flex items-center gap-6">
-          {/* Avatar del usuario */}
-          <img
-            src={getAvatarUrl(user.imagen)}
-            alt="Avatar"
-            className="w-20 h-20 rounded-full object-cover border border-gray-300 shadow"
-          />
+        {!modoEdicion ? (
+          <div className="card-panel animate-slide-up flex flex-col md:flex-row items-start md:items-center gap-6">
+            <img
+              src={getAvatarUrl(user.imagen)}
+              alt="Avatar"
+              className="w-20 h-20 rounded-full object-cover border border-gray-300 shadow"
+            />
 
-          {/* Información */}
-          <div>
-            <h1 className="title-main mb-4 animate-slide-up-slow">
-              Panel del Empleado
-            </h1>
-            <p>
-              <strong>Bienvenido:</strong> {user.nombre} {user.apellidos}
-            </p>
-            <p>
-              <strong>Cargo:</strong> {user.cargo}
-            </p>
-            <p>
-              <strong>Área:</strong>{" "}
-              {typeof user.area === "object" ? user.area.nombre : user.area}
-            </p>
+            <div className="flex-1">
+              <h1 className="title-main mb-4 animate-slide-up-slow">Panel del Empleado</h1>
+              <p><strong>Nombre:</strong> {user.nombre} {user.apellidos}</p>
+              <p><strong>Correo:</strong> {user.email}</p>
+              <p><strong>Cargo:</strong> {user.cargo}</p>
+              <p>
+                <strong>Área:</strong>{" "}
+                {user.area && typeof user.area === "object"
+                  ? user.area.nombre
+                  : typeof user.area === "string"
+                  ? user.area
+                  : "Sin área"}
+              </p>
+              <p><strong>Rol:</strong> <span className="badge bg-green-100 text-green-700">{user.rol}</span></p>
+            </div>
 
-            <p>
-              <strong>Rol:</strong>{" "}
-              <span className="badge bg-green-100 text-green-700">
-                {user.rol}
-              </span>
-            </p>
+            <button onClick={() => setModoEdicion(true)} className="btn-primary">
+              Editar perfil
+            </button>
           </div>
-        </div>
+        ) : (
+          <EditarPerfil salirEdicion={() => setModoEdicion(false)} />
+        )}
       </div>
     </>
   );

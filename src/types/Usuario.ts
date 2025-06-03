@@ -13,5 +13,11 @@ export type Usuario = {
   imagen?: string;
   activo?: boolean;
   fecha_ingreso?: string; // ISO string (ej. "2025-06-01T15:00:00.000Z")
-  creado_en?: string;     // Fecha de creación automática
+  creado_en?: string;
+
+  incidencias_activas?: {
+    tipo: string;
+    fecha_inicio: string;
+    fecha_fin: string;
+  }[]; // Fecha de creación automática
 };

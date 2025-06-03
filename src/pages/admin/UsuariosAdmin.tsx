@@ -1,8 +1,10 @@
+// src/pages/UsuariosAdmin.tsx
 import React, { useEffect, useState } from "react";
 import type { Usuario } from "../../types/Usuario";
 import AgregarUsuario from "./AgregarUsuario";
 import EditarUsuario from "./EditarUsuario";
 import { getAvatarUrl } from "../../helpers/getAvatarUrl";
+import { Info } from "lucide-react";
 
 const UsuariosAdmin: React.FC = () => {
   const [usuarios, setUsuarios] = useState<Usuario[]>([]);
@@ -44,9 +46,6 @@ const UsuariosAdmin: React.FC = () => {
       const data = await response.json();
       if (data.status === "success") {
         setUsuarios((prev) => prev.filter((u) => u._id !== id));
-        console.log("✅ Usuario eliminado correctamente");
-      } else {
-        console.error("❌ Error al eliminar usuario:", data.message);
       }
     } catch (error) {
       console.error("❌ Error en la solicitud DELETE:", error);
@@ -121,7 +120,9 @@ const UsuariosAdmin: React.FC = () => {
             </thead>
             <tbody>
               {usuarios.map((usuario) => {
-                console.log("🟡 Usuario recibido:", usuario); // 👈 Diagnóstico
+                const estaAusente =
+                  usuario.incidencias_activas &&
+                  usuario.incidencias_activas.length > 0;
                 return (
                   <tr
                     key={usuario._id}
@@ -157,15 +158,38 @@ const UsuariosAdmin: React.FC = () => {
                       </span>
                     </td>
                     <td className="py-2 px-4">
-                      <span
-                        className={`badge ${
-                          usuario.activo
-                            ? "bg-green-100 text-green-700"
-                            : "bg-red-100 text-red-700"
-                        }`}
-                      >
-                        {usuario.activo ? "Activo" : "Inactivo"}
-                      </span>
+                      {estaAusente ? (
+                        <div className="flex items-center gap-1">
+                          <span className="badge bg-yellow-100 text-yellow-800">
+                            Ausente
+                          </span>
+                          <div className="relative group cursor-pointer">
+                            <Info className="w-4 h-4 text-gray-500" />
+                            <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 hidden group-hover:block bg-white text-gray-800 border border-gray-300 rounded p-2 shadow text-xs z-10 whitespace-nowrap">
+                              {usuario.incidencias_activas
+                                ?.map(
+                                  (i) =>
+                                    `${i.tipo}: ${new Date(
+                                      i.fecha_inicio
+                                    ).toLocaleDateString()} - ${new Date(
+                                      i.fecha_fin
+                                    ).toLocaleDateString()}`
+                                )
+                                .join(", ")}
+                            </div>
+                          </div>
+                        </div>
+                      ) : (
+                        <span
+                          className={`badge ${
+                            usuario.activo
+                              ? "bg-green-100 text-green-700"
+                              : "bg-red-100 text-red-700"
+                          }`}
+                        >
+                          {usuario.activo ? "Activo" : "Inactivo"}
+                        </span>
+                      )}
                     </td>
                     <td className="py-2 px-4">
                       {usuario.fecha_ingreso

@@ -8,6 +8,14 @@ interface Area {
   descripcion?: string;
 }
 
+interface Incidencia {
+  _id: string;
+  tipo: string;
+  descripcion?: string;
+  fecha_inicio: string;
+  fecha_fin: string;
+}
+
 interface Usuario {
   _id: string;
   nombre: string;
@@ -35,6 +43,7 @@ const EditarUsuario: React.FC<Props> = ({ usuario, onUsuarioActualizado, onCance
   const [areas, setAreas] = useState<Area[]>([]);
   const [mensaje, setMensaje] = useState("");
   const [status, setStatus] = useState<"success" | "error" | "">("");
+  const [incidencias, setIncidencias] = useState<Incidencia[]>([]);
 
   useEffect(() => {
     const obtenerAreas = async () => {
@@ -50,8 +59,22 @@ const EditarUsuario: React.FC<Props> = ({ usuario, onUsuarioActualizado, onCance
       }
     };
 
+    const obtenerIncidencias = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        const response = await fetch(Global.url + `incidencia/usuario/${usuario._id}`, {
+          headers: { Authorization: token || "" },
+        });
+        const data = await response.json();
+        if (data.status === "success") setIncidencias(data.incidencias);
+      } catch (error) {
+        console.error("Error al obtener incidencias:", error);
+      }
+    };
+
     obtenerAreas();
-  }, []);
+    obtenerIncidencias();
+  }, [usuario._id]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value, type } = e.target;
@@ -111,106 +134,121 @@ const EditarUsuario: React.FC<Props> = ({ usuario, onUsuarioActualizado, onCance
   };
 
   return (
-    <form onSubmit={handleSubmit} className="card-panel p-4 shadow animate-fade-in">
-      <h3 className="text-lg font-semibold mb-4">Editar usuario</h3>
+    <>
+      <form onSubmit={handleSubmit} className="card-panel p-4 shadow animate-fade-in">
+        <h3 className="text-lg font-semibold mb-4">Editar usuario</h3>
 
-      {mensaje && (
-        <div className={`mb-4 ${status === "success" ? "text-green-600" : "text-red-600"}`}>
-          {mensaje}
-        </div>
-      )}
+        {mensaje && (
+          <div className={`mb-4 ${status === "success" ? "text-green-600" : "text-red-600"}`}>
+            {mensaje}
+          </div>
+        )}
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <input
-          type="text"
-          name="nombre"
-          placeholder="Nombre"
-          className="input-field"
-          value={formData.nombre}
-          onChange={handleChange}
-          required
-        />
-        <input
-          type="text"
-          name="apellidos"
-          placeholder="Apellidos"
-          className="input-field"
-          value={formData.apellidos}
-          onChange={handleChange}
-          required
-        />
-        <input
-          type="email"
-          name="email"
-          placeholder="Correo electrónico"
-          className="input-field"
-          value={formData.email}
-          onChange={handleChange}
-          required
-        />
-        <input
-          type="text"
-          name="cargo"
-          placeholder="Cargo"
-          className="input-field"
-          value={formData.cargo}
-          onChange={handleChange}
-          required
-        />
-        <select
-          name="area"
-          className="input-field"
-          value={formData.area?._id || ""}
-          onChange={(e) => {
-            const selectedArea = areas.find((a) => a._id === e.target.value);
-            setFormData({ ...formData, area: selectedArea || { _id: e.target.value, nombre: "" } });
-          }}
-          required
-        >
-          <option value="">Seleccione un área</option>
-          {areas.map((a) => (
-            <option key={a._id} value={a._id}>
-              {a.nombre}
-            </option>
-          ))}
-        </select>
-        <select
-          name="rol"
-          className="input-field"
-          value={formData.rol}
-          onChange={handleChange}
-        >
-          <option value="empleado">Empleado</option>
-          <option value="gerente">Gerente</option>
-          <option value="admin">Administrador</option>
-        </select>
-        <input
-          type="date"
-          name="fecha_ingreso"
-          className="input-field"
-          value={formData.fecha_ingreso?.substring(0, 10) || ""}
-          onChange={handleChange}
-        />
-        <label className="flex items-center gap-2">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <input
-            type="checkbox"
-            name="activo"
-            checked={formData.activo}
+            type="text"
+            name="nombre"
+            placeholder="Nombre"
+            className="input-field"
+            value={formData.nombre}
+            onChange={handleChange}
+            required
+          />
+          <input
+            type="text"
+            name="apellidos"
+            placeholder="Apellidos"
+            className="input-field"
+            value={formData.apellidos}
+            onChange={handleChange}
+            required
+          />
+          <input
+            type="email"
+            name="email"
+            placeholder="Correo electrónico"
+            className="input-field"
+            value={formData.email}
+            onChange={handleChange}
+            required
+          />
+          <input
+            type="text"
+            name="cargo"
+            placeholder="Cargo"
+            className="input-field"
+            value={formData.cargo}
+            onChange={handleChange}
+            required
+          />
+          <select
+            name="area"
+            className="input-field"
+            value={formData.area?._id || ""}
+            onChange={(e) => {
+              const selectedArea = areas.find((a) => a._id === e.target.value);
+              setFormData({ ...formData, area: selectedArea || { _id: e.target.value, nombre: "" } });
+            }}
+            required
+          >
+            <option value="">Seleccione un área</option>
+            {areas.map((a) => (
+              <option key={a._id} value={a._id}>
+                {a.nombre}
+              </option>
+            ))}
+          </select>
+          <select
+            name="rol"
+            className="input-field"
+            value={formData.rol}
+            onChange={handleChange}
+          >
+            <option value="empleado">Empleado</option>
+            <option value="gerente">Gerente</option>
+            <option value="admin">Administrador</option>
+          </select>
+          <input
+            type="date"
+            name="fecha_ingreso"
+            className="input-field"
+            value={formData.fecha_ingreso?.substring(0, 10) || ""}
             onChange={handleChange}
           />
-          Activo
-        </label>
-      </div>
+          <label className="flex items-center gap-2">
+            <input
+              type="checkbox"
+              name="activo"
+              checked={formData.activo}
+              onChange={handleChange}
+            />
+            Activo
+          </label>
+        </div>
 
-      <div className="mt-4 flex justify-between">
-        <button type="button" className="btn-danger" onClick={onCancelar}>
-          Cancelar
-        </button>
-        <button type="submit" className="btn-primary">
-          Guardar cambios
-        </button>
-      </div>
-    </form>
+        <div className="mt-4 flex justify-between">
+          <button type="button" className="btn-danger" onClick={onCancelar}>
+            Cancelar
+          </button>
+          <button type="submit" className="btn-primary">
+            Guardar cambios
+          </button>
+        </div>
+      </form>
+
+      {incidencias.length > 0 && (
+        <div className="mt-4 p-4 bg-gray-50 border rounded shadow">
+          <h4 className="text-sm font-semibold mb-2">📋 Incidencias recientes</h4>
+          <ul className="text-sm list-disc list-inside text-gray-700">
+            {incidencias.map((i) => (
+              <li key={i._id}>
+                <strong>{i.tipo}</strong>: {new Date(i.fecha_inicio).toLocaleDateString()} - {new Date(i.fecha_fin).toLocaleDateString()}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+    </>
   );
 };
 

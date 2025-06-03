@@ -6,6 +6,8 @@ import AdminPanel from "../pages/AdminPanel";
 import EmpleadoPanel from "../pages/EmpleadoPanel";
 import PrivateRoute from "./PrivateRoute";
 import AppLayout from "../layouts/AppLayout";
+import IncidenciasAdmin from "../pages/admin/IncidenciasAdmin";
+import GerenciaPanel from "../pages/gerencia/GerenciaPanel"; // ✅ nueva importación
 
 const AppRouter = () => {
   return (
@@ -36,6 +38,18 @@ const AppRouter = () => {
           }
         />
 
+        {/* Ruta privada - panel de gerencia */}
+        <Route
+          path="/gerencia"
+          element={
+            <PrivateRoute>
+              <AppLayout>
+                <GerenciaPanel />
+              </AppLayout>
+            </PrivateRoute>
+          }
+        />
+
         {/* Ruta privada - panel de empleado */}
         <Route
           path="/empleado"
@@ -43,6 +57,18 @@ const AppRouter = () => {
             <PrivateRoute>
               <AppLayout>
                 <EmpleadoPanel />
+              </AppLayout>
+            </PrivateRoute>
+          }
+        />
+
+        {/* Ruta directa a incidencias admin */}
+        <Route
+          path="/admin/incidencias"
+          element={
+            <PrivateRoute>
+              <AppLayout>
+                <IncidenciasAdmin />
               </AppLayout>
             </PrivateRoute>
           }

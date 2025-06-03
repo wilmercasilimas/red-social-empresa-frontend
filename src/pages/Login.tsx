@@ -1,3 +1,4 @@
+// src/pages/Login.tsx
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
@@ -36,10 +37,19 @@ const Login = () => {
       setEmail("");
       setPassword("");
 
-      if (user.rol === "admin") {
-        navigate("/admin");
-      } else {
-        navigate("/dashboard");
+      // 🔁 Redirección según rol
+      switch (user.rol) {
+        case "admin":
+          navigate("/admin");
+          break;
+        case "gerente":
+          navigate("/gerencia");
+          break;
+        case "empleado":
+          navigate("/empleado");
+          break;
+        default:
+          navigate("/dashboard");
       }
     } else {
       showToast(data.message || "Error al iniciar sesión", "error");
