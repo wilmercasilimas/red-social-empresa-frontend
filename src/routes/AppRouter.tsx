@@ -1,3 +1,5 @@
+import PublicacionesAdmin from "../pages/admin/PublicacionesAdmin";
+
 // src/routes/AppRouter.tsx
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Login from "../pages/Login";
@@ -8,6 +10,8 @@ import PrivateRoute from "./PrivateRoute";
 import AppLayout from "../layouts/AppLayout";
 import IncidenciasAdmin from "../pages/admin/IncidenciasAdmin";
 import GerenciaPanel from "../pages/gerencia/GerenciaPanel"; // ✅ nueva importación
+
+
 
 const AppRouter = () => {
   return (
@@ -73,6 +77,8 @@ const AppRouter = () => {
             </PrivateRoute>
           }
         />
+        <Route path="/admin/publicaciones" element={<PublicacionesAdmin />} />
+
       </Routes>
     </BrowserRouter>
   );

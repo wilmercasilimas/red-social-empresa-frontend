@@ -1,3 +1,4 @@
+// src/context/AuthProvider.tsx
 import React, { useEffect, useState } from "react";
 import { AuthContext } from "./AuthContextDef";
 import type { Usuario } from "../types/Usuario";
@@ -10,7 +11,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const storedUser = localStorage.getItem("user");
     const storedToken = localStorage.getItem("token");
 
-    if (storedUser && storedToken) {
+    if (storedUser && typeof storedToken === "string" && storedToken.trim() !== "") {
       const parsedUser = JSON.parse(storedUser) as Usuario;
       setUser(parsedUser);
       setToken(storedToken);
