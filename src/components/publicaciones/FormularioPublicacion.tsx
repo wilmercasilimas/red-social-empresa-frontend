@@ -1,7 +1,12 @@
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useAuth } from "../../hooks/useAuth";
 import { showToast } from "../../helpers/showToast";
 import Global from "../../helpers/Global";
+
+interface Tarea {
+  _id: string;
+  titulo: string;
+}
 
 interface FormularioPublicacionProps {
   onPublicacionCreada?: () => void;
@@ -9,10 +14,35 @@ interface FormularioPublicacionProps {
 
 const FormularioPublicacion = ({ onPublicacionCreada }: FormularioPublicacionProps) => {
   const { token, user } = useAuth();
-  const [titulo, setTitulo] = useState("");
-  const [contenido, setContenido] = useState("");
+  const [texto, setTexto] = useState("");
   const [imagen, setImagen] = useState<File | null>(null);
+  const [tarea, setTarea] = useState("");
+  const [tareas, setTareas] = useState<Tarea[]>([]);
   const [cargando, setCargando] = useState(false);
+  const [esperandoContexto, setEsperandoContexto] = useState(true);
+
+  const cargarTareas = useCallback(async () => {
+    try {
+      const res = await fetch(`${Global.url}tarea/listar`, {
+        headers: { Authorization: token },
+      });
+      const data = await res.json();
+      if (res.ok && Array.isArray(data.tareas)) {
+        setTareas(data.tareas);
+      } else {
+        showToast("No se pudieron cargar las tareas", "warn");
+      }
+    } catch {
+      showToast("Error al cargar tareas", "error");
+    }
+  }, [token]);
+
+  useEffect(() => {
+    if (user && token) {
+      setEsperandoContexto(false);
+      cargarTareas();
+    }
+  }, [user, token, cargarTareas]);
 
   const handleImagenChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -22,13 +52,8 @@ const FormularioPublicacion = ({ onPublicacionCreada }: FormularioPublicacionPro
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!titulo.trim() || !contenido.trim()) {
-      showToast("El título y contenido son obligatorios", "error");
-      return;
-    }
-
-    if (!user || !user._id) {
-      showToast("Usuario no autenticado correctamente", "error");
+    if (!texto.trim() || !tarea.trim()) {
+      showToast("El texto y la tarea son obligatorios", "error");
       return;
     }
 
@@ -36,19 +61,15 @@ const FormularioPublicacion = ({ onPublicacionCreada }: FormularioPublicacionPro
 
     try {
       const formData = new FormData();
-      formData.append("titulo", titulo);
-      formData.append("contenido", contenido);
-      formData.append("autor", user._id);
-
+      formData.append("texto", texto);
+      formData.append("tarea", tarea);
       if (imagen) {
         formData.append("imagen", imagen);
       }
 
       const res = await fetch(`${Global.url}publicacion/crear`, {
         method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+        headers: { Authorization: token },
         body: formData,
       });
 
@@ -56,20 +77,27 @@ const FormularioPublicacion = ({ onPublicacionCreada }: FormularioPublicacionPro
 
       if (res.ok) {
         showToast("Publicación creada exitosamente", "success");
-        setTitulo("");
-        setContenido("");
+        setTexto("");
         setImagen(null);
+        setTarea("");
         onPublicacionCreada?.();
       } else {
         showToast(data.message || "Error al crear la publicación", "error");
       }
-    } catch (error) {
-      console.error("Error al enviar publicación:", error);
+    } catch {
       showToast("Error de red o del servidor", "error");
     } finally {
       setCargando(false);
     }
   };
+
+  if (esperandoContexto) {
+    return (
+      <div className="text-center py-10 text-gray-600">
+        Cargando sesión del usuario...
+      </div>
+    );
+  }
 
   return (
     <form
@@ -78,22 +106,27 @@ const FormularioPublicacion = ({ onPublicacionCreada }: FormularioPublicacionPro
     >
       <h2 className="text-xl font-semibold text-gray-800">Nueva Publicación</h2>
 
-      <input
-        type="text"
-        placeholder="Título"
-        className="w-full border border-gray-300 p-2 rounded-md"
-        value={titulo}
-        onChange={(e) => setTitulo(e.target.value)}
+      <textarea
+        placeholder="Escribe tu publicación..."
+        className="w-full border border-gray-300 p-2 rounded-md h-32"
+        value={texto}
+        onChange={(e) => setTexto(e.target.value)}
         required
       />
 
-      <textarea
-        placeholder="Contenido..."
-        className="w-full border border-gray-300 p-2 rounded-md h-32"
-        value={contenido}
-        onChange={(e) => setContenido(e.target.value)}
+      <select
+        value={tarea}
+        onChange={(e) => setTarea(e.target.value)}
+        className="w-full border border-gray-300 p-2 rounded-md"
         required
-      />
+      >
+        <option value="">Selecciona una tarea</option>
+        {tareas.map((t) => (
+          <option key={t._id} value={t._id}>
+            {t.titulo}
+          </option>
+        ))}
+      </select>
 
       <div>
         <label className="block text-sm font-medium text-gray-600 mb-1">
