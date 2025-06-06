@@ -6,11 +6,13 @@ import { getAvatarUrl } from "../../helpers/getAvatarUrl";
 import { formatFecha } from "../../helpers/formatFecha";
 import FormularioPublicacion from "../../components/publicaciones/FormularioPublicacion";
 import { showToast } from "../../helpers/showToast";
+import ModalEditarPublicacion from "../../components/publicaciones/ModalEditarPublicacion";
 
 const PublicacionesAdmin = () => {
   const { token } = useAuth();
   const [publicaciones, setPublicaciones] = useState<Publicacion[]>([]);
   const [cargando, setCargando] = useState(true);
+  const [publicacionSeleccionada, setPublicacionSeleccionada] = useState<Publicacion | null>(null);
 
   const cargarPublicaciones = useCallback(async () => {
     if (!token || token.trim() === "") return;
@@ -54,7 +56,7 @@ const PublicacionesAdmin = () => {
     <div className="p-6 space-y-8">
       <h2 className="text-2xl font-semibold mb-2">📚 Publicaciones</h2>
 
-      <FormularioPublicacion />
+      <FormularioPublicacion onPublicacionCreada={cargarPublicaciones} />
 
       {cargando ? (
         <p className="text-gray-500">Cargando publicaciones...</p>
@@ -109,18 +111,35 @@ const PublicacionesAdmin = () => {
                     <span className="text-xs italic text-gray-400">Sin imagen</span>
                   )}
                 </td>
-                <td className="p-2 text-center">
+                <td className="p-2 text-center space-x-2">
                   <button
                     onClick={() => eliminarPublicacion(pub._id)}
                     className="text-red-600 hover:underline text-sm"
                   >
                     Eliminar
                   </button>
+                  <button
+                    onClick={() => setPublicacionSeleccionada(pub)}
+                    className="text-blue-600 hover:underline text-sm"
+                  >
+                    Editar
+                  </button>
                 </td>
               </tr>
             ))}
           </tbody>
         </table>
+      )}
+
+      {publicacionSeleccionada && (
+        <ModalEditarPublicacion
+          publicacion={publicacionSeleccionada}
+          onClose={() => setPublicacionSeleccionada(null)}
+          onActualizacionExitosa={async () => {
+            await cargarPublicaciones();
+            setPublicacionSeleccionada(null);
+          }}
+        />
       )}
     </div>
   );
