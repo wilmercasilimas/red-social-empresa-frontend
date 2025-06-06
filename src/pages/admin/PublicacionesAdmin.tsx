@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom"; // ✅ NUEVO
 import type { Publicacion } from "../../types/Publicacion";
 import { fetchWithAuth } from "../../helpers/fetchWithAuth";
 import { useAuth } from "../../hooks/useAuth";
@@ -10,6 +11,7 @@ import ModalEditarPublicacion from "../../components/publicaciones/ModalEditarPu
 
 const PublicacionesAdmin = () => {
   const { token } = useAuth();
+  const navigate = useNavigate(); // ✅ NUEVO
   const [publicaciones, setPublicaciones] = useState<Publicacion[]>([]);
   const [cargando, setCargando] = useState(true);
   const [publicacionSeleccionada, setPublicacionSeleccionada] = useState<Publicacion | null>(null);
@@ -54,7 +56,12 @@ const PublicacionesAdmin = () => {
 
   return (
     <div className="p-6 space-y-8">
-      <h2 className="text-2xl font-semibold mb-2">📚 Publicaciones</h2>
+      <div className="flex justify-between items-center">
+        <h2 className="text-2xl font-semibold mb-2">📚 Publicaciones</h2>
+        <button onClick={() => navigate("/admin")} className="btn-secondary text-sm">
+          ← Volver al panel
+        </button>
+      </div>
 
       <FormularioPublicacion onPublicacionCreada={cargarPublicaciones} />
 

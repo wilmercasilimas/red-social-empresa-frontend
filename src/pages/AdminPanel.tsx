@@ -11,10 +11,8 @@ import { getAvatarUrl } from "../helpers/getAvatarUrl";
 import { useNavigate } from "react-router-dom";
 
 const AdminPanel: React.FC = () => {
-  const { user } = useAuth();
-  const [vista, setVista] = useState<"usuarios" | "areas" | "incidencias">(
-    "usuarios"
-  );
+  const { user, logout } = useAuth();
+  const [vista, setVista] = useState<"usuarios" | "areas" | "incidencias">("usuarios");
   const [modoEdicion, setModoEdicion] = useState(false);
   const navigate = useNavigate();
 
@@ -22,15 +20,25 @@ const AdminPanel: React.FC = () => {
 
   const avatarUrl = getAvatarUrl(user.imagen);
 
+  const handleLogout = () => {
+    logout();
+    navigate("/login");
+  };
+
   return (
     <>
       <Topbar />
       <div className="min-h-screen bg-gray-100 p-8 fade-in space-y-6">
-        <BienvenidaPanel
-          titulo="Panel de Administración"
-          user={user}
-          descripcion="Desde aquí podrás gestionar usuarios, áreas, tareas e incidencias."
-        />
+        <div className="flex justify-between items-center">
+          <BienvenidaPanel
+            titulo="Panel de Administración"
+            user={user}
+            descripcion="Desde aquí podrás gestionar usuarios, áreas, tareas e incidencias."
+          />
+          <button onClick={handleLogout} className="btn-secondary text-sm">
+            Cerrar sesión
+          </button>
+        </div>
 
         {/* 🧑‍💼 Tarjeta del administrador */}
         {!modoEdicion ? (
@@ -84,25 +92,19 @@ const AdminPanel: React.FC = () => {
         <div className="flex gap-4">
           <button
             onClick={() => setVista("usuarios")}
-            className={`btn-primary ${
-              vista === "usuarios" ? "opacity-100" : "opacity-70"
-            }`}
+            className={`btn-primary ${vista === "usuarios" ? "opacity-100" : "opacity-70"}`}
           >
             Ver usuarios
           </button>
           <button
             onClick={() => setVista("areas")}
-            className={`btn-primary ${
-              vista === "areas" ? "opacity-100" : "opacity-70"
-            }`}
+            className={`btn-primary ${vista === "areas" ? "opacity-100" : "opacity-70"}`}
           >
             Ver áreas
           </button>
           <button
             onClick={() => setVista("incidencias")}
-            className={`btn-primary ${
-              vista === "incidencias" ? "opacity-100" : "opacity-70"
-            }`}
+            className={`btn-primary ${vista === "incidencias" ? "opacity-100" : "opacity-70"}`}
           >
             Ver incidencias
           </button>
