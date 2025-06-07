@@ -1,20 +1,23 @@
 import { useCallback, useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom"; // ✅ NUEVO
+import { useNavigate } from "react-router-dom";
 import type { Publicacion } from "../../types/Publicacion";
 import { fetchWithAuth } from "../../helpers/fetchWithAuth";
 import { useAuth } from "../../hooks/useAuth";
 import { getAvatarUrl } from "../../helpers/getAvatarUrl";
 import { formatFecha } from "../../helpers/formatFecha";
 import FormularioPublicacion from "../../components/publicaciones/FormularioPublicacion";
-import { showToast } from "../../helpers/showToast";
 import ModalEditarPublicacion from "../../components/publicaciones/ModalEditarPublicacion";
+import { showToast } from "../../helpers/showToast";
+import ListadoComentarios from "../../components/comentarios/ListaComentarios";
+import FormularioComentario from "../../components/comentarios/FormularioComentario";
 
 const PublicacionesAdmin = () => {
   const { token } = useAuth();
-  const navigate = useNavigate(); // ✅ NUEVO
+  const navigate = useNavigate();
   const [publicaciones, setPublicaciones] = useState<Publicacion[]>([]);
   const [cargando, setCargando] = useState(true);
   const [publicacionSeleccionada, setPublicacionSeleccionada] = useState<Publicacion | null>(null);
+  const [mostrarComentarios, setMostrarComentarios] = useState<string | null>(null);
 
   const cargarPublicaciones = useCallback(async () => {
     if (!token || token.trim() === "") return;
@@ -70,55 +73,24 @@ const PublicacionesAdmin = () => {
       ) : publicaciones.length === 0 ? (
         <p>No hay publicaciones aún.</p>
       ) : (
-        <table className="table-auto w-full bg-white rounded-lg shadow">
-          <thead>
-            <tr className="bg-blue-600 text-white">
-              <th className="p-2">Autor</th>
-              <th className="p-2">Tarea</th>
-              <th className="p-2">Texto</th>
-              <th className="p-2">Fecha</th>
-              <th className="p-2">Imagen</th>
-              <th className="p-2">Acciones</th>
-            </tr>
-          </thead>
-          <tbody>
-            {publicaciones.map((pub) => (
-              <tr key={pub._id} className="border-t hover:bg-gray-50">
-                <td className="p-2">
-                  {pub.autor ? (
-                    <div className="flex items-center gap-2">
-                      <img
-                        src={getAvatarUrl(pub.autor.imagen || "default.png")}
-                        className="w-8 h-8 rounded-full object-cover"
-                        alt="Avatar"
-                      />
-                      <span>
-                        {pub.autor.nombre} {pub.autor.apellidos}
-                      </span>
-                    </div>
-                  ) : (
-                    <span className="italic text-gray-400">Autor desconocido</span>
-                  )}
-                </td>
-                <td className="p-2">{pub.tarea?.titulo || "Sin tarea"}</td>
-                <td className="p-2 text-sm">{pub.texto}</td>
-                <td className="p-2 text-sm">{formatFecha(pub.creado_en)}</td>
-                <td className="p-2">
-                  {pub.imagen ? (
-                    <img
-                      src={
-                        pub.imagen.startsWith("http")
-                          ? pub.imagen
-                          : `/uploads/publicaciones/${pub.imagen}`
-                      }
-                      alt="Imagen"
-                      className="h-16 rounded border"
-                    />
-                  ) : (
-                    <span className="text-xs italic text-gray-400">Sin imagen</span>
-                  )}
-                </td>
-                <td className="p-2 text-center space-x-2">
+        <div className="space-y-6">
+          {publicaciones.map((pub) => (
+            <div key={pub._id} className="bg-white p-4 rounded shadow space-y-2">
+              <div className="flex justify-between items-start">
+                <div className="flex items-center gap-3">
+                  <img
+                    src={getAvatarUrl(pub.autor?.imagen || "default.png")}
+                    className="w-10 h-10 rounded-full object-cover"
+                    alt="Avatar"
+                  />
+                  <div>
+                    <p className="font-semibold">
+                      {pub.autor?.nombre} {pub.autor?.apellidos}
+                    </p>
+                    <p className="text-sm text-gray-500">{formatFecha(pub.creado_en)}</p>
+                  </div>
+                </div>
+                <div className="space-x-2">
                   <button
                     onClick={() => eliminarPublicacion(pub._id)}
                     className="text-red-600 hover:underline text-sm"
@@ -131,11 +103,35 @@ const PublicacionesAdmin = () => {
                   >
                     Editar
                   </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+                  <button
+                    onClick={() => setMostrarComentarios((prev) => (prev === pub._id ? null : pub._id))}
+                    className="text-green-600 hover:underline text-sm"
+                  >
+                    {mostrarComentarios === pub._id ? "Ocultar comentarios" : "Ver comentarios"}
+                  </button>
+                </div>
+              </div>
+              <p className="text-sm text-gray-800">{pub.texto}</p>
+              {pub.imagen && (
+                <img
+                  src={
+                    pub.imagen.startsWith("http")
+                      ? pub.imagen
+                      : `/uploads/publicaciones/${pub.imagen}`
+                  }
+                  alt="Imagen"
+                  className="rounded border max-w-xs mt-2"
+                />
+              )}
+              {mostrarComentarios === pub._id && (
+                <div className="mt-4 space-y-4">
+                  <ListadoComentarios publicacionId={pub._id} />
+                  <FormularioComentario publicacionId={pub._id} onComentarioAgregado={() => {}} />
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
       )}
 
       {publicacionSeleccionada && (

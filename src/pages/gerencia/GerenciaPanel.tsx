@@ -31,7 +31,9 @@ const GerenciaPanel: React.FC = () => {
               className="w-20 h-20 rounded-full object-cover border border-gray-300 shadow"
             />
             <div className="flex-1">
-              <h2 className="title-main mb-2 animate-slide-up-slow">Panel de Gerencia</h2>
+              <h2 className="title-main mb-2 animate-slide-up-slow">
+                Panel de Gerencia
+              </h2>
               <p>
                 <strong>Nombre:</strong> {user.nombre} {user.apellidos}
               </p>
@@ -39,17 +41,29 @@ const GerenciaPanel: React.FC = () => {
                 <strong>Correo:</strong> {user.email}
               </p>
               <p>
-                <strong>Área:</strong> {typeof user.area === "object" ? user.area?.nombre : user.area || "Sin área"}
+                <strong>Área:</strong>{" "}
+                {typeof user.area === "object"
+                  ? user.area?.nombre
+                  : user.area || "Sin área"}
               </p>
               <p>
-                <strong>Rol:</strong> <span className="badge bg-blue-100 text-blue-700">{user.rol}</span>
+                <strong>Rol:</strong>{" "}
+                <span className="badge bg-blue-100 text-blue-700">
+                  {user.rol}
+                </span>
               </p>
             </div>
             <div className="flex flex-col gap-2">
-              <button onClick={() => setModoEdicion(true)} className="btn-primary">
+              <button
+                onClick={() => setModoEdicion(true)}
+                className="btn-primary"
+              >
                 Editar perfil
               </button>
-              <button onClick={() => setVerPublicaciones(true)} className="btn-secondary">
+              <button
+                onClick={() => setVerPublicaciones(true)}
+                className="btn-secondary"
+              >
                 📚 Ver publicaciones
               </button>
             </div>
