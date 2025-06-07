@@ -8,8 +8,7 @@ import { formatFecha } from "../../helpers/formatFecha";
 import FormularioPublicacion from "../../components/publicaciones/FormularioPublicacion";
 import ModalEditarPublicacion from "../../components/publicaciones/ModalEditarPublicacion";
 import { showToast } from "../../helpers/showToast";
-import ListadoComentarios from "../../components/comentarios/ListaComentarios";
-import FormularioComentario from "../../components/comentarios/FormularioComentario";
+import ComentariosPublicacion from "../../components/comentarios/ComentariosPublicacion";
 
 const PublicacionesAdmin = () => {
   const { token } = useAuth();
@@ -124,10 +123,7 @@ const PublicacionesAdmin = () => {
                 />
               )}
               {mostrarComentarios === pub._id && (
-                <div className="mt-4 space-y-4">
-                  <ListadoComentarios publicacionId={pub._id} />
-                  <FormularioComentario publicacionId={pub._id} onComentarioAgregado={() => {}} />
-                </div>
+                <ComentariosPublicacion publicacionId={pub._id} onComentarioAgregado={cargarPublicaciones} />
               )}
             </div>
           ))}
