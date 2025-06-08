@@ -15,26 +15,35 @@ const PublicacionesAdmin = () => {
   const navigate = useNavigate();
   const [publicaciones, setPublicaciones] = useState<Publicacion[]>([]);
   const [cargando, setCargando] = useState(true);
-  const [publicacionSeleccionada, setPublicacionSeleccionada] = useState<Publicacion | null>(null);
-  const [mostrarComentarios, setMostrarComentarios] = useState<string | null>(null);
+  const [publicacionSeleccionada, setPublicacionSeleccionada] =
+    useState<Publicacion | null>(null);
+  const [mostrarComentarios, setMostrarComentarios] = useState<string | null>(
+    null
+  );
+  const [paginaActual, setPaginaActual] = useState(1);
+  const [totalPaginas, setTotalPaginas] = useState(1);
 
   const cargarPublicaciones = useCallback(async () => {
     if (!token || token.trim() === "") return;
+    setCargando(true);
     try {
-      const data = await fetchWithAuth<{ publicaciones: Publicacion[] }>(
-        "publicacion/todas",
-        token
-      );
+      const data = await fetchWithAuth<{
+        publicaciones: Publicacion[];
+        totalPaginas: number;
+      }>(`publicacion/todas?pagina=${paginaActual}&limite=5`, token);
       setPublicaciones(data.publicaciones);
+      setTotalPaginas(data.totalPaginas);
     } catch (err) {
       console.debug("[fetchWithAuth] Error obteniendo publicaciones:", err);
     } finally {
       setCargando(false);
     }
-  }, [token]);
+  }, [token, paginaActual]);
 
   const eliminarPublicacion = async (id: string) => {
-    const confirmar = window.confirm("¿Seguro que deseas eliminar esta publicación?");
+    const confirmar = window.confirm(
+      "¿Seguro que deseas eliminar esta publicación?"
+    );
     if (!confirmar) return;
 
     try {
@@ -42,6 +51,7 @@ const PublicacionesAdmin = () => {
         method: "DELETE",
       });
       showToast("Publicación eliminada", "success");
+      setPaginaActual(1);
       await cargarPublicaciones();
     } catch (err) {
       console.error("Error al eliminar publicación:", err);
@@ -50,22 +60,27 @@ const PublicacionesAdmin = () => {
   };
 
   useEffect(() => {
-    const delayTokenCheck = setTimeout(() => {
-      cargarPublicaciones();
-    }, 200);
-    return () => clearTimeout(delayTokenCheck);
+    cargarPublicaciones();
   }, [cargarPublicaciones]);
 
   return (
     <div className="p-6 space-y-8">
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-semibold mb-2">📚 Publicaciones</h2>
-        <button onClick={() => navigate("/admin")} className="btn-secondary text-sm">
+        <button
+          onClick={() => navigate("/admin")}
+          className="btn-secondary text-sm"
+        >
           ← Volver al panel
         </button>
       </div>
 
-      <FormularioPublicacion onPublicacionCreada={cargarPublicaciones} />
+      <FormularioPublicacion
+        onPublicacionCreada={async () => {
+          setPaginaActual(1);
+          await cargarPublicaciones();
+        }}
+      />
 
       {cargando ? (
         <p className="text-gray-500">Cargando publicaciones...</p>
@@ -74,7 +89,10 @@ const PublicacionesAdmin = () => {
       ) : (
         <div className="space-y-6">
           {publicaciones.map((pub) => (
-            <div key={pub._id} className="bg-white p-4 rounded shadow space-y-2">
+            <div
+              key={pub._id}
+              className="bg-white p-4 rounded shadow space-y-2"
+            >
               <div className="flex justify-between items-start">
                 <div className="flex items-center gap-3">
                   <img
@@ -86,7 +104,9 @@ const PublicacionesAdmin = () => {
                     <p className="font-semibold">
                       {pub.autor?.nombre} {pub.autor?.apellidos}
                     </p>
-                    <p className="text-sm text-gray-500">{formatFecha(pub.creado_en)}</p>
+                    <p className="text-sm text-gray-500">
+                      {formatFecha(pub.creado_en)}
+                    </p>
                   </div>
                 </div>
                 <div className="space-x-2">
@@ -103,10 +123,16 @@ const PublicacionesAdmin = () => {
                     Editar
                   </button>
                   <button
-                    onClick={() => setMostrarComentarios((prev) => (prev === pub._id ? null : pub._id))}
+                    onClick={() =>
+                      setMostrarComentarios((prev) =>
+                        prev === pub._id ? null : pub._id
+                      )
+                    }
                     className="text-green-600 hover:underline text-sm"
                   >
-                    {mostrarComentarios === pub._id ? "Ocultar comentarios" : "Ver comentarios"}
+                    {mostrarComentarios === pub._id
+                      ? "Ocultar comentarios"
+                      : "Ver comentarios"}
                   </button>
                 </div>
               </div>
@@ -123,10 +149,33 @@ const PublicacionesAdmin = () => {
                 />
               )}
               {mostrarComentarios === pub._id && (
-                <ComentariosPublicacion publicacionId={pub._id} onComentarioAgregado={cargarPublicaciones} />
+                <ComentariosPublicacion
+                  publicacionId={pub._id}
+                  onComentarioAgregado={async () => cargarPublicaciones()}
+                />
               )}
             </div>
           ))}
+
+          <div className="flex justify-center items-center gap-4 pt-4">
+            <button
+              className="btn-outline px-3 py-1"
+              disabled={paginaActual === 1}
+              onClick={() => setPaginaActual((prev) => Math.max(1, prev - 1))}
+            >
+              « Anterior
+            </button>
+            <span className="text-sm">
+              Página {paginaActual} de {totalPaginas}
+            </span>
+            <button
+              className="btn-outline px-3 py-1"
+              disabled={paginaActual === totalPaginas}
+              onClick={() => setPaginaActual((prev) => prev + 1)}
+            >
+              Siguiente »
+            </button>
+          </div>
         </div>
       )}
 

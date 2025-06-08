@@ -15,18 +15,25 @@ const PublicacionesEmpleado: React.FC<PublicacionesEmpleadoProps> = ({ volver })
   const [publicaciones, setPublicaciones] = useState<Publicacion[]>([]);
   const [cargando, setCargando] = useState(true);
   const [comentariosVisibles, setComentariosVisibles] = useState<Record<string, boolean>>({});
+  const [paginaActual, setPaginaActual] = useState(1);
+  const [totalPaginas, setTotalPaginas] = useState(1);
 
   const cargarPublicaciones = useCallback(async () => {
     if (!token || token.trim() === "") return;
+    setCargando(true);
     try {
-      const data = await fetchWithAuth<{ publicaciones: Publicacion[] }>("publicacion/todas", token);
+      const data = await fetchWithAuth<{ publicaciones: Publicacion[]; totalPaginas: number }>(
+        `publicacion/todas?pagina=${paginaActual}&limite=5`,
+        token
+      );
       setPublicaciones(data.publicaciones);
+      setTotalPaginas(data.totalPaginas);
     } catch (err) {
       console.error("Error obteniendo publicaciones:", err);
     } finally {
       setCargando(false);
     }
-  }, [token]);
+  }, [token, paginaActual]);
 
   const toggleComentarios = (id: string) => {
     setComentariosVisibles(prev => ({ ...prev, [id]: !prev[id] }));
@@ -53,42 +60,67 @@ const PublicacionesEmpleado: React.FC<PublicacionesEmpleadoProps> = ({ volver })
       ) : publicaciones.length === 0 ? (
         <p>No hay publicaciones aún.</p>
       ) : (
-        publicaciones.map(pub => (
-          <div key={pub._id} className="bg-white rounded shadow p-4 space-y-2">
-            <div className="flex items-center gap-2">
-              <img
-                src={getAvatarUrl(pub.autor?.imagen || "default.png")}
-                className="w-10 h-10 rounded-full object-cover"
-                alt="Avatar"
-              />
-              <div>
-                <p className="font-semibold">
-                  {pub.autor?.nombre} {pub.autor?.apellidos}
-                </p>
-                <p className="text-xs text-gray-500">{formatFecha(pub.creado_en)}</p>
+        <>
+          {publicaciones.map(pub => (
+            <div key={pub._id} className="bg-white rounded shadow p-4 space-y-2">
+              <div className="flex items-center gap-2">
+                <img
+                  src={getAvatarUrl(pub.autor?.imagen || "default.png")}
+                  className="w-10 h-10 rounded-full object-cover"
+                  alt="Avatar"
+                />
+                <div>
+                  <p className="font-semibold">
+                    {pub.autor?.nombre} {pub.autor?.apellidos}
+                  </p>
+                  <p className="text-xs text-gray-500">{formatFecha(pub.creado_en)}</p>
+                </div>
               </div>
+              <p className="text-sm text-gray-800">{pub.texto}</p>
+              {pub.imagen && (
+                <img
+                  src={pub.imagen.startsWith("http") ? pub.imagen : `/uploads/publicaciones/${pub.imagen}`}
+                  alt="Imagen"
+                  className="max-h-64 rounded border"
+                />
+              )}
+              <div className="text-right">
+                <button
+                  onClick={() => toggleComentarios(pub._id)}
+                  className="text-green-600 text-sm hover:underline"
+                >
+                  {comentariosVisibles[pub._id] ? "Ocultar comentarios" : "Ver comentarios"}
+                </button>
+              </div>
+              {comentariosVisibles[pub._id] && (
+                <ComentariosPublicacion
+                  publicacionId={pub._id}
+                  onComentarioAgregado={async () => cargarPublicaciones()}
+                />
+              )}
             </div>
-            <p className="text-sm text-gray-800">{pub.texto}</p>
-            {pub.imagen && (
-              <img
-                src={pub.imagen.startsWith("http") ? pub.imagen : `/uploads/publicaciones/${pub.imagen}`}
-                alt="Imagen"
-                className="max-h-64 rounded border"
-              />
-            )}
-            <div className="text-right">
-              <button
-                onClick={() => toggleComentarios(pub._id)}
-                className="text-green-600 text-sm hover:underline"
-              >
-                {comentariosVisibles[pub._id] ? "Ocultar comentarios" : "Ver comentarios"}
-              </button>
-            </div>
-            {comentariosVisibles[pub._id] && (
-              <ComentariosPublicacion publicacionId={pub._id} onComentarioAgregado={cargarPublicaciones} />
-            )}
+          ))}
+
+          <div className="flex justify-center items-center gap-4 pt-4">
+            <button
+              className="btn-outline px-3 py-1"
+              disabled={paginaActual === 1}
+              onClick={() => setPaginaActual(prev => Math.max(1, prev - 1))}
+            >
+              « Anterior
+            </button>
+            <span className="text-sm">
+              Página {paginaActual} de {totalPaginas}
+            </span>
+            <button
+              className="btn-outline px-3 py-1"
+              disabled={paginaActual === totalPaginas}
+              onClick={() => setPaginaActual(prev => prev + 1)}
+            >
+              Siguiente »
+            </button>
           </div>
-        ))
+        </>
       )}
     </div>
   );
