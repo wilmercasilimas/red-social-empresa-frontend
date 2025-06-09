@@ -5,6 +5,7 @@ import { useAuth } from "../../hooks/useAuth";
 import { getAvatarUrl } from "../../helpers/getAvatarUrl";
 import { formatFecha } from "../../helpers/formatFecha";
 import ComentariosPublicacion from "../../components/comentarios/ComentariosPublicacion";
+import FormularioPublicacion from "../../components/publicaciones/FormularioPublicacion";
 
 type PublicacionesGerenciaProps = {
   volver: () => void;
@@ -54,6 +55,14 @@ const PublicacionesGerencia: React.FC<PublicacionesGerenciaProps> = ({ volver })
           ← Volver al panel
         </button>
       </div>
+
+      {/* ✅ Formulario de creación */}
+      <FormularioPublicacion
+        onPublicacionCreada={async () => {
+          setPaginaActual(1);
+          await cargarPublicaciones();
+        }}
+      />
 
       {cargando ? (
         <p className="text-gray-500">Cargando publicaciones...</p>

@@ -5,6 +5,7 @@ import { useAuth } from "../../hooks/useAuth";
 import { getAvatarUrl } from "../../helpers/getAvatarUrl";
 import { formatFecha } from "../../helpers/formatFecha";
 import ComentariosPublicacion from "../../components/comentarios/ComentariosPublicacion";
+import FormularioPublicacion from "../../components/publicaciones/FormularioPublicacion";
 
 interface PublicacionesEmpleadoProps {
   volver: () => void;
@@ -54,6 +55,13 @@ const PublicacionesEmpleado: React.FC<PublicacionesEmpleadoProps> = ({ volver })
           ← Volver al panel
         </button>
       </div>
+
+      <FormularioPublicacion
+        onPublicacionCreada={async () => {
+          setPaginaActual(1);
+          await cargarPublicaciones();
+        }}
+      />
 
       {cargando ? (
         <p className="text-gray-500">Cargando publicaciones...</p>
