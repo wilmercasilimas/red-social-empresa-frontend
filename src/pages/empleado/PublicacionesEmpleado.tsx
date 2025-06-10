@@ -6,6 +6,10 @@ import { getAvatarUrl } from "../../helpers/getAvatarUrl";
 import { formatFecha } from "../../helpers/formatFecha";
 import ComentariosPublicacion from "../../components/comentarios/ComentariosPublicacion";
 import FormularioPublicacion from "../../components/publicaciones/FormularioPublicacion";
+import FiltrosPublicaciones from "../../components/publicaciones/FiltrosPublicaciones";
+import type { Usuario } from "../../types/Usuario";
+import type { Tarea } from "../../types/Tarea";
+import type { Area } from "../../types/Area";
 
 interface PublicacionesEmpleadoProps {
   volver: () => void;
@@ -19,12 +23,28 @@ const PublicacionesEmpleado: React.FC<PublicacionesEmpleadoProps> = ({ volver })
   const [paginaActual, setPaginaActual] = useState(1);
   const [totalPaginas, setTotalPaginas] = useState(1);
 
+  const [filtroAutor, setFiltroAutor] = useState("");
+  const [filtroTarea, setFiltroTarea] = useState("");
+  const [filtroArea, setFiltroArea] = useState("");
+
+  const [autores, setAutores] = useState<Usuario[]>([]);
+  const [tareas, setTareas] = useState<Tarea[]>([]);
+  const [areas, setAreas] = useState<Area[]>([]);
+
   const cargarPublicaciones = useCallback(async () => {
     if (!token || token.trim() === "") return;
     setCargando(true);
     try {
+      const queryParams = new URLSearchParams({
+        pagina: paginaActual.toString(),
+        limite: "5",
+        ...(filtroAutor && { autor: filtroAutor }),
+        ...(filtroTarea && { tarea: filtroTarea }),
+        ...(filtroArea && { area: filtroArea }),
+      }).toString();
+
       const data = await fetchWithAuth<{ publicaciones: Publicacion[]; totalPaginas: number }>(
-        `publicacion/todas?pagina=${paginaActual}&limite=5`,
+        `publicacion/todas?${queryParams}`,
         token
       );
       setPublicaciones(data.publicaciones);
@@ -34,18 +54,35 @@ const PublicacionesEmpleado: React.FC<PublicacionesEmpleadoProps> = ({ volver })
     } finally {
       setCargando(false);
     }
-  }, [token, paginaActual]);
+  }, [token, paginaActual, filtroAutor, filtroTarea, filtroArea]);
+
+  const cargarFiltros = useCallback(async () => {
+    if (!token || token.trim() === "") return;
+    try {
+      const [usuariosData, tareasData, areasData] = await Promise.all([
+        fetchWithAuth<{ usuarios: Usuario[] }>("user/usuarios", token),
+        fetchWithAuth<{ tareas: Tarea[] }>("tarea/listar", token),
+        fetchWithAuth<{ areas: Area[] }>("area/listar", token),
+      ]);
+      setAutores(usuariosData.usuarios);
+      setTareas(tareasData.tareas);
+      setAreas(areasData.areas);
+    } catch (err) {
+      console.error("Error cargando filtros:", err);
+    }
+  }, [token]);
+
+  useEffect(() => {
+    cargarFiltros();
+  }, [cargarFiltros]);
+
+  useEffect(() => {
+    cargarPublicaciones();
+  }, [cargarPublicaciones]);
 
   const toggleComentarios = (id: string) => {
     setComentariosVisibles(prev => ({ ...prev, [id]: !prev[id] }));
   };
-
-  useEffect(() => {
-    const delayTokenCheck = setTimeout(() => {
-      cargarPublicaciones();
-    }, 200);
-    return () => clearTimeout(delayTokenCheck);
-  }, [cargarPublicaciones]);
 
   return (
     <div className="p-6 space-y-8">
@@ -61,6 +98,18 @@ const PublicacionesEmpleado: React.FC<PublicacionesEmpleadoProps> = ({ volver })
           setPaginaActual(1);
           await cargarPublicaciones();
         }}
+      />
+
+      <FiltrosPublicaciones
+        autores={autores}
+        filtroAutor={filtroAutor}
+        setFiltroAutor={setFiltroAutor}
+        tareas={tareas}
+        filtroTarea={filtroTarea}
+        setFiltroTarea={setFiltroTarea}
+        areas={areas}
+        filtroArea={filtroArea}
+        setFiltroArea={setFiltroArea}
       />
 
       {cargando ? (

@@ -1,3 +1,4 @@
+// ✅ PublicacionesGerencia.tsx con filtros por autor, tarea y área
 import { useCallback, useEffect, useState } from "react";
 import type { Publicacion } from "../../types/Publicacion";
 import { fetchWithAuth } from "../../helpers/fetchWithAuth";
@@ -6,6 +7,10 @@ import { getAvatarUrl } from "../../helpers/getAvatarUrl";
 import { formatFecha } from "../../helpers/formatFecha";
 import ComentariosPublicacion from "../../components/comentarios/ComentariosPublicacion";
 import FormularioPublicacion from "../../components/publicaciones/FormularioPublicacion";
+import FiltrosPublicaciones from "../../components/publicaciones/FiltrosPublicaciones";
+import type { Usuario } from "../../types/Usuario";
+import type { Tarea } from "../../types/Tarea";
+import type { Area } from "../../types/Area";
 
 type PublicacionesGerenciaProps = {
   volver: () => void;
@@ -18,13 +23,27 @@ const PublicacionesGerencia: React.FC<PublicacionesGerenciaProps> = ({ volver })
   const [comentariosVisibles, setComentariosVisibles] = useState<{ [id: string]: boolean }>({});
   const [paginaActual, setPaginaActual] = useState(1);
   const [totalPaginas, setTotalPaginas] = useState(1);
+  const [filtroAutor, setFiltroAutor] = useState("");
+  const [filtroTarea, setFiltroTarea] = useState("");
+  const [filtroArea, setFiltroArea] = useState("");
+  const [autores, setAutores] = useState<Usuario[]>([]);
+  const [tareas, setTareas] = useState<Tarea[]>([]);
+  const [areas, setAreas] = useState<Area[]>([]);
 
   const cargarPublicaciones = useCallback(async () => {
     if (!token || token.trim() === "") return;
     setCargando(true);
     try {
+      const queryParams = new URLSearchParams({
+        pagina: paginaActual.toString(),
+        limite: "5",
+        ...(filtroAutor && { autor: filtroAutor }),
+        ...(filtroTarea && { tarea: filtroTarea }),
+        ...(filtroArea && { area: filtroArea }),
+      }).toString();
+
       const data = await fetchWithAuth<{ publicaciones: Publicacion[]; totalPaginas: number }>(
-        `publicacion/todas?pagina=${paginaActual}&limite=5`,
+        `publicacion/todas?${queryParams}`,
         token
       );
       setPublicaciones(data.publicaciones);
@@ -34,13 +53,30 @@ const PublicacionesGerencia: React.FC<PublicacionesGerenciaProps> = ({ volver })
     } finally {
       setCargando(false);
     }
-  }, [token, paginaActual]);
+  }, [token, paginaActual, filtroAutor, filtroTarea, filtroArea]);
+
+  const cargarFiltros = useCallback(async () => {
+    if (!token || token.trim() === "") return;
+    try {
+      const [usuariosData, tareasData, areasData] = await Promise.all([
+        fetchWithAuth<{ usuarios: Usuario[] }>("user/usuarios", token),
+        fetchWithAuth<{ tareas: Tarea[] }>("tarea/listar", token),
+        fetchWithAuth<{ areas: Area[] }>("area/listar", token),
+      ]);
+      setAutores(usuariosData.usuarios);
+      setTareas(tareasData.tareas);
+      setAreas(areasData.areas);
+    } catch (err) {
+      console.error("Error cargando filtros:", err);
+    }
+  }, [token]);
 
   useEffect(() => {
-    const delayTokenCheck = setTimeout(() => {
-      cargarPublicaciones();
-    }, 200);
-    return () => clearTimeout(delayTokenCheck);
+    cargarFiltros();
+  }, [cargarFiltros]);
+
+  useEffect(() => {
+    cargarPublicaciones();
   }, [cargarPublicaciones]);
 
   const toggleComentarios = (id: string) => {
@@ -56,12 +92,23 @@ const PublicacionesGerencia: React.FC<PublicacionesGerenciaProps> = ({ volver })
         </button>
       </div>
 
-      {/* ✅ Formulario de creación */}
       <FormularioPublicacion
         onPublicacionCreada={async () => {
           setPaginaActual(1);
           await cargarPublicaciones();
         }}
+      />
+
+      <FiltrosPublicaciones
+        autores={autores}
+        tareas={tareas}
+        areas={areas}
+        filtroAutor={filtroAutor}
+        setFiltroAutor={setFiltroAutor}
+        filtroTarea={filtroTarea}
+        setFiltroTarea={setFiltroTarea}
+        filtroArea={filtroArea}
+        setFiltroArea={setFiltroArea}
       />
 
       {cargando ? (
@@ -72,10 +119,7 @@ const PublicacionesGerencia: React.FC<PublicacionesGerenciaProps> = ({ volver })
         <>
           <div className="space-y-6">
             {publicaciones.map((pub) => (
-              <div
-                key={pub._id}
-                className="bg-white rounded-lg shadow p-4 space-y-3 animate-fade-in"
-              >
+              <div key={pub._id} className="bg-white rounded-lg shadow p-4 space-y-3">
                 <div className="flex items-center gap-3">
                   <img
                     src={getAvatarUrl(pub.autor?.imagen || "default.png")}
@@ -94,11 +138,7 @@ const PublicacionesGerencia: React.FC<PublicacionesGerenciaProps> = ({ volver })
 
                 {pub.imagen && (
                   <img
-                    src={
-                      pub.imagen.startsWith("http")
-                        ? pub.imagen
-                        : `/uploads/publicaciones/${pub.imagen}`
-                    }
+                    src={pub.imagen.startsWith("http") ? pub.imagen : `/uploads/publicaciones/${pub.imagen}`}
                     alt="Imagen"
                     className="max-w-xs rounded border"
                   />
