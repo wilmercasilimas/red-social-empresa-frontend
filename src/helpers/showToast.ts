@@ -1,7 +1,17 @@
 import { toast } from "react-toastify";
 import type { ToastOptions, ToastPosition, Theme } from "react-toastify";
 
-type TipoToast = "success" | "error" | "info" | "warn";
+// Acepta también "warning" por conveniencia
+type TipoToast = "success" | "error" | "info" | "warn" | "warning";
+
+// Mapeo interno para que "warning" use "warn"
+const mapeoToast: Record<TipoToast, "success" | "error" | "info" | "warn"> = {
+  success: "success",
+  error: "error",
+  info: "info",
+  warn: "warn",
+  warning: "warn",
+};
 
 export const showToast = (
   mensaje: string,
@@ -18,7 +28,7 @@ export const showToast = (
     theme: "colored" as Theme,
   };
 
-  toast[tipo](mensaje, {
+  toast[mapeoToast[tipo]](mensaje, {
     ...opcionesPorDefecto,
     ...opcionesPersonalizadas,
   });

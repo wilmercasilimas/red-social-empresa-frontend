@@ -1,4 +1,4 @@
-// ✅ src/pages/gerencia/GerenciaPanel.tsx restaurado con "Editar perfil" y vista de publicaciones
+// ✅ src/pages/gerencia/GerenciaPanel.tsx restaurado con botón "📋 Ver tareas"
 import React, { useState } from "react";
 import Topbar from "../../components/common/Topbar";
 import IncidenciasAdmin from "../admin/IncidenciasAdmin";
@@ -7,11 +7,13 @@ import { Navigate } from "react-router-dom";
 import EditarPerfil from "../empleado/EditarPerfil";
 import { getAvatarUrl } from "../../helpers/getAvatarUrl";
 import PublicacionesGerencia from "./PublicacionesGerencia";
+import { useNavigate } from "react-router-dom"; // ✅ agregado
 
 const GerenciaPanel: React.FC = () => {
   const { user } = useAuth();
   const [modoEdicion, setModoEdicion] = useState(false);
   const [verPublicaciones, setVerPublicaciones] = useState(false);
+  const navigate = useNavigate(); // ✅ navegación
 
   if (!user) return null;
 
@@ -65,6 +67,12 @@ const GerenciaPanel: React.FC = () => {
                 className="btn-secondary"
               >
                 📚 Ver publicaciones
+              </button>
+              <button
+                onClick={() => navigate("/gerencia/tareas")}
+                className="btn-secondary"
+              >
+                📋 Ver tareas
               </button>
             </div>
           </div>

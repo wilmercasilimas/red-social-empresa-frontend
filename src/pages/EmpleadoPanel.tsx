@@ -4,11 +4,13 @@ import Topbar from "../components/common/Topbar";
 import { getAvatarUrl } from "../helpers/getAvatarUrl";
 import EditarPerfil from "./empleado/EditarPerfil";
 import PublicacionesEmpleado from "./empleado/PublicacionesEmpleado";
+import MisTareas from "./usuario/MisTareas";
 
 const EmpleadoPanel: React.FC = () => {
   const { user } = useAuth();
   const [modoEdicion, setModoEdicion] = useState(false);
   const [verPublicaciones, setVerPublicaciones] = useState(false);
+  const [verTareas, setVerTareas] = useState(false);
 
   if (!user) return null;
 
@@ -16,7 +18,13 @@ const EmpleadoPanel: React.FC = () => {
     <>
       <Topbar />
       <div className="min-h-screen bg-gray-100 p-8 fade-in space-y-6">
-        {!modoEdicion && !verPublicaciones ? (
+        {modoEdicion ? (
+          <EditarPerfil salirEdicion={() => setModoEdicion(false)} />
+        ) : verPublicaciones ? (
+          <PublicacionesEmpleado volver={() => setVerPublicaciones(false)} />
+        ) : verTareas ? (
+          <MisTareas volver={() => setVerTareas(false)} />
+        ) : (
           <div className="card-panel animate-slide-up flex flex-col md:flex-row items-start md:items-center gap-6">
             <img
               src={getAvatarUrl(user.imagen)}
@@ -47,12 +55,11 @@ const EmpleadoPanel: React.FC = () => {
               <button onClick={() => setVerPublicaciones(true)} className="btn-secondary">
                 📚 Ver publicaciones
               </button>
+              <button onClick={() => setVerTareas(true)} className="btn-secondary">
+                📋 Ver tareas
+              </button>
             </div>
           </div>
-        ) : modoEdicion ? (
-          <EditarPerfil salirEdicion={() => setModoEdicion(false)} />
-        ) : (
-          <PublicacionesEmpleado volver={() => setVerPublicaciones(false)} />
         )}
       </div>
     </>

@@ -12,7 +12,9 @@ import { useNavigate } from "react-router-dom";
 
 const AdminPanel: React.FC = () => {
   const { user, logout } = useAuth();
-  const [vista, setVista] = useState<"usuarios" | "areas" | "incidencias">("usuarios");
+  const [vista, setVista] = useState<"usuarios" | "areas" | "incidencias">(
+    "usuarios"
+  );
   const [modoEdicion, setModoEdicion] = useState(false);
   const navigate = useNavigate();
 
@@ -92,19 +94,25 @@ const AdminPanel: React.FC = () => {
         <div className="flex gap-4">
           <button
             onClick={() => setVista("usuarios")}
-            className={`btn-primary ${vista === "usuarios" ? "opacity-100" : "opacity-70"}`}
+            className={`btn-primary ${
+              vista === "usuarios" ? "opacity-100" : "opacity-70"
+            }`}
           >
             Ver usuarios
           </button>
           <button
             onClick={() => setVista("areas")}
-            className={`btn-primary ${vista === "areas" ? "opacity-100" : "opacity-70"}`}
+            className={`btn-primary ${
+              vista === "areas" ? "opacity-100" : "opacity-70"
+            }`}
           >
             Ver áreas
           </button>
           <button
             onClick={() => setVista("incidencias")}
-            className={`btn-primary ${vista === "incidencias" ? "opacity-100" : "opacity-70"}`}
+            className={`btn-primary ${
+              vista === "incidencias" ? "opacity-100" : "opacity-70"
+            }`}
           >
             Ver incidencias
           </button>
@@ -114,6 +122,13 @@ const AdminPanel: React.FC = () => {
             className="btn-primary opacity-70 hover:opacity-100 transition"
           >
             Ver publicaciones
+          </button>
+
+          <button
+            onClick={() => navigate("/admin/tareas")}
+            className="btn-primary opacity-70 hover:opacity-100 transition"
+          >
+            Ver tareas
           </button>
         </div>
 

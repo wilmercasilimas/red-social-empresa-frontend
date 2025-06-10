@@ -10,8 +10,8 @@ import PrivateRoute from "./PrivateRoute";
 import AppLayout from "../layouts/AppLayout";
 import IncidenciasAdmin from "../pages/admin/IncidenciasAdmin";
 import GerenciaPanel from "../pages/gerencia/GerenciaPanel"; // ✅ nueva importación
-
-
+import TareasGerencia from "../pages/gerencia/TareasGerencia";
+import TareasAdmin from "../pages/admin/TareasAdmin";
 
 const AppRouter = () => {
   return (
@@ -77,8 +77,31 @@ const AppRouter = () => {
             </PrivateRoute>
           }
         />
-        <Route path="/admin/publicaciones" element={<PublicacionesAdmin />} />
 
+        <Route
+          path="/gerencia/tareas"
+          element={
+            <PrivateRoute>
+              <AppLayout>
+                <TareasGerencia />
+              </AppLayout>
+            </PrivateRoute>
+          }
+        />
+
+        {/* Ruta privada - tareas admin */}
+        <Route
+          path="/admin/tareas"
+          element={
+            <PrivateRoute>
+              <AppLayout>
+                <TareasAdmin />
+              </AppLayout>
+            </PrivateRoute>
+          }
+        />
+
+        <Route path="/admin/publicaciones" element={<PublicacionesAdmin />} />
       </Routes>
     </BrowserRouter>
   );
