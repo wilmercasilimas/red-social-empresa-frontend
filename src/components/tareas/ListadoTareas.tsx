@@ -57,8 +57,20 @@ const ListadoTareas: React.FC<ListadoTareasProps> = ({
           <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm text-gray-700">
             <p><strong>Estado:</strong> {tarea.estado}</p>
             <p><strong>Fecha de entrega:</strong> {tarea.fecha_entrega ? formatFecha(tarea.fecha_entrega) : "No asignada"}</p>
-            <p><strong>Asignada a:</strong> {typeof tarea.asignada_a === "string" ? tarea.asignada_a : `${tarea.asignada_a.nombre} ${tarea.asignada_a.apellidos}`}</p>
-            <p><strong>Creada por:</strong> {`${tarea.creada_por.nombre} ${tarea.creada_por.apellidos}`}</p>
+            <p>
+              <strong>Asignada a:</strong>{" "}
+              {typeof tarea.asignada_a === "string"
+                ? tarea.asignada_a
+                : tarea.asignada_a
+                ? `${tarea.asignada_a.nombre} ${tarea.asignada_a.apellidos}`
+                : "No disponible"}
+            </p>
+            <p>
+              <strong>Creada por:</strong>{" "}
+              {tarea.creada_por
+                ? `${tarea.creada_por.nombre} ${tarea.creada_por.apellidos}`
+                : "No disponible"}
+            </p>
             <p><strong>Creada el:</strong> {formatFecha(tarea.creada_en)}</p>
           </div>
         </div>

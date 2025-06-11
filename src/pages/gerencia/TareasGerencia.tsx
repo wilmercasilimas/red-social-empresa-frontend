@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import Topbar from "../../components/common/Topbar";
 import FormularioTarea from "../../components/tareas/FormularioTarea";
 import ListadoTareas from "../../components/tareas/ListadoTareas";
+import FiltrosTareas from "../../components/tareas/FiltrosTareas";
 import { fetchWithAuth } from "../../helpers/fetchWithAuth";
 import type { TareaCompleta } from "../../types/Tarea";
 import { useAuth } from "../../hooks/useAuth";
@@ -12,13 +13,23 @@ const TareasGerencia: React.FC = () => {
   const navigate = useNavigate();
   const { token } = useAuth();
   const [tareas, setTareas] = useState<TareaCompleta[]>([]);
+  const [filtros, setFiltros] = useState<{
+    asignada_a?: string;
+    creada_por?: string;
+    area?: string;
+  }>({});
 
   const cargarTareas = useCallback(async () => {
     try {
-      const data = await fetchWithAuth<{ tareas: TareaCompleta[] }>(
-        "tarea/listar",
-        token
-      );
+      const params = new URLSearchParams();
+
+      if (filtros.asignada_a) params.append("asignada_a", filtros.asignada_a);
+      if (filtros.creada_por) params.append("creada_por", filtros.creada_por);
+      if (filtros.area) params.append("area", filtros.area);
+
+      const url = `tarea/todas?${params.toString()}`;
+
+      const data = await fetchWithAuth<{ tareas: TareaCompleta[] }>(url, token);
 
       if (!data.tareas) {
         showToast("Error en el formato de datos", "error");
@@ -27,13 +38,16 @@ const TareasGerencia: React.FC = () => {
 
       setTareas(data.tareas);
     } catch {
-  showToast("Error al obtener tareas desde el servidor", "error");
-}
-
-  }, [token]);
+      showToast("Error al obtener tareas desde el servidor", "error");
+    }
+  }, [token, filtros]);
 
   const handleSuccess = () => {
     cargarTareas();
+  };
+
+  const handleFiltrar = (nuevosFiltros: typeof filtros) => {
+    setFiltros(nuevosFiltros);
   };
 
   useEffect(() => {
@@ -45,27 +59,35 @@ const TareasGerencia: React.FC = () => {
       <Topbar />
       <div className="min-h-screen bg-gray-100 p-8 fade-in space-y-6">
         <div className="flex justify-end">
-          <button onClick={() => navigate("/gerencia")} className="btn-secondary">
+          <button
+            onClick={() => navigate("/gerencia")}
+            className="btn-secondary"
+          >
             ← Volver al panel
           </button>
         </div>
 
         <div className="card-panel animate-slide-up">
           <h1 className="text-xl font-bold mb-2">
-            <span role="img" aria-label="tareas">📝</span> Gestión de tareas
+            <span role="img" aria-label="tareas">
+              📝
+            </span>{" "}
+            Gestión de tareas
           </h1>
           <p className="text-gray-600 mb-4">
-            Aquí podrás crear, editar, eliminar y filtrar tareas por área, creador y usuario asignado.
+            Aquí podrás crear, editar, eliminar y filtrar tareas por área,
+            creador y usuario asignado.
           </p>
 
           <FormularioTarea onSuccess={handleSuccess} />
         </div>
 
         <div className="card-panel animate-slide-up">
-          <ListadoTareas
-            tareas={tareas}
-            mostrarControles={true}
-          />
+          <FiltrosTareas onFiltrar={handleFiltrar} />
+        </div>
+
+        <div className="card-panel animate-slide-up">
+          <ListadoTareas tareas={tareas} mostrarControles={true} />
         </div>
       </div>
     </>
