@@ -1,15 +1,44 @@
-import React from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import Topbar from "../../components/common/Topbar";
 import FormularioTarea from "../../components/tareas/FormularioTarea";
+import ListadoTareas from "../../components/tareas/ListadoTareas";
+import { fetchWithAuth } from "../../helpers/fetchWithAuth";
+import type { TareaCompleta } from "../../types/Tarea";
+import { useAuth } from "../../hooks/useAuth";
+import { showToast } from "../../helpers/showToast";
 
 const TareasGerencia: React.FC = () => {
   const navigate = useNavigate();
+  const { token } = useAuth();
+  const [tareas, setTareas] = useState<TareaCompleta[]>([]);
+
+  const cargarTareas = useCallback(async () => {
+    try {
+      const data = await fetchWithAuth<{ tareas: TareaCompleta[] }>(
+        "tarea/listar",
+        token
+      );
+
+      if (!data.tareas) {
+        showToast("Error en el formato de datos", "error");
+        return;
+      }
+
+      setTareas(data.tareas);
+    } catch {
+  showToast("Error al obtener tareas desde el servidor", "error");
+}
+
+  }, [token]);
 
   const handleSuccess = () => {
-    // Aquí podrías recargar la lista de tareas en el futuro
-    
+    cargarTareas();
   };
+
+  useEffect(() => {
+    cargarTareas();
+  }, [cargarTareas]);
 
   return (
     <>
@@ -29,15 +58,14 @@ const TareasGerencia: React.FC = () => {
             Aquí podrás crear, editar, eliminar y filtrar tareas por área, creador y usuario asignado.
           </p>
 
-          {/* Formulario para nueva tarea */}
           <FormularioTarea onSuccess={handleSuccess} />
         </div>
 
-        {/* Listado de tareas (pendiente) */}
         <div className="card-panel animate-slide-up">
-          <p className="text-sm italic text-gray-400">
-            (Listado de tareas en construcción...)
-          </p>
+          <ListadoTareas
+            tareas={tareas}
+            mostrarControles={true}
+          />
         </div>
       </div>
     </>
