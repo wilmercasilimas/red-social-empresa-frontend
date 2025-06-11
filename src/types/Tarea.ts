@@ -10,6 +10,7 @@ export interface UsuarioTarea {
   nombre: string;
   apellidos: string;
   email?: string;
+  rol?: string;
 }
 
 export interface TareaCompleta extends TareaBasica {

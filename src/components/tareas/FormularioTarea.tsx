@@ -1,144 +1,146 @@
-import React, { useEffect, useState } from "react";
-import type { TareaCompleta } from "../../types/Tarea";
+import { useEffect, useState } from "react";
+import type { TareaCompleta, UsuarioTarea } from "../../types/Tarea";
 import { fetchWithAuth } from "../../helpers/fetchWithAuth";
 import { showToast } from "../../helpers/showToast";
-import { useAuth } from "../../hooks/useAuth";
 
 interface Props {
-  tarea?: TareaCompleta;
-  onSuccess: () => void;
+  onSuccess?: () => void;
 }
 
-type UsuarioMinimo = {
-  _id: string;
-  nombre: string;
-  apellidos: string;
+// ✅ Tipos auxiliares para respuestas
+type RespuestaUsuarios = {
+  status: string;
+  message: string;
+  total: number;
+  usuarios: UsuarioTarea[];
 };
 
-const FormularioTarea: React.FC<Props> = ({ tarea, onSuccess }) => {
-  const { token } = useAuth();
+type RespuestaCreacionTarea = {
+  status: string;
+  message: string;
+  tarea: TareaCompleta;
+};
 
-  const [titulo, setTitulo] = useState(tarea?.titulo || "");
-  const [descripcion, setDescripcion] = useState(tarea?.descripcion || "");
-  const [asignadaA, setAsignadaA] = useState(
-    tarea?.asignada_a && typeof tarea.asignada_a === "object"
-      ? tarea.asignada_a._id
-      : ""
-  );
-  const [fechaEntrega, setFechaEntrega] = useState(
-    tarea?.fecha_entrega?.slice(0, 10) || ""
-  );
-  const [usuarios, setUsuarios] = useState<UsuarioMinimo[]>([]);
-  const [loading, setLoading] = useState(false);
+const FormularioTarea: React.FC<Props> = ({ onSuccess }) => {
+  const [titulo, setTitulo] = useState("");
+  const [descripcion, setDescripcion] = useState("");
+  const [fechaEntrega, setFechaEntrega] = useState("");
+  const [asignadoA, setAsignadoA] = useState("");
+  const [usuarios, setUsuarios] = useState<UsuarioTarea[]>([]);
 
-  const modoEdicion = !!tarea;
-
-  useEffect(() => {
-    const cargarUsuarios = async () => {
-      try {
-        const data = await fetchWithAuth("user/lista-empleados", token) as UsuarioMinimo[];
-        setUsuarios(data);
-      } catch {
-        showToast("Error al cargar usuarios", "error");
-      }
-    };
-    cargarUsuarios();
-  }, [token]);
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!titulo || !descripcion || !asignadaA || !fechaEntrega) {
-      return showToast("Completa todos los campos", "warn");
-    }
-
-    const payload = {
-      titulo,
-      descripcion,
-      asignada_a: asignadaA,
-      fecha_entrega: fechaEntrega,
-    };
-
+  const cargarUsuarios = async () => {
     try {
-      setLoading(true);
-      if (modoEdicion) {
-        await fetchWithAuth(`tarea/editar/${tarea?._id}`, token, {
-          method: "PUT",
-          body: JSON.stringify(payload),
-        });
-        showToast("Tarea actualizada exitosamente", "success");
+      const token = localStorage.getItem("token");
+      if (!token) return;
+
+      const data = await fetchWithAuth<RespuestaUsuarios>("user/usuarios", token);
+
+      if (Array.isArray(data.usuarios)) {
+        setUsuarios(data.usuarios);
       } else {
-        await fetchWithAuth("tarea/crear", token, {
-          method: "POST",
-          body: JSON.stringify(payload),
-        });
-        showToast("Tarea creada exitosamente", "success");
+        console.error("[FormularioTarea] ❌ Formato inesperado:", data);
+        showToast("Respuesta inesperada del servidor", "error");
       }
-      onSuccess();
-    } catch {
-      showToast("Error al guardar la tarea", "error");
-    } finally {
-      setLoading(false);
+    } catch (error) {
+      console.error("[FormularioTarea] ❌ Error al cargar usuarios", error);
+      showToast("Error al cargar usuarios", "error");
     }
   };
 
-  return (
-    <form
-      onSubmit={handleSubmit}
-      className="bg-white shadow-md rounded p-6 max-w-xl mx-auto"
-    >
-      <h2 className="text-xl font-bold mb-4">
-        {modoEdicion ? "✏️ Editar Tarea" : "📝 Nueva Tarea"}
-      </h2>
+  const manejarEnvio = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) return;
 
+      const nuevaTarea: Partial<TareaCompleta> = {
+        titulo,
+        descripcion,
+        fecha_entrega: fechaEntrega,
+        asignada_a: asignadoA,
+      };
+
+      const respuesta = await fetchWithAuth<RespuestaCreacionTarea>("tarea/crear", token, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(nuevaTarea),
+      });
+
+      if (respuesta && respuesta.tarea && respuesta.tarea._id) {
+        showToast("Tarea registrada correctamente", "success");
+        setTitulo("");
+        setDescripcion("");
+        setFechaEntrega("");
+        setAsignadoA("");
+        onSuccess?.();
+      } else {
+        console.error("[FormularioTarea] ❌ Respuesta inesperada:", respuesta);
+        showToast("No se pudo registrar la tarea", "error");
+      }
+    } catch (error) {
+      console.error("[FormularioTarea] ❌ Error en envío:", error);
+      showToast("Error al registrar tarea", "error");
+    }
+  };
+
+  useEffect(() => {
+    cargarUsuarios();
+  }, []);
+
+  return (
+    <form onSubmit={manejarEnvio} className="bg-white rounded-xl shadow-md p-6">
+      <h2 className="text-xl font-semibold mb-4">Registrar nueva tarea</h2>
       <div className="mb-4">
-        <label className="block text-sm font-medium text-gray-700">Título</label>
+        <label className="block text-sm font-medium mb-1">Título</label>
         <input
           type="text"
           value={titulo}
           onChange={(e) => setTitulo(e.target.value)}
-          className="input"
+          className="w-full border rounded p-2"
+          required
         />
       </div>
-
       <div className="mb-4">
-        <label className="block text-sm font-medium text-gray-700">Descripción</label>
+        <label className="block text-sm font-medium mb-1">Descripción</label>
         <textarea
           value={descripcion}
           onChange={(e) => setDescripcion(e.target.value)}
-          className="input"
+          className="w-full border rounded p-2"
+          rows={3}
+          required
         />
       </div>
-
       <div className="mb-4">
-        <label className="block text-sm font-medium text-gray-700">Asignar a</label>
-        <select
-          value={asignadaA}
-          onChange={(e) => setAsignadaA(e.target.value)}
-          className="input"
-        >
-          <option value="">-- Selecciona un usuario --</option>
-          {(usuarios as UsuarioMinimo[]).map((u) => (
-            <option key={u._id} value={u._id}>
-              {u.nombre} {u.apellidos}
-            </option>
-          ))}
-        </select>
-      </div>
-
-      <div className="mb-6">
-        <label className="block text-sm font-medium text-gray-700">
-          Fecha de entrega
-        </label>
+        <label className="block text-sm font-medium mb-1">Fecha límite</label>
         <input
           type="date"
           value={fechaEntrega}
           onChange={(e) => setFechaEntrega(e.target.value)}
-          className="input"
+          className="w-full border rounded p-2"
+          required
         />
       </div>
-
-      <button type="submit" className="btn-primary w-full" disabled={loading}>
-        {modoEdicion ? "Guardar cambios" : "Crear tarea"}
+      <div className="mb-4">
+        <label className="block text-sm font-medium mb-1">Asignar a:</label>
+        <select
+          value={asignadoA}
+          onChange={(e) => setAsignadoA(e.target.value)}
+          className="w-full border rounded p-2"
+          required
+        >
+          <option value="">-- Selecciona un empleado --</option>
+          {usuarios.map((usuario) => (
+            <option key={usuario._id} value={usuario._id}>
+              {usuario.nombre} ({usuario.email})
+            </option>
+          ))}
+        </select>
+      </div>
+      <button
+        type="submit"
+        className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+      >
+        Registrar Tarea
       </button>
     </form>
   );
