@@ -1,15 +1,58 @@
-import React from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import Topbar from "../../components/common/Topbar";
 import FormularioTarea from "../../components/tareas/FormularioTarea";
+import FiltrosTareas from "../../components/tareas/FiltrosTareas";
+import ListadoTareas from "../../components/tareas/ListadoTareas";
+import { fetchWithAuth } from "../../helpers/fetchWithAuth";
+import { useAuth } from "../../hooks/useAuth";
+import { showToast } from "../../helpers/showToast";
+import type { TareaCompleta } from "../../types/Tarea";
 
 const TareasAdmin: React.FC = () => {
   const navigate = useNavigate();
+  const { token } = useAuth();
+  const [tareas, setTareas] = useState<TareaCompleta[]>([]);
+  const [filtros, setFiltros] = useState<{
+    asignada_a?: string;
+    creada_por?: string;
+    area?: string;
+  }>({});
+
+  const cargarTareas = useCallback(async () => {
+    try {
+      const params = new URLSearchParams();
+
+      if (filtros.asignada_a) params.append("asignada_a", filtros.asignada_a);
+      if (filtros.creada_por) params.append("creada_por", filtros.creada_por);
+      if (filtros.area) params.append("area", filtros.area);
+
+      const url = `tarea/todas?${params.toString()}`;
+
+      const data = await fetchWithAuth<{ tareas: TareaCompleta[] }>(url, token);
+
+      if (!data.tareas) {
+        showToast("Error en el formato de datos", "error");
+        return;
+      }
+
+      setTareas(data.tareas);
+    } catch {
+      showToast("Error al obtener tareas desde el servidor", "error");
+    }
+  }, [token, filtros]);
 
   const handleSuccess = () => {
-    // Aquí podrías recargar la lista de tareas en el futuro
-    console.log("✅ Tarea registrada exitosamente (admin)");
+    cargarTareas();
   };
+
+  const handleFiltrar = (nuevosFiltros: typeof filtros) => {
+    setFiltros(nuevosFiltros);
+  };
+
+  useEffect(() => {
+    cargarTareas();
+  }, [cargarTareas]);
 
   return (
     <>
@@ -29,15 +72,15 @@ const TareasAdmin: React.FC = () => {
             Aquí podrás crear, editar, eliminar y filtrar tareas por área, creador y usuario asignado.
           </p>
 
-          {/* ✅ Formulario para nueva tarea */}
           <FormularioTarea onSuccess={handleSuccess} />
         </div>
 
-        {/* 🔜 Listado de tareas (pendiente) */}
         <div className="card-panel animate-slide-up">
-          <p className="text-sm italic text-gray-400">
-            (Listado de tareas en construcción...)
-          </p>
+          <FiltrosTareas onFiltrar={handleFiltrar} />
+        </div>
+
+        <div className="card-panel animate-slide-up">
+          <ListadoTareas tareas={tareas} mostrarControles={true} />
         </div>
       </div>
     </>
