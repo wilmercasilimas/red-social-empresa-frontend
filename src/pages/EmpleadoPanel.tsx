@@ -33,10 +33,18 @@ const EmpleadoPanel: React.FC = () => {
             />
 
             <div className="flex-1">
-              <h1 className="title-main mb-4 animate-slide-up-slow">Panel del Empleado</h1>
-              <p><strong>Nombre:</strong> {user.nombre} {user.apellidos}</p>
-              <p><strong>Correo:</strong> {user.email}</p>
-              <p><strong>Cargo:</strong> {user.cargo}</p>
+              <h1 className="title-main mb-4 animate-slide-up-slow">
+                Panel del Empleado
+              </h1>
+              <p>
+                <strong>Nombre:</strong> {user.nombre} {user.apellidos}
+              </p>
+              <p>
+                <strong>Correo:</strong> {user.email}
+              </p>
+              <p>
+                <strong>Cargo:</strong> {user.cargo}
+              </p>
               <p>
                 <strong>Área:</strong>{" "}
                 {user.area && typeof user.area === "object"
@@ -45,17 +53,31 @@ const EmpleadoPanel: React.FC = () => {
                   ? user.area
                   : "Sin área"}
               </p>
-              <p><strong>Rol:</strong> <span className="badge bg-green-100 text-green-700">{user.rol}</span></p>
+              <p>
+                <strong>Rol:</strong>{" "}
+                <span className="badge bg-green-100 text-green-700">
+                  {user.rol}
+                </span>
+              </p>
             </div>
 
             <div className="flex flex-col gap-2">
-              <button onClick={() => setModoEdicion(true)} className="btn-primary">
+              <button
+                onClick={() => setModoEdicion(true)}
+                className="btn-primary"
+              >
                 Editar perfil
               </button>
-              <button onClick={() => setVerPublicaciones(true)} className="btn-secondary">
+              <button
+                onClick={() => setVerPublicaciones(true)}
+                className="btn-secondary"
+              >
                 📚 Ver publicaciones
               </button>
-              <button onClick={() => setVerTareas(true)} className="btn-secondary">
+              <button
+                onClick={() => setVerTareas(true)}
+                className="btn-secondary"
+              >
                 📋 Ver tareas
               </button>
             </div>

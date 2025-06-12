@@ -4,6 +4,7 @@ import Topbar from "../../components/common/Topbar";
 import FormularioTarea from "../../components/tareas/FormularioTarea";
 import ListadoTareas from "../../components/tareas/ListadoTareas";
 import FiltrosTareas from "../../components/tareas/FiltrosTareas";
+import ModalEditarTarea from "../../components/tareas/ModalEditarTarea";
 import { fetchWithAuth } from "../../helpers/fetchWithAuth";
 import type { TareaCompleta } from "../../types/Tarea";
 import { useAuth } from "../../hooks/useAuth";
@@ -18,6 +19,8 @@ const TareasGerencia: React.FC = () => {
     creada_por?: string;
     area?: string;
   }>({});
+
+  const [tareaEditando, setTareaEditando] = useState<TareaCompleta | null>(null);
 
   const cargarTareas = useCallback(async () => {
     try {
@@ -48,6 +51,14 @@ const TareasGerencia: React.FC = () => {
 
   const handleFiltrar = (nuevosFiltros: typeof filtros) => {
     setFiltros(nuevosFiltros);
+  };
+
+  const handleEditar = (tarea: TareaCompleta) => {
+    setTareaEditando(tarea);
+  };
+
+  const cerrarModalEditar = () => {
+    setTareaEditando(null);
   };
 
   useEffect(() => {
@@ -87,9 +98,17 @@ const TareasGerencia: React.FC = () => {
         </div>
 
         <div className="card-panel animate-slide-up">
-          <ListadoTareas tareas={tareas} mostrarControles={true} />
+          <ListadoTareas tareas={tareas} mostrarControles={true} onEditar={handleEditar} />
         </div>
       </div>
+
+      {tareaEditando && (
+        <ModalEditarTarea
+          tarea={tareaEditando}
+          onClose={cerrarModalEditar}
+          onTareaActualizada={handleSuccess}
+        />
+      )}
     </>
   );
 };

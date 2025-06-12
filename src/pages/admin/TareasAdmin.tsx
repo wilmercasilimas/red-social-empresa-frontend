@@ -4,6 +4,8 @@ import Topbar from "../../components/common/Topbar";
 import FormularioTarea from "../../components/tareas/FormularioTarea";
 import FiltrosTareas from "../../components/tareas/FiltrosTareas";
 import ListadoTareas from "../../components/tareas/ListadoTareas";
+import ModalEditarTarea from "../../components/tareas/ModalEditarTarea";
+import ModalEliminarTarea from "../../components/tareas/ModalEliminarTarea";
 import { fetchWithAuth } from "../../helpers/fetchWithAuth";
 import { useAuth } from "../../hooks/useAuth";
 import { showToast } from "../../helpers/showToast";
@@ -18,6 +20,9 @@ const TareasAdmin: React.FC = () => {
     creada_por?: string;
     area?: string;
   }>({});
+
+  const [tareaAEditar, setTareaAEditar] = useState<TareaCompleta | null>(null);
+  const [tareaAEliminar, setTareaAEliminar] = useState<TareaCompleta | null>(null);
 
   const cargarTareas = useCallback(async () => {
     try {
@@ -80,9 +85,35 @@ const TareasAdmin: React.FC = () => {
         </div>
 
         <div className="card-panel animate-slide-up">
-          <ListadoTareas tareas={tareas} mostrarControles={true} />
+          <ListadoTareas
+            tareas={tareas}
+            mostrarControles={true}
+            onEditar={(tarea) => setTareaAEditar(tarea)}
+            onEliminar={(id) => {
+              const tareaSeleccionada = tareas.find((t) => t._id === id);
+              if (tareaSeleccionada) {
+                setTareaAEliminar(tareaSeleccionada);
+              }
+            }}
+          />
         </div>
       </div>
+
+      {tareaAEditar && (
+        <ModalEditarTarea
+          tarea={tareaAEditar}
+          onClose={() => setTareaAEditar(null)}
+          onTareaActualizada={handleSuccess}
+        />
+      )}
+
+      {tareaAEliminar && (
+        <ModalEliminarTarea
+          tareaId={tareaAEliminar._id}
+          onClose={() => setTareaAEliminar(null)}
+          onTareaEliminada={handleSuccess}
+        />
+      )}
     </>
   );
 };
