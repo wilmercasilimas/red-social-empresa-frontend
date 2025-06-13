@@ -19,20 +19,29 @@ const TareasGerencia: React.FC = () => {
     creada_por?: string;
     area?: string;
   }>({});
-
-  const [tareaEditando, setTareaEditando] = useState<TareaCompleta | null>(null);
+  const [pagina, setPagina] = useState(1);
+  const [limite, setLimite] = useState(10);
+  const [totalPaginas, setTotalPaginas] = useState(1);
+  const [tareaEditando, setTareaEditando] = useState<TareaCompleta | null>(
+    null
+  );
 
   const cargarTareas = useCallback(async () => {
     try {
       const params = new URLSearchParams();
-
       if (filtros.asignada_a) params.append("asignada_a", filtros.asignada_a);
       if (filtros.creada_por) params.append("creada_por", filtros.creada_por);
       if (filtros.area) params.append("area", filtros.area);
+      params.append("pagina", pagina.toString());
+      params.append("limite", limite.toString());
 
       const url = `tarea/todas?${params.toString()}`;
-
-      const data = await fetchWithAuth<{ tareas: TareaCompleta[] }>(url, token);
+      const data = await fetchWithAuth<{
+        tareas: TareaCompleta[];
+        pagina: number;
+        paginas: number;
+        limite: number;
+      }>(url, token);
 
       if (!data.tareas) {
         showToast("Error en el formato de datos", "error");
@@ -40,10 +49,13 @@ const TareasGerencia: React.FC = () => {
       }
 
       setTareas(data.tareas);
+      setPagina(data.pagina);
+      setLimite(data.limite);
+      setTotalPaginas(data.paginas);
     } catch {
       showToast("Error al obtener tareas desde el servidor", "error");
     }
-  }, [token, filtros]);
+  }, [token, filtros, pagina, limite]);
 
   const handleSuccess = () => {
     cargarTareas();
@@ -51,6 +63,7 @@ const TareasGerencia: React.FC = () => {
 
   const handleFiltrar = (nuevosFiltros: typeof filtros) => {
     setFiltros(nuevosFiltros);
+    setPagina(1);
   };
 
   const handleEditar = (tarea: TareaCompleta) => {
@@ -89,7 +102,6 @@ const TareasGerencia: React.FC = () => {
             Aquí podrás crear, editar, eliminar y filtrar tareas por área,
             creador y usuario asignado.
           </p>
-
           <FormularioTarea onSuccess={handleSuccess} />
         </div>
 
@@ -98,7 +110,35 @@ const TareasGerencia: React.FC = () => {
         </div>
 
         <div className="card-panel animate-slide-up">
-          <ListadoTareas tareas={tareas} mostrarControles={true} onEditar={handleEditar} />
+          <ListadoTareas
+            tareas={tareas}
+            mostrarControles={true}
+            onEditar={handleEditar}
+            paginaActual={pagina}
+          />
+
+          {totalPaginas > 1 && (
+            <div className="flex justify-center gap-4 mt-4">
+              <button
+                disabled={pagina === 1}
+                onClick={() => setPagina(pagina - 1)}
+                className="btn-outline"
+              >
+                ← Anterior
+              </button>
+              {/* <span className="text-gray-700">
+                   Página {pagina} de {totalPaginas}
+                </span> */}
+
+              <button
+                disabled={pagina === totalPaginas}
+                onClick={() => setPagina(pagina + 1)}
+                className="btn-outline"
+              >
+                Siguiente →
+              </button>
+            </div>
+          )}
         </div>
       </div>
 

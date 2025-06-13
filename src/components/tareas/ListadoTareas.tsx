@@ -7,6 +7,7 @@ type ListadoTareasProps = {
   onEditar?: (tarea: TareaCompleta) => void;
   onEliminar?: (id: string) => void;
   mostrarControles?: boolean;
+  paginaActual?: number;
 };
 
 const ListadoTareas: React.FC<ListadoTareasProps> = ({
@@ -14,6 +15,7 @@ const ListadoTareas: React.FC<ListadoTareasProps> = ({
   onEditar,
   onEliminar,
   mostrarControles = false,
+  paginaActual,
 }) => {
   if (tareas.length === 0) {
     return (
@@ -26,7 +28,14 @@ const ListadoTareas: React.FC<ListadoTareasProps> = ({
   return (
     <div className="space-y-4">
       {tareas.map((tarea) => (
-        <div key={tarea._id} className="bg-white p-4 rounded-xl shadow-md space-y-2">
+        <div
+          key={`${tarea._id}-${paginaActual}`} // 🟢 fuerza rerender
+          className="bg-white p-4 rounded-xl shadow-md space-y-2"
+        >
+          <div className="text-xs text-gray-400 italic mb-1">
+            Página actual: {paginaActual}
+          </div>
+
           <div className="flex justify-between items-start">
             <div>
               <h2 className="text-lg font-semibold">{tarea.titulo}</h2>
@@ -55,8 +64,15 @@ const ListadoTareas: React.FC<ListadoTareasProps> = ({
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm text-gray-700">
-            <p><strong>Estado:</strong> {tarea.estado}</p>
-            <p><strong>Fecha de entrega:</strong> {tarea.fecha_entrega ? formatFecha(tarea.fecha_entrega) : "No asignada"}</p>
+            <p>
+              <strong>Estado:</strong> {tarea.estado}
+            </p>
+            <p>
+              <strong>Fecha de entrega:</strong>{" "}
+              {tarea.fecha_entrega
+                ? formatFecha(tarea.fecha_entrega)
+                : "No asignada"}
+            </p>
             <p>
               <strong>Asignada a:</strong>{" "}
               {typeof tarea.asignada_a === "string"
@@ -71,7 +87,9 @@ const ListadoTareas: React.FC<ListadoTareasProps> = ({
                 ? `${tarea.creada_por.nombre} ${tarea.creada_por.apellidos}`
                 : "No disponible"}
             </p>
-            <p><strong>Creada el:</strong> {formatFecha(tarea.creada_en)}</p>
+            <p>
+              <strong>Creada el:</strong> {formatFecha(tarea.creada_en)}
+            </p>
           </div>
         </div>
       ))}

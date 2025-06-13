@@ -22,3 +22,4 @@ export interface TareaCompleta extends TareaBasica {
 
   creada_por: UsuarioTarea;
 }
+export type Tarea = TareaCompleta;
