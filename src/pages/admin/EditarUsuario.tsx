@@ -257,7 +257,7 @@ const EditarUsuario: React.FC<Props> = ({
             Cancelar
           </button>
           <button type="submit" className="btn-primary">
-            Guardar cambios
+            Guardar
           </button>
         </div>
       </form>

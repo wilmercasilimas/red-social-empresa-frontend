@@ -83,51 +83,51 @@ const AdminPanel: React.FC = () => {
         )}
 
         {/* 🔁 Botones de navegación */}
-        <div className="flex gap-4">
-          <button
-            onClick={() => setVista("usuarios")}
-            className={`btn-primary ${
-              vista === "usuarios" ? "opacity-100" : "opacity-70"
-            }`}
-          >
-            Ver usuarios
-          </button>
-          <button
-            onClick={() => setVista("areas")}
-            className={`btn-primary ${
-              vista === "areas" ? "opacity-100" : "opacity-70"
-            }`}
-          >
-            Ver áreas
-          </button>
-          <button
-            onClick={() => setVista("incidencias")}
-            className={`btn-primary ${
-              vista === "incidencias" ? "opacity-100" : "opacity-70"
-            }`}
-          >
-            Ver incidencias
-          </button>
+        <div className="w-full max-w-xl mx-auto">
+          <div className="grid grid-cols-2 gap-4 sm:flex sm:flex-wrap sm:gap-4">
+            <button
+              onClick={() => setVista("usuarios")}
+              className={`btn-primary ${
+                vista === "usuarios" ? "opacity-100" : "opacity-70"
+              }`}
+            >
+              Usuarios
+            </button>
+            <button
+              onClick={() => setVista("areas")}
+              className={`btn-primary ${
+                vista === "areas" ? "opacity-100" : "opacity-70"
+              }`}
+            >
+              Áreas
+            </button>
+            <button
+              onClick={() => setVista("incidencias")}
+              className={`btn-primary ${
+                vista === "incidencias" ? "opacity-100" : "opacity-70"
+              }`}
+            >
+              Incide
+            </button>
+            <button
+              onClick={() => navigate("/admin/publicaciones")}
+              className="btn-primary opacity-70 hover:opacity-100 transition"
+            >
+              Publicaciones
+            </button>
+            <button
+              onClick={() => navigate("/admin/tareas")}
+              className="btn-primary opacity-70 hover:opacity-100 transition"
+            >
+              Tareas
+            </button>
+          </div>
 
-          <button
-            onClick={() => navigate("/admin/publicaciones")}
-            className="btn-primary opacity-70 hover:opacity-100 transition"
-          >
-            Ver publicaciones
-          </button>
-
-          <button
-            onClick={() => navigate("/admin/tareas")}
-            className="btn-primary opacity-70 hover:opacity-100 transition"
-          >
-            Ver tareas
-          </button>
+          {/* 📦 Contenido dinámico */}
+          {vista === "usuarios" && <UsuariosAdmin />}
+          {vista === "areas" && <AreasAdmin />}
+          {vista === "incidencias" && <IncidenciasAdmin />}
         </div>
-
-        {/* 📦 Contenido dinámico */}
-        {vista === "usuarios" && <UsuariosAdmin />}
-        {vista === "areas" && <AreasAdmin />}
-        {vista === "incidencias" && <IncidenciasAdmin />}
       </div>
     </>
   );

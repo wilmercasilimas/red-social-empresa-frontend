@@ -4,8 +4,8 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
 import { loginService } from "../services/authService";
 import type { Usuario } from "../types/Usuario";
-import Topbar from "../components/common/Topbar";
 import { showToast } from "../helpers/showToast";
+import logo from "../assets/logo.jpg"; // ✅ asegúrate de que el archivo existe
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -37,7 +37,6 @@ const Login = () => {
       setEmail("");
       setPassword("");
 
-      // 🔁 Redirección según rol
       switch (user.rol) {
         case "admin":
           navigate("/admin");
@@ -58,28 +57,48 @@ const Login = () => {
 
   return (
     <>
-      <Topbar />
-      <div className="min-h-screen flex items-center justify-center bg-gray-100 fade-in">
+      {/* ✅ Header fijo con degradado */}
+      <header
+        className="fixed top-0 left-0 w-full z-50 px-4 sm:px-6 py-3 sm:py-4 shadow-md backdrop-blur-md"
+        style={{
+          background:
+            "linear-gradient(to bottom, rgba(37, 99, 235, 1), rgba(37, 99, 235, 0.3))",
+        }}
+      >
+        <div className="max-w-7xl mx-auto flex items-center gap-3">
+          <img
+            src={logo}
+            alt="Logo"
+            className="w-10 h-10 object-cover rounded-full bg-white shadow"
+          />
+          <span className="text-base sm:text-lg md:text-xl font-bold text-white tracking-wide">
+            Red Social Empresarial
+          </span>
+        </div>
+      </header>
+
+      {/* ✅ Login Form */}
+      <div className="min-h-screen flex items-center justify-center bg-gray-100 px-4 pt-24 fade-in">
         <form
           onSubmit={handleSubmit}
-          className="card-panel w-full max-w-md animate-slide-up"
+          className="w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg xl:max-w-xl 2xl:max-w-2xl bg-white p-4 sm:p-6 rounded-lg shadow-md space-y-6 mx-auto text-sm sm:text-base overflow-hidden"
         >
-          <h2 className="text-2xl font-bold mb-6 text-center animate-slide-right">
+          <h2 className="text-lg sm:text-2xl font-bold text-center">
             Iniciar sesión
           </h2>
 
-          <div className="mb-4">
+          <div>
             <label className="form-label">Correo</label>
             <input
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              className="input-field"
+              className="input-field w-full"
             />
           </div>
 
-          <div className="mb-6">
+          <div>
             <label className="form-label">Contraseña</label>
             <div className="relative">
               <input
@@ -87,19 +106,19 @@ const Login = () => {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
-                className="input-field"
+                className="input-field w-full"
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-2 text-sm text-gray-500"
+                className="absolute right-3 top-2 text-sm text-gray-500 whitespace-nowrap"
               >
                 {showPassword ? "Ocultar" : "Ver"}
               </button>
             </div>
           </div>
 
-          <button type="submit" className="btn-primary w-full animate-bounce-slow">
+          <button type="submit" className="btn-primary w-full">
             Entrar
           </button>
         </form>

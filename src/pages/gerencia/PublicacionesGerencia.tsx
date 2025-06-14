@@ -17,11 +17,15 @@ type PublicacionesGerenciaProps = {
   volver: () => void;
 };
 
-const PublicacionesGerencia: React.FC<PublicacionesGerenciaProps> = ({ volver }) => {
+const PublicacionesGerencia: React.FC<PublicacionesGerenciaProps> = ({
+  volver,
+}) => {
   const { token } = useAuth();
   const [publicaciones, setPublicaciones] = useState<Publicacion[]>([]);
   const [cargando, setCargando] = useState(true);
-  const [comentariosVisibles, setComentariosVisibles] = useState<{ [id: string]: boolean }>({});
+  const [comentariosVisibles, setComentariosVisibles] = useState<{
+    [id: string]: boolean;
+  }>({});
   const [paginaActual, setPaginaActual] = useState(1);
   const [totalPaginas, setTotalPaginas] = useState(1);
   const [filtroAutor, setFiltroAutor] = useState("");
@@ -30,7 +34,8 @@ const PublicacionesGerencia: React.FC<PublicacionesGerenciaProps> = ({ volver })
   const [autores, setAutores] = useState<Usuario[]>([]);
   const [tareas, setTareas] = useState<Tarea[]>([]);
   const [areas, setAreas] = useState<Area[]>([]);
-  const [publicacionSeleccionada, setPublicacionSeleccionada] = useState<Publicacion | null>(null);
+  const [publicacionSeleccionada, setPublicacionSeleccionada] =
+    useState<Publicacion | null>(null);
   const [imagenAmpliada, setImagenAmpliada] = useState<string | null>(null);
 
   const cargarPublicaciones = useCallback(async () => {
@@ -45,10 +50,10 @@ const PublicacionesGerencia: React.FC<PublicacionesGerenciaProps> = ({ volver })
         ...(filtroArea && { area: filtroArea }),
       }).toString();
 
-      const data = await fetchWithAuth<{ publicaciones: Publicacion[]; totalPaginas: number }>(
-        `publicacion/todas?${queryParams}`,
-        token
-      );
+      const data = await fetchWithAuth<{
+        publicaciones: Publicacion[];
+        totalPaginas: number;
+      }>(`publicacion/todas?${queryParams}`, token);
       setPublicaciones(data.publicaciones);
       setTotalPaginas(data.totalPaginas);
     } catch (err) {
@@ -91,7 +96,7 @@ const PublicacionesGerencia: React.FC<PublicacionesGerenciaProps> = ({ volver })
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-semibold mb-2">📚 Publicaciones</h2>
         <button onClick={volver} className="btn-secondary text-sm">
-          ← Volver al panel
+          ←Regresar
         </button>
       </div>
 
@@ -122,7 +127,10 @@ const PublicacionesGerencia: React.FC<PublicacionesGerenciaProps> = ({ volver })
         <>
           <div className="space-y-6">
             {publicaciones.map((pub) => (
-              <div key={pub._id} className="bg-white rounded-lg shadow p-4 space-y-3">
+              <div
+                key={pub._id}
+                className="bg-white rounded-lg shadow p-4 space-y-3"
+              >
                 <div className="flex justify-between items-start">
                   <div className="flex items-center gap-3">
                     <img
@@ -134,10 +142,12 @@ const PublicacionesGerencia: React.FC<PublicacionesGerenciaProps> = ({ volver })
                       <p className="font-semibold text-sm">
                         {pub.autor?.nombre} {pub.autor?.apellidos}
                       </p>
-                      <p className="text-xs text-gray-500">{formatFecha(pub.creado_en)}</p>
+                      <p className="text-xs text-gray-500">
+                        {formatFecha(pub.creado_en)}
+                      </p>
                     </div>
                   </div>
-                  <div className="flex gap-2">
+                  <div className="flex flex-col items-end gap-1">
                     <button
                       onClick={() => setPublicacionSeleccionada(pub)}
                       className="text-blue-600 hover:underline text-sm"
@@ -148,18 +158,26 @@ const PublicacionesGerencia: React.FC<PublicacionesGerenciaProps> = ({ volver })
                       onClick={() => toggleComentarios(pub._id)}
                       className="text-green-600 hover:underline text-sm"
                     >
-                      {comentariosVisibles[pub._id] ? "Ocultar comentarios" : "Ver comentarios"}
+                      {comentariosVisibles[pub._id]
+                        ? "Ocultar comentarios"
+                        : "Ver"}
                     </button>
                   </div>
                 </div>
 
-                <p className="text-gray-700 text-sm whitespace-pre-wrap">{pub.texto}</p>
+                <p className="text-gray-700 text-sm whitespace-pre-wrap">
+                  {pub.texto}
+                </p>
 
                 {pub.imagen && (
                   <img
-                    src={pub.imagen.startsWith("http") ? pub.imagen : `/uploads/publicaciones/${pub.imagen}`}
+                    src={
+                      pub.imagen.startsWith("http")
+                        ? pub.imagen
+                        : `/uploads/publicaciones/${pub.imagen}`
+                    }
                     alt="Imagen"
-                    onClick={() => setImagenAmpliada(pub.imagen ?? null )}
+                    onClick={() => setImagenAmpliada(pub.imagen ?? null)}
                     className="max-w-xs rounded border cursor-zoom-in hover:opacity-90 transition"
                   />
                 )}
@@ -174,19 +192,29 @@ const PublicacionesGerencia: React.FC<PublicacionesGerenciaProps> = ({ volver })
             ))}
           </div>
 
-          <div className="flex justify-center items-center gap-4 pt-4">
+          <div className="flex flex-col items-center justify-center space-y-2 pt-6 text-sm">
             <button
-              className="btn-outline px-3 py-1"
+              className={`btn-outline px-4 py-1 rounded ${
+                paginaActual === 1
+                  ? "opacity-50 cursor-not-allowed"
+                  : "hover:bg-gray-200"
+              }`}
               disabled={paginaActual === 1}
               onClick={() => setPaginaActual((prev) => Math.max(1, prev - 1))}
             >
               « Anterior
             </button>
-            <span className="text-sm">
+
+            <span className="text-gray-600 font-medium">
               Página {paginaActual} de {totalPaginas}
             </span>
+
             <button
-              className="btn-outline px-3 py-1"
+              className={`btn-outline px-4 py-1 rounded ${
+                paginaActual === totalPaginas
+                  ? "opacity-50 cursor-not-allowed"
+                  : "hover:bg-gray-200"
+              }`}
               disabled={paginaActual === totalPaginas}
               onClick={() => setPaginaActual((prev) => prev + 1)}
             >
@@ -213,7 +241,11 @@ const PublicacionesGerencia: React.FC<PublicacionesGerenciaProps> = ({ volver })
           onClick={() => setImagenAmpliada(null)}
         >
           <img
-            src={imagenAmpliada.startsWith("http") ? imagenAmpliada : `/uploads/publicaciones/${imagenAmpliada}`}
+            src={
+              imagenAmpliada.startsWith("http")
+                ? imagenAmpliada
+                : `/uploads/publicaciones/${imagenAmpliada}`
+            }
             className="w-full h-full object-contain p-4"
             alt="Ampliada"
           />

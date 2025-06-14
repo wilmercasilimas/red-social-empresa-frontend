@@ -16,34 +16,38 @@ const Topbar: React.FC = () => {
   };
 
   return (
-    <header className="w-full bg-blue-600 text-white shadow-md">
-      <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-        <div className="flex items-center gap-4">
+    <header className="w-full bg-transparent text-white shadow-none">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4 bg-blue-600 rounded-lg shadow-md flex flex-col sm:flex-row items-center sm:justify-between gap-4">
+        {/* Logo + título */}
+        <div className="flex items-center gap-3">
           <img
             src={logo}
             alt="Logo"
-            className="w-10 h-10 object-cover rounded-full shadow bg-white"
+            className="w-10 h-10 object-cover rounded-full bg-white shadow"
           />
-          <span className="text-lg font-semibold tracking-wide">
+          <span className="text-lg font-semibold tracking-wide text-center sm:text-left">
             Red Social Empresarial
           </span>
         </div>
 
+        {/* Usuario + botón */}
         {!isLogin && user && (
-          <div className="flex items-center gap-3">
-            {/* ✅ Botón cerrar sesión al inicio del bloque */}
-            <button onClick={logout} className="btn-secondary text-sm">
-              Salir
-            </button>
-            <span className="font-medium">
+          <div className="flex items-center gap-3 flex-wrap justify-center sm:justify-end w-full sm:w-auto">
+            <span className="font-medium text-sm text-white text-center sm:text-right">
               {user.nombre} {user.apellidos}
             </span>
             <img
               src={user.imagen}
               alt="avatar"
               onError={handleAvatarError}
-              className="h-10 w-10 rounded-full border border-white shadow"
+              className="w-10 h-10 rounded-full border border-white shadow"
             />
+            <button
+              onClick={logout}
+              className="btn-secondary text-sm px-3 py-1 whitespace-nowrap"
+            >
+              Salir
+            </button>
           </div>
         )}
       </div>

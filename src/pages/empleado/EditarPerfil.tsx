@@ -58,7 +58,7 @@ const EditarPerfil: React.FC<EditarPerfilProps> = ({ salirEdicion }) => {
           }),
         });
 
-        const data = await res.json(); // ← esta línea causaba el error
+        const data = await res.json();
         if (data.status === "success") {
           showToast("Contraseña actualizada correctamente");
         } else {
@@ -74,13 +74,29 @@ const EditarPerfil: React.FC<EditarPerfilProps> = ({ salirEdicion }) => {
 
   return (
     <form onSubmit={handleSubmit} className="card-panel animate-slide-up space-y-6">
-      <div className="flex items-center gap-4">
-        <img
-          src={getAvatarUrl(user?.imagen)}
-          alt="Avatar actual"
-          className="w-16 h-16 rounded-full object-cover border"
-        />
-        <input type="file" accept="image/*" onChange={handleAvatarChange} />
+      {/* ✅ Sección avatar con preview + input custom */}
+      <div>
+        <label className="form-label">Cambiar avatar</label>
+        <div className="flex items-center gap-4">
+          <img
+            src={avatarFile ? URL.createObjectURL(avatarFile) : getAvatarUrl(user?.imagen)}
+            alt="Avatar"
+            className="w-14 h-14 rounded-full object-cover border border-gray-300 shadow"
+          />
+          <label
+            htmlFor="avatarInput"
+            className="cursor-pointer bg-blue-600 text-white text-sm font-medium px-4 py-2 rounded hover:bg-blue-700 transition"
+          >
+            Seleccionar imagen
+          </label>
+          <input
+            id="avatarInput"
+            type="file"
+            accept="image/*"
+            onChange={handleAvatarChange}
+            className="hidden"
+          />
+        </div>
       </div>
 
       <div>
@@ -115,7 +131,7 @@ const EditarPerfil: React.FC<EditarPerfilProps> = ({ salirEdicion }) => {
 
       <div className="flex gap-4">
         <button type="submit" className="btn-primary">
-          Guardar cambios
+          Guardar
         </button>
         <button type="button" className="btn-secondary" onClick={salirEdicion}>
           Cancelar

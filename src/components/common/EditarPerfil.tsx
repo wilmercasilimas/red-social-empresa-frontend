@@ -3,7 +3,6 @@ import React, { useState } from "react";
 import { showToast } from "../../helpers/showToast";
 import Global from "../../helpers/Global";
 
-
 interface Props {
   salirEdicion: () => void;
 }
@@ -71,13 +70,29 @@ const EditarPerfil: React.FC<Props> = ({ salirEdicion }) => {
     <form onSubmit={handleSubmit} className="card-panel space-y-4 mt-6 animate-slide-up">
       <h3 className="text-xl font-bold">Editar Perfil</h3>
 
+      {/* ✅ Input avatar custom */}
       <div>
         <label className="form-label">Cambiar avatar</label>
-        <input
-          type="file"
-          accept="image/*"
-          onChange={(e) => setAvatar(e.target.files?.[0] || null)}
-        />
+        <div className="flex items-center gap-4">
+          <img
+            src={avatar ? URL.createObjectURL(avatar) : "/img/user.png"}
+            alt="Preview"
+            className="w-12 h-12 rounded-full object-cover border border-gray-300 shadow"
+          />
+          <label
+            htmlFor="avatarInput"
+            className="cursor-pointer bg-blue-600 text-white text-sm font-medium px-4 py-2 rounded hover:bg-blue-700 transition"
+          >
+            Seleccionar imagen
+          </label>
+          <input
+            id="avatarInput"
+            type="file"
+            accept="image/*"
+            onChange={(e) => setAvatar(e.target.files?.[0] || null)}
+            className="hidden"
+          />
+        </div>
       </div>
 
       <div>
@@ -102,7 +117,7 @@ const EditarPerfil: React.FC<Props> = ({ salirEdicion }) => {
 
       <div className="flex gap-4 mt-4">
         <button type="submit" className="btn-primary" disabled={loading}>
-          Guardar cambios
+          Guardar
         </button>
         <button
           type="button"

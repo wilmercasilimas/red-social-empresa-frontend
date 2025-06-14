@@ -19,8 +19,11 @@ const PublicacionesAdmin = () => {
   const navigate = useNavigate();
   const [publicaciones, setPublicaciones] = useState<Publicacion[]>([]);
   const [cargando, setCargando] = useState(true);
-  const [publicacionSeleccionada, setPublicacionSeleccionada] = useState<Publicacion | null>(null);
-  const [mostrarComentarios, setMostrarComentarios] = useState<string | null>(null);
+  const [publicacionSeleccionada, setPublicacionSeleccionada] =
+    useState<Publicacion | null>(null);
+  const [mostrarComentarios, setMostrarComentarios] = useState<string | null>(
+    null
+  );
   const [paginaActual, setPaginaActual] = useState(1);
   const [totalPaginas, setTotalPaginas] = useState(1);
   const [filtroAutor, setFiltroAutor] = useState("");
@@ -74,7 +77,9 @@ const PublicacionesAdmin = () => {
   }, [token]);
 
   const eliminarPublicacion = async (id: string) => {
-    const confirmar = window.confirm("¿Seguro que deseas eliminar esta publicación?");
+    const confirmar = window.confirm(
+      "¿Seguro que deseas eliminar esta publicación?"
+    );
     if (!confirmar) return;
 
     try {
@@ -106,8 +111,11 @@ const PublicacionesAdmin = () => {
     <div className="p-6 space-y-8">
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-semibold mb-2">📚 Publicaciones</h2>
-        <button onClick={() => navigate("/admin")} className="btn-secondary text-sm">
-          ← Volver al panel
+        <button
+          onClick={() => navigate("/admin")}
+          className="btn-secondary text-sm"
+        >
+          ←Regresar
         </button>
       </div>
 
@@ -137,7 +145,10 @@ const PublicacionesAdmin = () => {
       ) : (
         <div className="space-y-6">
           {publicaciones.map((pub) => (
-            <div key={pub._id} className="bg-white p-4 rounded shadow space-y-2">
+            <div
+              key={pub._id}
+              className="bg-white p-4 rounded shadow space-y-2"
+            >
               <div className="flex justify-between items-start">
                 <div className="flex items-center gap-3">
                   <img
@@ -149,34 +160,51 @@ const PublicacionesAdmin = () => {
                     <p className="font-semibold">
                       {pub.autor?.nombre} {pub.autor?.apellidos}
                     </p>
-                    <p className="text-sm text-gray-500">{formatFecha(pub.creado_en)}</p>
+                    <p className="text-sm text-gray-500">
+                      {formatFecha(pub.creado_en)}
+                    </p>
                   </div>
                 </div>
-                <div className="space-x-2">
+                <div className="flex flex-col items-end gap-1">
+                  {/* 1. Ver comentarios */}
                   <button
-                    onClick={() => eliminarPublicacion(pub._id)}
-                    className="text-red-600 hover:underline text-sm"
+                    onClick={() =>
+                      setMostrarComentarios(
+                        pub._id === mostrarComentarios ? null : pub._id
+                      )
+                    }
+                    className="text-green-600 hover:underline text-sm"
                   >
-                    Eliminar
+                    {mostrarComentarios === pub._id
+                      ? "Ocultar comentarios"
+                      : "Ver"}
                   </button>
+
+                  {/* 2. Editar */}
                   <button
                     onClick={() => setPublicacionSeleccionada(pub)}
                     className="text-blue-600 hover:underline text-sm"
                   >
                     Editar
                   </button>
+
+                  {/* 3. Eliminar separado */}
                   <button
-                    onClick={() => setMostrarComentarios(pub._id === mostrarComentarios ? null : pub._id)}
-                    className="text-green-600 hover:underline text-sm"
+                    onClick={() => eliminarPublicacion(pub._id)}
+                    className="text-red-600 hover:underline text-sm mt-2"
                   >
-                    {mostrarComentarios === pub._id ? "Ocultar comentarios" : "Ver comentarios"}
+                    Eliminar
                   </button>
                 </div>
               </div>
               <p className="text-sm text-gray-800">{pub.texto}</p>
               {pub.imagen && (
                 <img
-                  src={pub.imagen.startsWith("http") ? pub.imagen : `/uploads/publicaciones/${pub.imagen}`}
+                  src={
+                    pub.imagen.startsWith("http")
+                      ? pub.imagen
+                      : `/uploads/publicaciones/${pub.imagen}`
+                  }
                   alt="Imagen"
                   onClick={() => setImagenAmpliada(pub.imagen ?? null)}
                   className="rounded border max-w-xs mt-2 cursor-zoom-in hover:opacity-90 transition"
@@ -191,19 +219,29 @@ const PublicacionesAdmin = () => {
             </div>
           ))}
 
-          <div className="flex justify-center items-center gap-4 pt-4">
+          <div className="flex flex-col items-center justify-center space-y-2 pt-6 text-sm">
             <button
-              className="btn-outline px-3 py-1"
+              className={`btn-outline px-4 py-1 rounded ${
+                paginaActual === 1
+                  ? "opacity-50 cursor-not-allowed"
+                  : "hover:bg-gray-200"
+              }`}
               disabled={paginaActual === 1}
               onClick={() => setPaginaActual((prev) => Math.max(1, prev - 1))}
             >
               « Anterior
             </button>
-            <span className="text-sm">
+
+            <span className="text-gray-600 font-medium">
               Página {paginaActual} de {totalPaginas}
             </span>
+
             <button
-              className="btn-outline px-3 py-1"
+              className={`btn-outline px-4 py-1 rounded ${
+                paginaActual === totalPaginas
+                  ? "opacity-50 cursor-not-allowed"
+                  : "hover:bg-gray-200"
+              }`}
               disabled={paginaActual === totalPaginas}
               onClick={() => setPaginaActual((prev) => prev + 1)}
             >
@@ -230,7 +268,11 @@ const PublicacionesAdmin = () => {
           onClick={() => setImagenAmpliada(null)}
         >
           <img
-            src={imagenAmpliada.startsWith("http") ? imagenAmpliada : `/uploads/publicaciones/${imagenAmpliada}`}
+            src={
+              imagenAmpliada.startsWith("http")
+                ? imagenAmpliada
+                : `/uploads/publicaciones/${imagenAmpliada}`
+            }
             className="w-full h-full object-contain p-4"
             alt="Ampliada"
           />

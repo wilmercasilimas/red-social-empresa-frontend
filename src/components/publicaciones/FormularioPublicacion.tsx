@@ -129,22 +129,38 @@ const FormularioPublicacion = ({ onPublicacionCreada }: FormularioPublicacionPro
       </select>
 
       <div>
-        <label className="block text-sm font-medium text-gray-600 mb-1">
-          Imagen (opcional)
-        </label>
-        <input
-          type="file"
-          accept="image/*"
-          onChange={handleImagenChange}
-        />
-        {imagen && (
-          <img
-            src={URL.createObjectURL(imagen)}
-            alt="Vista previa"
-            className="mt-2 h-40 object-cover rounded-lg border"
-          />
-        )}
-      </div>
+  <label className="block text-sm font-medium text-gray-600 mb-1">
+    Imagen (opcional)
+  </label>
+
+  <div className="flex items-center gap-3 mt-1">
+    <label
+      htmlFor="imagenInput"
+      className="cursor-pointer bg-blue-600 text-white px-3 py-1 rounded text-sm hover:bg-blue-700 transition"
+    >
+      Seleccionar imagen
+    </label>
+    <span className="text-sm text-gray-600 truncate max-w-[160px]">
+      {imagen ? imagen.name : "No hay imagen seleccionada"}
+    </span>
+    <input
+      id="imagenInput"
+      type="file"
+      accept="image/*"
+      onChange={handleImagenChange}
+      className="hidden"
+    />
+  </div>
+
+  {imagen && (
+    <img
+      src={URL.createObjectURL(imagen)}
+      alt="Vista previa"
+      className="mt-2 h-40 object-cover rounded-lg border"
+    />
+  )}
+</div>
+
 
       <button
         type="submit"
