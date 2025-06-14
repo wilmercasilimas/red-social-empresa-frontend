@@ -1,4 +1,4 @@
-// ✅ PublicacionesGerencia.tsx con filtros por autor, tarea y área
+// src/pages/gerencia/PublicacionesGerencia.tsx
 import { useCallback, useEffect, useState } from "react";
 import type { Publicacion } from "../../types/Publicacion";
 import { fetchWithAuth } from "../../helpers/fetchWithAuth";
@@ -8,6 +8,7 @@ import { formatFecha } from "../../helpers/formatFecha";
 import ComentariosPublicacion from "../../components/comentarios/ComentariosPublicacion";
 import FormularioPublicacion from "../../components/publicaciones/FormularioPublicacion";
 import FiltrosPublicaciones from "../../components/publicaciones/FiltrosPublicaciones";
+import ModalEditarPublicacion from "../../components/publicaciones/ModalEditarPublicacion";
 import type { Usuario } from "../../types/Usuario";
 import type { Tarea } from "../../types/Tarea";
 import type { Area } from "../../types/Area";
@@ -29,6 +30,8 @@ const PublicacionesGerencia: React.FC<PublicacionesGerenciaProps> = ({ volver })
   const [autores, setAutores] = useState<Usuario[]>([]);
   const [tareas, setTareas] = useState<Tarea[]>([]);
   const [areas, setAreas] = useState<Area[]>([]);
+  const [publicacionSeleccionada, setPublicacionSeleccionada] = useState<Publicacion | null>(null);
+  const [imagenAmpliada, setImagenAmpliada] = useState<string | null>(null);
 
   const cargarPublicaciones = useCallback(async () => {
     if (!token || token.trim() === "") return;
@@ -120,17 +123,33 @@ const PublicacionesGerencia: React.FC<PublicacionesGerenciaProps> = ({ volver })
           <div className="space-y-6">
             {publicaciones.map((pub) => (
               <div key={pub._id} className="bg-white rounded-lg shadow p-4 space-y-3">
-                <div className="flex items-center gap-3">
-                  <img
-                    src={getAvatarUrl(pub.autor?.imagen || "default.png")}
-                    className="w-10 h-10 rounded-full object-cover"
-                    alt="Avatar"
-                  />
-                  <div>
-                    <p className="font-semibold text-sm">
-                      {pub.autor?.nombre} {pub.autor?.apellidos}
-                    </p>
-                    <p className="text-xs text-gray-500">{formatFecha(pub.creado_en)}</p>
+                <div className="flex justify-between items-start">
+                  <div className="flex items-center gap-3">
+                    <img
+                      src={getAvatarUrl(pub.autor?.imagen || "default.png")}
+                      className="w-10 h-10 rounded-full object-cover"
+                      alt="Avatar"
+                    />
+                    <div>
+                      <p className="font-semibold text-sm">
+                        {pub.autor?.nombre} {pub.autor?.apellidos}
+                      </p>
+                      <p className="text-xs text-gray-500">{formatFecha(pub.creado_en)}</p>
+                    </div>
+                  </div>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => setPublicacionSeleccionada(pub)}
+                      className="text-blue-600 hover:underline text-sm"
+                    >
+                      Editar
+                    </button>
+                    <button
+                      onClick={() => toggleComentarios(pub._id)}
+                      className="text-green-600 hover:underline text-sm"
+                    >
+                      {comentariosVisibles[pub._id] ? "Ocultar comentarios" : "Ver comentarios"}
+                    </button>
                   </div>
                 </div>
 
@@ -140,18 +159,10 @@ const PublicacionesGerencia: React.FC<PublicacionesGerenciaProps> = ({ volver })
                   <img
                     src={pub.imagen.startsWith("http") ? pub.imagen : `/uploads/publicaciones/${pub.imagen}`}
                     alt="Imagen"
-                    className="max-w-xs rounded border"
+                    onClick={() => setImagenAmpliada(pub.imagen ?? null )}
+                    className="max-w-xs rounded border cursor-zoom-in hover:opacity-90 transition"
                   />
                 )}
-
-                <div className="text-right">
-                  <button
-                    onClick={() => toggleComentarios(pub._id)}
-                    className="text-green-600 hover:underline text-sm"
-                  >
-                    {comentariosVisibles[pub._id] ? "Ocultar comentarios" : "Ver comentarios"}
-                  </button>
-                </div>
 
                 {comentariosVisibles[pub._id] && (
                   <ComentariosPublicacion
@@ -183,6 +194,30 @@ const PublicacionesGerencia: React.FC<PublicacionesGerenciaProps> = ({ volver })
             </button>
           </div>
         </>
+      )}
+
+      {publicacionSeleccionada && (
+        <ModalEditarPublicacion
+          publicacion={publicacionSeleccionada}
+          onClose={() => setPublicacionSeleccionada(null)}
+          onActualizacionExitosa={async () => {
+            await cargarPublicaciones();
+            setPublicacionSeleccionada(null);
+          }}
+        />
+      )}
+
+      {imagenAmpliada && (
+        <div
+          className="fixed inset-0 z-50 bg-black bg-opacity-70 flex items-center justify-center"
+          onClick={() => setImagenAmpliada(null)}
+        >
+          <img
+            src={imagenAmpliada.startsWith("http") ? imagenAmpliada : `/uploads/publicaciones/${imagenAmpliada}`}
+            className="w-full h-full object-contain p-4"
+            alt="Ampliada"
+          />
+        </div>
       )}
     </div>
   );

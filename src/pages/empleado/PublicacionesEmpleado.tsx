@@ -22,6 +22,7 @@ const PublicacionesEmpleado: React.FC<PublicacionesEmpleadoProps> = ({ volver })
   const [comentariosVisibles, setComentariosVisibles] = useState<Record<string, boolean>>({});
   const [paginaActual, setPaginaActual] = useState(1);
   const [totalPaginas, setTotalPaginas] = useState(1);
+  const [imagenAmpliada, setImagenAmpliada] = useState<string | null>(null);
 
   const [filtroAutor, setFiltroAutor] = useState("");
   const [filtroTarea, setFiltroTarea] = useState("");
@@ -138,7 +139,8 @@ const PublicacionesEmpleado: React.FC<PublicacionesEmpleadoProps> = ({ volver })
                 <img
                   src={pub.imagen.startsWith("http") ? pub.imagen : `/uploads/publicaciones/${pub.imagen}`}
                   alt="Imagen"
-                  className="max-h-64 rounded border"
+                  onClick={() => setImagenAmpliada(pub.imagen ?? null)}
+                  className="max-w-xs rounded border cursor-zoom-in hover:opacity-90 transition"
                 />
               )}
               <div className="text-right">
@@ -178,6 +180,23 @@ const PublicacionesEmpleado: React.FC<PublicacionesEmpleadoProps> = ({ volver })
             </button>
           </div>
         </>
+      )}
+
+      {imagenAmpliada && (
+        <div
+          className="fixed inset-0 z-50 bg-black bg-opacity-70 flex items-center justify-center"
+          onClick={() => setImagenAmpliada(null)}
+        >
+          <img
+            src={
+              imagenAmpliada.startsWith("http")
+                ? imagenAmpliada
+                : `/uploads/publicaciones/${imagenAmpliada}`
+            }
+            className="w-full h-full object-contain p-4"
+            alt="Ampliada"
+          />
+        </div>
       )}
     </div>
   );

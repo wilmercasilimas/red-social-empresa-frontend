@@ -5,14 +5,14 @@ import { useAuth } from "../../hooks/useAuth";
 import logo from "../../assets/logo.jpg";
 
 const Topbar: React.FC = () => {
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
   const location = useLocation();
 
   const isLogin = location.pathname === "/";
 
   const handleAvatarError = (e: React.SyntheticEvent<HTMLImageElement>) => {
     console.error("Topbar avatar falló:", e.currentTarget.src);
-    e.currentTarget.src = "/img/user.png"; // ✅ Ruta corregida
+    e.currentTarget.src = "/img/user.png";
   };
 
   return (
@@ -31,10 +31,13 @@ const Topbar: React.FC = () => {
 
         {!isLogin && user && (
           <div className="flex items-center gap-3">
+            {/* ✅ Botón cerrar sesión al inicio del bloque */}
+            <button onClick={logout} className="btn-secondary text-sm">
+              Salir
+            </button>
             <span className="font-medium">
               {user.nombre} {user.apellidos}
             </span>
-            {/* ✅ Usar directamente el valor ya normalizado */}
             <img
               src={user.imagen}
               alt="avatar"

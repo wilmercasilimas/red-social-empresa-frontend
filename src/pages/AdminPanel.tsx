@@ -11,7 +11,7 @@ import { getAvatarUrl } from "../helpers/getAvatarUrl";
 import { useNavigate } from "react-router-dom";
 
 const AdminPanel: React.FC = () => {
-  const { user, logout } = useAuth();
+  const { user } = useAuth();
   const [vista, setVista] = useState<"usuarios" | "areas" | "incidencias">(
     "usuarios"
   );
@@ -21,11 +21,6 @@ const AdminPanel: React.FC = () => {
   if (!user) return null;
 
   const avatarUrl = getAvatarUrl(user.imagen);
-
-  const handleLogout = () => {
-    logout();
-    navigate("/login");
-  };
 
   return (
     <>
@@ -37,9 +32,6 @@ const AdminPanel: React.FC = () => {
             user={user}
             descripcion="Desde aquí podrás gestionar usuarios, áreas, tareas e incidencias."
           />
-          <button onClick={handleLogout} className="btn-secondary text-sm">
-            Cerrar sesión
-          </button>
         </div>
 
         {/* 🧑‍💼 Tarjeta del administrador */}

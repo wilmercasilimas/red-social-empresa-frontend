@@ -19,11 +19,8 @@ const PublicacionesAdmin = () => {
   const navigate = useNavigate();
   const [publicaciones, setPublicaciones] = useState<Publicacion[]>([]);
   const [cargando, setCargando] = useState(true);
-  const [publicacionSeleccionada, setPublicacionSeleccionada] =
-    useState<Publicacion | null>(null);
-  const [mostrarComentarios, setMostrarComentarios] = useState<string | null>(
-    null
-  );
+  const [publicacionSeleccionada, setPublicacionSeleccionada] = useState<Publicacion | null>(null);
+  const [mostrarComentarios, setMostrarComentarios] = useState<string | null>(null);
   const [paginaActual, setPaginaActual] = useState(1);
   const [totalPaginas, setTotalPaginas] = useState(1);
   const [filtroAutor, setFiltroAutor] = useState("");
@@ -32,6 +29,7 @@ const PublicacionesAdmin = () => {
   const [autores, setAutores] = useState<Usuario[]>([]);
   const [tareas, setTareas] = useState<Tarea[]>([]);
   const [areas, setAreas] = useState<Area[]>([]);
+  const [imagenAmpliada, setImagenAmpliada] = useState<string | null>(null);
 
   const cargarPublicaciones = useCallback(async () => {
     if (!token || token.trim() === "") return;
@@ -76,9 +74,7 @@ const PublicacionesAdmin = () => {
   }, [token]);
 
   const eliminarPublicacion = async (id: string) => {
-    const confirmar = window.confirm(
-      "¿Seguro que deseas eliminar esta publicación?"
-    );
+    const confirmar = window.confirm("¿Seguro que deseas eliminar esta publicación?");
     if (!confirmar) return;
 
     try {
@@ -110,10 +106,7 @@ const PublicacionesAdmin = () => {
     <div className="p-6 space-y-8">
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-semibold mb-2">📚 Publicaciones</h2>
-        <button
-          onClick={() => navigate("/admin")}
-          className="btn-secondary text-sm"
-        >
+        <button onClick={() => navigate("/admin")} className="btn-secondary text-sm">
           ← Volver al panel
         </button>
       </div>
@@ -144,10 +137,7 @@ const PublicacionesAdmin = () => {
       ) : (
         <div className="space-y-6">
           {publicaciones.map((pub) => (
-            <div
-              key={pub._id}
-              className="bg-white p-4 rounded shadow space-y-2"
-            >
+            <div key={pub._id} className="bg-white p-4 rounded shadow space-y-2">
               <div className="flex justify-between items-start">
                 <div className="flex items-center gap-3">
                   <img
@@ -159,9 +149,7 @@ const PublicacionesAdmin = () => {
                     <p className="font-semibold">
                       {pub.autor?.nombre} {pub.autor?.apellidos}
                     </p>
-                    <p className="text-sm text-gray-500">
-                      {formatFecha(pub.creado_en)}
-                    </p>
+                    <p className="text-sm text-gray-500">{formatFecha(pub.creado_en)}</p>
                   </div>
                 </div>
                 <div className="space-x-2">
@@ -178,29 +166,20 @@ const PublicacionesAdmin = () => {
                     Editar
                   </button>
                   <button
-                    onClick={() =>
-                      setMostrarComentarios((prev) =>
-                        prev === pub._id ? null : pub._id
-                      )
-                    }
+                    onClick={() => setMostrarComentarios(pub._id === mostrarComentarios ? null : pub._id)}
                     className="text-green-600 hover:underline text-sm"
                   >
-                    {mostrarComentarios === pub._id
-                      ? "Ocultar comentarios"
-                      : "Ver comentarios"}
+                    {mostrarComentarios === pub._id ? "Ocultar comentarios" : "Ver comentarios"}
                   </button>
                 </div>
               </div>
               <p className="text-sm text-gray-800">{pub.texto}</p>
               {pub.imagen && (
                 <img
-                  src={
-                    pub.imagen.startsWith("http")
-                      ? pub.imagen
-                      : `/uploads/publicaciones/${pub.imagen}`
-                  }
+                  src={pub.imagen.startsWith("http") ? pub.imagen : `/uploads/publicaciones/${pub.imagen}`}
                   alt="Imagen"
-                  className="rounded border max-w-xs mt-2"
+                  onClick={() => setImagenAmpliada(pub.imagen ?? null)}
+                  className="rounded border max-w-xs mt-2 cursor-zoom-in hover:opacity-90 transition"
                 />
               )}
               {mostrarComentarios === pub._id && (
@@ -243,6 +222,19 @@ const PublicacionesAdmin = () => {
             setPublicacionSeleccionada(null);
           }}
         />
+      )}
+
+      {imagenAmpliada && (
+        <div
+          className="fixed inset-0 z-50 bg-black bg-opacity-70 flex items-center justify-center"
+          onClick={() => setImagenAmpliada(null)}
+        >
+          <img
+            src={imagenAmpliada.startsWith("http") ? imagenAmpliada : `/uploads/publicaciones/${imagenAmpliada}`}
+            className="w-full h-full object-contain p-4"
+            alt="Ampliada"
+          />
+        </div>
       )}
     </div>
   );
