@@ -3,6 +3,10 @@ import { useAuth } from "../../hooks/useAuth";
 import { getAvatarUrl } from "../../helpers/getAvatarUrl";
 import { showToast } from "../../helpers/showToast";
 
+// ✅ Nuevos imports para botones con iconos
+import BotonIcono from "../../components/ui/BotonIcono";
+import { Save, X } from "lucide-react";
+
 interface EditarPerfilProps {
   salirEdicion: () => void;
 }
@@ -74,7 +78,6 @@ const EditarPerfil: React.FC<EditarPerfilProps> = ({ salirEdicion }) => {
 
   return (
     <form onSubmit={handleSubmit} className="card-panel animate-slide-up space-y-6">
-      {/* ✅ Sección avatar con preview + input custom */}
       <div>
         <label className="form-label">Cambiar avatar</label>
         <div className="flex items-center gap-4">
@@ -130,12 +133,19 @@ const EditarPerfil: React.FC<EditarPerfilProps> = ({ salirEdicion }) => {
       </div>
 
       <div className="flex gap-4">
-        <button type="submit" className="btn-primary">
-          Guardar
-        </button>
-        <button type="button" className="btn-secondary" onClick={salirEdicion}>
-          Cancelar
-        </button>
+        <BotonIcono
+          type="submit"
+          texto="Guardar"
+          Icono={Save}
+          cargando={false}
+        />
+        <BotonIcono
+          type="button"
+          texto="Cancelar"
+          Icono={X}
+          onClick={salirEdicion}
+          variante="secundario"
+        />
       </div>
     </form>
   );

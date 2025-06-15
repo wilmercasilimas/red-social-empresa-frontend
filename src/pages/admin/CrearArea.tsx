@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import Global from "../../helpers/Global";
 import { showToast } from "../../helpers/showToast";
+import BotonIcono from "../../components/ui/BotonIcono";
+import { Save } from "lucide-react";
 
 interface Props {
   onAreaCreada: () => void;
@@ -80,9 +82,7 @@ const CrearArea: React.FC<Props> = ({ onAreaCreada }) => {
       </div>
 
       <div className="mt-4 flex justify-end">
-        <button type="submit" className="btn-primary">
-          Guardar
-        </button>
+        <BotonIcono type="submit" texto="Guardar" Icono={Save} />
       </div>
     </form>
   );

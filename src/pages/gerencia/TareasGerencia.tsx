@@ -1,3 +1,4 @@
+// src/pages/gerencia/TareasGerencia.tsx
 import React, { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import Topbar from "../../components/common/Topbar";
@@ -81,7 +82,7 @@ const TareasGerencia: React.FC = () => {
   return (
     <>
       <Topbar />
-      <div className="min-h-screen bg-gray-100 p-8 fade-in space-y-6">
+      <div className="min-h-screen bg-gray-100 p-8 fade-in space-y-6 relative z-0">
         <div className="flex justify-end">
           <button
             onClick={() => navigate("/gerencia")}
@@ -91,25 +92,26 @@ const TareasGerencia: React.FC = () => {
           </button>
         </div>
 
-        <div className="card-panel animate-slide-up">
-          <h1 className="text-xl font-bold mb-2">
-            <span role="img" aria-label="tareas">
-              📝
-            </span>{" "}
-            Gestión de tareas
-          </h1>
-          <p className="text-gray-600 mb-4">
-            Aquí podrás crear, editar, eliminar y filtrar tareas por área,
-            creador y usuario asignado.
-          </p>
-          <FormularioTarea onSuccess={handleSuccess} />
+        {/* 🛠 Panel de registro con z-10 para desplegables */}
+        <div className="relative z-10">
+          <div className="card-panel animate-slide-up">
+            <h1 className="text-xl font-bold mb-2">
+              <span role="img" aria-label="tareas">📝</span> Gestión de tareas
+            </h1>
+            <p className="text-gray-600 mb-4">
+              Aquí podrás crear, editar, eliminar y filtrar tareas por área,
+              creador y usuario asignado.
+            </p>
+            <FormularioTarea onSuccess={handleSuccess} />
+          </div>
         </div>
 
-        <div className="card-panel animate-slide-up">
+        {/* 👇 Panel de filtros sin interferencia */}
+        <div className="card-panel animate-slide-up relative z-0">
           <FiltrosTareas onFiltrar={handleFiltrar} />
         </div>
 
-        <div className="card-panel animate-slide-up">
+        <div className="card-panel animate-slide-up relative z-0">
           <ListadoTareas
             tareas={tareas}
             mostrarControles={true}
@@ -126,9 +128,6 @@ const TareasGerencia: React.FC = () => {
               >
                 ← Anterior
               </button>
-              {/* <span className="text-gray-700">
-                   Página {pagina} de {totalPaginas}
-                </span> */}
 
               <button
                 disabled={pagina === totalPaginas}

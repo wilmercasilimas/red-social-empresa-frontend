@@ -1,4 +1,3 @@
-// src/pages/AdminPanel.tsx
 import React, { useState } from "react";
 import { useAuth } from "../hooks/useAuth";
 import Topbar from "../components/common/Topbar";
@@ -9,6 +8,8 @@ import BienvenidaPanel from "../components/common/BienvenidaPanel";
 import EditarPerfil from "./empleado/EditarPerfil";
 import { getAvatarUrl } from "../helpers/getAvatarUrl";
 import { useNavigate } from "react-router-dom";
+import BotonIcono from "../components/ui/BotonIcono";
+import { Pencil } from "lucide-react";
 
 const AdminPanel: React.FC = () => {
   const { user } = useAuth();
@@ -70,12 +71,11 @@ const AdminPanel: React.FC = () => {
               </p>
             </div>
             <div className="mt-4 md:mt-0">
-              <button
+              <BotonIcono
+                texto="Editar perfil"
+                Icono={Pencil}
                 onClick={() => setModoEdicion(true)}
-                className="btn-primary"
-              >
-                Editar perfil
-              </button>
+              />
             </div>
           </div>
         ) : (

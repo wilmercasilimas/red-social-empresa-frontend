@@ -29,24 +29,24 @@ const ListadoTareas: React.FC<ListadoTareasProps> = ({
     <div className="space-y-4">
       {tareas.map((tarea) => (
         <div
-          key={`${tarea._id}-${paginaActual}`} // 🟢 fuerza rerender
+          key={`${tarea._id}-${paginaActual}`}
           className="bg-white p-4 rounded-xl shadow-md space-y-2"
         >
           <div className="text-xs text-gray-400 italic mb-1">
             Página actual: {paginaActual}
           </div>
 
-          <div className="flex justify-between items-start">
-            <div>
-              <h2 className="text-lg font-semibold">{tarea.titulo}</h2>
-              <p className="text-sm text-gray-600">{tarea.descripcion}</p>
+          <div className="flex justify-between gap-4">
+            <div className="flex-1 overflow-hidden">
+              <h2 className="text-lg font-semibold break-words">{tarea.titulo}</h2>
+              <p className="text-sm text-gray-600 break-words">{tarea.descripcion}</p>
             </div>
             {mostrarControles && (
-              <div className="flex space-x-2">
+              <div className="flex flex-col items-end gap-2 min-w-[90px]">
                 {onEditar && (
                   <button
                     onClick={() => onEditar(tarea)}
-                    className="btn-sm btn-primary"
+                    className="btn-sm btn-primary w-full"
                   >
                     Editar
                   </button>
@@ -54,7 +54,7 @@ const ListadoTareas: React.FC<ListadoTareasProps> = ({
                 {onEliminar && (
                   <button
                     onClick={() => onEliminar(tarea._id)}
-                    className="btn-sm btn-danger"
+                    className="btn-sm btn-danger w-full"
                   >
                     Eliminar
                   </button>

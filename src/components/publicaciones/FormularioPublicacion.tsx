@@ -2,6 +2,8 @@ import { useState, useEffect, useCallback } from "react";
 import { useAuth } from "../../hooks/useAuth";
 import { showToast } from "../../helpers/showToast";
 import Global from "../../helpers/Global";
+import Select from "react-select";
+import { Upload } from "lucide-react"; // 👈 Ícono para botón
 
 interface Tarea {
   _id: string;
@@ -114,60 +116,65 @@ const FormularioPublicacion = ({ onPublicacionCreada }: FormularioPublicacionPro
         required
       />
 
-      <select
-        value={tarea}
-        onChange={(e) => setTarea(e.target.value)}
-        className="w-full border border-gray-300 p-2 rounded-md"
-        required
-      >
-        <option value="">Selecciona una tarea</option>
-        {tareas.map((t) => (
-          <option key={t._id} value={t._id}>
-            {t.titulo}
-          </option>
-        ))}
-      </select>
+      <Select
+        options={[
+          { value: "", label: "Selecciona una tarea" },
+          ...tareas.map((t) => ({ value: t._id, label: t.titulo })),
+        ]}
+        value={{
+          value: tarea,
+          label:
+            tareas.find((t) => t._id === tarea)?.titulo || "Selecciona una tarea",
+        }}
+        onChange={(op) => setTarea(op?.value || "")}
+        className="react-select-container"
+        classNamePrefix="react-select"
+      />
 
       <div>
-  <label className="block text-sm font-medium text-gray-600 mb-1">
-    Imagen (opcional)
-  </label>
-
-  <div className="flex items-center gap-3 mt-1">
-    <label
-      htmlFor="imagenInput"
-      className="cursor-pointer bg-blue-600 text-white px-3 py-1 rounded text-sm hover:bg-blue-700 transition"
-    >
-      Seleccionar imagen
-    </label>
-    <span className="text-sm text-gray-600 truncate max-w-[160px]">
-      {imagen ? imagen.name : "No hay imagen seleccionada"}
-    </span>
-    <input
-      id="imagenInput"
-      type="file"
-      accept="image/*"
-      onChange={handleImagenChange}
-      className="hidden"
-    />
-  </div>
-
-  {imagen && (
-    <img
-      src={URL.createObjectURL(imagen)}
-      alt="Vista previa"
-      className="mt-2 h-40 object-cover rounded-lg border"
-    />
-  )}
-</div>
-
+        <label className="block text-sm font-medium text-gray-600 mb-1">
+          Imagen (opcional)
+        </label>
+        <div className="flex items-center gap-3 mt-1">
+          <label
+            htmlFor="imagenInput"
+            className="cursor-pointer bg-blue-600 text-white px-3 py-1 rounded text-sm hover:bg-blue-700 transition"
+          >
+            Seleccionar imagen
+          </label>
+          <span className="text-sm text-gray-600 truncate max-w-[160px]">
+            {imagen ? imagen.name : "Sín Imagen"}
+          </span>
+          <input
+            id="imagenInput"
+            type="file"
+            accept="image/*"
+            onChange={handleImagenChange}
+            className="hidden"
+          />
+        </div>
+        {imagen && (
+          <img
+            src={URL.createObjectURL(imagen)}
+            alt="Vista previa"
+            className="mt-2 h-40 object-cover rounded-lg border"
+          />
+        )}
+      </div>
 
       <button
         type="submit"
         disabled={cargando}
-        className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition disabled:opacity-50"
+        className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition disabled:opacity-50 flex items-center justify-center gap-2"
       >
-        {cargando ? "Publicando..." : "Publicar"}
+        {cargando ? (
+          "Publicando..."
+        ) : (
+          <>
+            <Upload className="w-5 h-5" />
+            <span className="hidden sm:inline">Publicar</span>
+          </>
+        )}
       </button>
     </form>
   );

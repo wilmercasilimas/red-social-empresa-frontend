@@ -3,6 +3,8 @@ import { showToast } from "../../helpers/showToast";
 import { useAuth } from "../../hooks/useAuth";
 import Global from "../../helpers/Global";
 import type { Publicacion } from "../../types/Publicacion";
+import Select from "react-select";
+import { Save, X } from "lucide-react"; // ✅ Íconos añadidos
 
 interface ModalEditarPublicacionProps {
   publicacion: Publicacion;
@@ -19,8 +21,8 @@ const ModalEditarPublicacion = ({
   const [texto, setTexto] = useState(publicacion.texto);
   const [tarea, setTarea] = useState(publicacion.tarea?._id || "");
   const [imagen, setImagen] = useState<File | null>(null);
-  const [cargando, setCargando] = useState(false);
   const [tareas, setTareas] = useState<{ _id: string; titulo: string }[]>([]);
+  const [cargando, setCargando] = useState(false);
 
   useEffect(() => {
     const cargarTareas = async () => {
@@ -86,38 +88,49 @@ const ModalEditarPublicacion = ({
             className="w-full p-2 border rounded"
             rows={4}
           />
-          <select
-            value={tarea}
-            onChange={(e) => setTarea(e.target.value)}
-            className="w-full p-2 border rounded"
-            required
-          >
-            <option value="">Selecciona una tarea</option>
-            {tareas.map((t) => (
-              <option key={t._id} value={t._id}>
-                {t.titulo}
-              </option>
-            ))}
-          </select>
+
+          <Select
+            options={[
+              { value: "", label: "Selecciona una tarea" },
+              ...tareas.map((t) => ({ value: t._id, label: t.titulo })),
+            ]}
+            value={{
+              value: tarea,
+              label: tareas.find((t) => t._id === tarea)?.titulo || "Selecciona una tarea",
+            }}
+            onChange={(op) => setTarea(op?.value || "")}
+            classNamePrefix="react-select"
+          />
+
           <input
             type="file"
             accept="image/*"
             onChange={(e) => setImagen(e.target.files?.[0] || null)}
           />
+
           <div className="flex justify-end space-x-2">
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
+              className="px-4 py-2 bg-gray-300 text-gray-800 rounded hover:bg-gray-400 flex items-center gap-2"
             >
-              Cancelar
+              <X className="w-4 h-4" />
+              <span className="hidden sm:inline">Cancelar</span>
             </button>
+
             <button
               type="submit"
               disabled={cargando}
-              className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+              className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 flex items-center gap-2 disabled:opacity-50"
             >
-              {cargando ? "Guardando..." : "Guardar cambios"}
+              {cargando ? (
+                "Guardando..."
+              ) : (
+                <>
+                  <Save className="w-4 h-4" />
+                  <span className="hidden sm:inline">Guardar cambios</span>
+                </>
+              )}
             </button>
           </div>
         </form>

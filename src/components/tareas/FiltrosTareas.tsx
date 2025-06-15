@@ -1,10 +1,10 @@
-// src/components/tareas/FiltrosTareas.tsx
 import React, { useEffect, useState } from "react";
 import { fetchWithAuth } from "../../helpers/fetchWithAuth";
 import type { Usuario } from "../../types/Usuario";
 import type { Area } from "../../types/Area";
 import { useAuth } from "../../hooks/useAuth";
 import { showToast } from "../../helpers/showToast";
+import Select from "react-select";
 
 export type FiltroTarea = {
   asignada_a?: string;
@@ -45,10 +45,8 @@ const FiltrosTareas: React.FC<FiltrosTareasProps> = ({ onFiltrar }) => {
     cargarAreas();
   }, [token]);
 
-  const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const { name, value } = e.target;
-    const nuevoValor = value || undefined;
-    const nuevosFiltros = { ...filtros, [name]: nuevoValor };
+  const handleChange = (campo: keyof FiltroTarea, valor: string | undefined) => {
+    const nuevosFiltros = { ...filtros, [campo]: valor || undefined };
     setFiltros(nuevosFiltros);
     onFiltrar(nuevosFiltros);
   };
@@ -59,53 +57,80 @@ const FiltrosTareas: React.FC<FiltrosTareasProps> = ({ onFiltrar }) => {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div>
           <label className="block text-sm font-medium mb-1">Asignado a</label>
-          <select
-            name="asignada_a"
-            value={filtros.asignada_a || ""}
-            onChange={handleChange}
-            className="w-full border rounded p-2"
-          >
-            <option value="">Todos</option>
-            {usuarios.map((u) => (
-              <option key={u._id} value={u._id}>
-                {u.nombre} {u.apellidos}
-              </option>
-            ))}
-          </select>
+          <Select
+            options={[
+              { value: "", label: "Todos" },
+              ...usuarios.map((u) => ({
+                value: u._id,
+                label: `${u.nombre} ${u.apellidos}`,
+              })),
+            ]}
+            value={
+              filtros.asignada_a
+                ? {
+                    value: filtros.asignada_a,
+                    label:
+                      usuarios.find((u) => u._id === filtros.asignada_a)?.nombre +
+                      " " +
+                      usuarios.find((u) => u._id === filtros.asignada_a)?.apellidos,
+                  }
+                : { value: "", label: "Todos" }
+            }
+            onChange={(op) => handleChange("asignada_a", op?.value || undefined)}
+            classNamePrefix="react-select"
+            menuPortalTarget={document.body}
+            menuPosition="absolute"
+          />
         </div>
 
         <div>
           <label className="block text-sm font-medium mb-1">Creador</label>
-          <select
-            name="creada_por"
-            value={filtros.creada_por || ""}
-            onChange={handleChange}
-            className="w-full border rounded p-2"
-          >
-            <option value="">Todos</option>
-            {usuarios.map((u) => (
-              <option key={u._id} value={u._id}>
-                {u.nombre} {u.apellidos}
-              </option>
-            ))}
-          </select>
+          <Select
+            options={[
+              { value: "", label: "Todos" },
+              ...usuarios.map((u) => ({
+                value: u._id,
+                label: `${u.nombre} ${u.apellidos}`,
+              })),
+            ]}
+            value={
+              filtros.creada_por
+                ? {
+                    value: filtros.creada_por,
+                    label:
+                      usuarios.find((u) => u._id === filtros.creada_por)?.nombre +
+                      " " +
+                      usuarios.find((u) => u._id === filtros.creada_por)?.apellidos,
+                  }
+                : { value: "", label: "Todos" }
+            }
+            onChange={(op) => handleChange("creada_por", op?.value || undefined)}
+            classNamePrefix="react-select"
+            menuPortalTarget={document.body}
+            menuPosition="absolute"
+          />
         </div>
 
         <div>
           <label className="block text-sm font-medium mb-1">Área</label>
-          <select
-            name="area"
-            value={filtros.area || ""}
-            onChange={handleChange}
-            className="w-full border rounded p-2"
-          >
-            <option value="">Todas</option>
-            {areas.map((a) => (
-              <option key={a._id} value={a._id}>
-                {a.nombre}
-              </option>
-            ))}
-          </select>
+          <Select
+            options={[
+              { value: "", label: "Todas" },
+              ...areas.map((a) => ({ value: a._id, label: a.nombre })),
+            ]}
+            value={
+              filtros.area
+                ? {
+                    value: filtros.area,
+                    label: areas.find((a) => a._id === filtros.area)?.nombre || "",
+                  }
+                : { value: "", label: "Todas" }
+            }
+            onChange={(op) => handleChange("area", op?.value || undefined)}
+            classNamePrefix="react-select"
+            menuPortalTarget={document.body}
+            menuPosition="absolute"
+          />
         </div>
       </div>
     </div>

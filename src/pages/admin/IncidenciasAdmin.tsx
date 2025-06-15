@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 import { showToast } from "../../components/common/ui/showToast";
 import FormularioIncidencia from "../../components/common/incidencias/FormularioIncidencia";
 import { formatFecha } from "../../helpers/formatFecha"; // ✅ Importar helper
+import BotonIcono from "../../components/ui/BotonIcono";
+import { Plus, X, Trash2 } from "lucide-react";
 
 interface Usuario {
   nombre: string;
@@ -85,12 +87,13 @@ const IncidenciasAdmin: React.FC = () => {
     <div className="p-6">
       <h2 className="text-2xl font-semibold mb-4">Incidencias activas</h2>
 
-      <button
-        onClick={() => setMostrarFormulario(!mostrarFormulario)}
-        className="mb-4 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-      >
-        {mostrarFormulario ? "Ocultar formulario" : "+ Nueva incidencia"}
-      </button>
+      <div className="mb-4">
+        <BotonIcono
+          texto={mostrarFormulario ? "Ocultar formulario" : "Nueva incidencia"}
+          Icono={mostrarFormulario ? X : Plus}
+          onClick={() => setMostrarFormulario(!mostrarFormulario)}
+        />
+      </div>
 
       {mostrarFormulario && (
         <FormularioIncidencia onIncidenciaCreada={obtenerIncidencias} />
@@ -127,12 +130,13 @@ const IncidenciasAdmin: React.FC = () => {
                   {incidencia.asignada_por?.nombre} {incidencia.asignada_por?.apellidos}
                 </td>
                 <td className="p-2 border">
-                  <button
+                  <BotonIcono
+                    texto="Eliminar"
+                    Icono={Trash2}
                     onClick={() => eliminarIncidencia(incidencia._id)}
-                    className="bg-red-500 text-white px-2 py-1 rounded text-sm hover:bg-red-600"
-                  >
-                    Eliminar
-                  </button>
+                    variante="peligro"
+                    className="text-sm"
+                  />
                 </td>
               </tr>
             ))}

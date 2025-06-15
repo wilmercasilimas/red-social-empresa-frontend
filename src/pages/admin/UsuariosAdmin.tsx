@@ -4,8 +4,9 @@ import type { Usuario } from "../../types/Usuario";
 import AgregarUsuario from "./AgregarUsuario";
 import EditarUsuario from "./EditarUsuario";
 import { getAvatarUrl } from "../../helpers/getAvatarUrl";
-import { Info } from "lucide-react";
+import { Info, Edit, Trash2, Plus, X } from "lucide-react";
 import { formatFecha } from "../../helpers/formatFecha";
+import BotonIcono from "../../components/ui/BotonIcono";
 
 const UsuariosAdmin: React.FC = () => {
   const [usuarios, setUsuarios] = useState<Usuario[]>([]);
@@ -68,15 +69,14 @@ const UsuariosAdmin: React.FC = () => {
             Aquí puedes ver, editar y eliminar usuarios registrados.
           </p>
         </div>
-        <button
-          className="btn-primary animate-bounce-slow"
+        <BotonIcono
+          texto={mostrarFormulario ? "Cancelar" : "Agregar usuario"}
+          Icono={mostrarFormulario ? X : Plus}
           onClick={() => {
             setMostrarFormulario(!mostrarFormulario);
             setUsuarioEditando(null);
           }}
-        >
-          {mostrarFormulario ? "Cancelar" : "Agregar usuario"}
-        </button>
+        />
       </div>
 
       {mostrarFormulario && (
@@ -178,9 +178,9 @@ const UsuariosAdmin: React.FC = () => {
                                   <span className="font-semibold">
                                     {i.tipo}
                                   </span>
-                                  :{" "}
+                                  : {" "}
                                   <span>
-                                    {formatFecha(i.fecha_inicio)} -{" "}
+                                    {formatFecha(i.fecha_inicio)} - {" "}
                                     {formatFecha(i.fecha_fin)}
                                   </span>
                                 </div>
@@ -211,22 +211,25 @@ const UsuariosAdmin: React.FC = () => {
                         ? formatFecha(usuario.creado_en)
                         : "No disponible"}
                     </td>
-                    <td className="py-2 px-4 text-center space-x-2">
-                      <button
-                        className="btn-primary text-sm"
-                        onClick={() => {
-                          setUsuarioEditando(usuario);
-                          setMostrarFormulario(false);
-                        }}
-                      >
-                        Editar
-                      </button>
-                      <button
-                        className="btn-danger text-sm"
-                        onClick={() => handleEliminarUsuario(usuario._id)}
-                      >
-                        Eliminar
-                      </button>
+                    <td className="py-2 px-4 text-center">
+                      <div className="flex justify-center items-center gap-2">
+                        <BotonIcono
+                          texto="Editar"
+                          Icono={Edit}
+                          onClick={() => {
+                            setUsuarioEditando(usuario);
+                            setMostrarFormulario(false);
+                          }}
+                          className="text-sm"
+                        />
+                        <BotonIcono
+                          texto="Eliminar"
+                          Icono={Trash2}
+                          onClick={() => handleEliminarUsuario(usuario._id)}
+                          variante="peligro"
+                          className="text-sm"
+                        />
+                      </div>
                     </td>
                   </tr>
                 );

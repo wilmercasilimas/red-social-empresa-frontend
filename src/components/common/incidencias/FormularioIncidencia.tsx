@@ -3,6 +3,8 @@ import Select from "react-select";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { showToast } from "../ui/showToast";
+import { Plus } from "lucide-react";
+import BotonIcono from "../../ui/BotonIcono";
 
 interface Usuario {
   _id: string;
@@ -53,14 +55,23 @@ const FormularioIncidencia: React.FC<Props> = ({ onIncidenciaCreada }) => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Validación previa
+    if (!form.usuario || !startDate || !endDate) {
+      showToast("Todos los campos son obligatorios", "error");
+      return;
+    }
+
+    const payload = {
+      tipo: form.tipo,
+      descripcion: form.descripcion,
+      usuario: form.usuario,
+      fecha_inicio: startDate.toISOString(),
+      fecha_fin: endDate.toISOString(),
+    };
+
     try {
       const token = localStorage.getItem("token");
-
-      const payload = {
-        ...form,
-        fecha_inicio: startDate ? startDate.toISOString() : "",
-        fecha_fin: endDate ? endDate.toISOString() : "",
-      };
 
       const response = await fetch(
         "https://red-social-empresa-backend.onrender.com/api/incidencia/crear",
@@ -183,9 +194,12 @@ const FormularioIncidencia: React.FC<Props> = ({ onIncidenciaCreada }) => {
         />
       </div>
 
-      <button type="submit" className="btn-primary">
-        Registrar Incidencia
-      </button>
+      <BotonIcono
+        type="submit"
+        texto="Registrar Incidencia"
+        Icono={Plus}
+        variante="primario"
+      />
     </form>
   );
 };

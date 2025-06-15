@@ -4,6 +4,9 @@ import CrearArea from "./CrearArea";
 import EditarArea from "./EditarArea";
 import { showToast } from "../../helpers/showToast";
 
+import BotonIcono from "../../components/ui/BotonIcono";
+import { Edit, Trash2, Plus, X } from "lucide-react";
+
 interface Empleado {
   _id: string;
   nombre: string;
@@ -114,15 +117,14 @@ const AreasAdmin: React.FC = () => {
             Aquí puedes ver, editar y eliminar las áreas registradas.
           </p>
         </div>
-        <button
-          className="btn-primary animate-bounce-slow"
+        <BotonIcono
+          texto={mostrarFormulario ? "Cancelar" : "Agregar área"}
+          Icono={mostrarFormulario ? X : Plus}
           onClick={() => {
             setMostrarFormulario(!mostrarFormulario);
             setAreaSeleccionada(null);
           }}
-        >
-          {mostrarFormulario ? "Cancelar" : "Agregar área"}
-        </button>
+        />
       </div>
 
       {mostrarFormulario && (
@@ -181,26 +183,25 @@ const AreasAdmin: React.FC = () => {
                         </span>
                       )}
                     </td>
-                    <td className="py-2 px-4 text-center space-x-2">
-                      <button
-                        className="btn-primary text-sm"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setAreaSeleccionada(area);
-                          setMostrarFormulario(false);
-                        }}
-                      >
-                        Editar
-                      </button>
-                      <button
-                        className="btn-danger text-sm"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleEliminarArea(area._id);
-                        }}
-                      >
-                        Eliminar
-                      </button>
+                    <td className="py-2 px-4 text-center">
+                      <div className="flex justify-center items-center gap-2">
+                        <BotonIcono
+                          texto="Editar"
+                          Icono={Edit}
+                          onClick={() => {
+                            setAreaSeleccionada(area);
+                            setMostrarFormulario(false);
+                          }}
+                          className="text-sm"
+                        />
+                        <BotonIcono
+                          texto="Eliminar"
+                          Icono={Trash2}
+                          onClick={() => handleEliminarArea(area._id)}
+                          variante="peligro"
+                          className="text-sm"
+                        />
+                      </div>
                     </td>
                   </tr>
 

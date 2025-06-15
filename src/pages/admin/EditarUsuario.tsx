@@ -2,6 +2,11 @@ import React, { useEffect, useState } from "react";
 import Global from "../../helpers/Global";
 import { showToast } from "../../helpers/showToast";
 import { formatFecha } from "../../helpers/formatFecha";
+import Select from "react-select";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+import BotonIcono from "../../components/ui/BotonIcono";
+import { Save, X } from "lucide-react";
 
 interface Area {
   _id: string;
@@ -35,16 +40,15 @@ interface Props {
   onCancelar: () => void;
 }
 
-const EditarUsuario: React.FC<Props> = ({
-  usuario,
-  onUsuarioActualizado,
-  onCancelar,
-}) => {
+const EditarUsuario: React.FC<Props> = ({ usuario, onUsuarioActualizado, onCancelar }) => {
   const [formData, setFormData] = useState({
     ...usuario,
     activo: usuario.activo ?? true,
-    fecha_ingreso: usuario.fecha_ingreso ?? "",
+    fecha_ingreso: usuario.fecha_ingreso ?? ""
   });
+  const [startDate, setStartDate] = useState<Date | null>(
+    usuario.fecha_ingreso ? new Date(usuario.fecha_ingreso) : null
+  );
   const [areas, setAreas] = useState<Area[]>([]);
   const [mensaje, setMensaje] = useState("");
   const [status, setStatus] = useState<"success" | "error" | "">("");
@@ -67,12 +71,9 @@ const EditarUsuario: React.FC<Props> = ({
     const obtenerIncidencias = async () => {
       try {
         const token = localStorage.getItem("token");
-        const response = await fetch(
-          Global.url + `incidencia/usuario/${usuario._id}`,
-          {
-            headers: { Authorization: token || "" },
-          }
-        );
+        const response = await fetch(Global.url + `incidencia/usuario/${usuario._id}`, {
+          headers: { Authorization: token || "" },
+        });
         const data = await response.json();
         if (data.status === "success") setIncidencias(data.incidencias);
       } catch (error) {
@@ -84,16 +85,11 @@ const EditarUsuario: React.FC<Props> = ({
     obtenerIncidencias();
   }, [usuario._id]);
 
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
-  ) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value, type } = e.target;
 
     if (type === "checkbox") {
-      setFormData({
-        ...formData,
-        [name]: (e.target as HTMLInputElement).checked,
-      });
+      setFormData({ ...formData, [name]: (e.target as HTMLInputElement).checked });
     } else {
       setFormData({ ...formData, [name]: value });
     }
@@ -113,21 +109,18 @@ const EditarUsuario: React.FC<Props> = ({
         area: formData.area?._id || "",
         rol: formData.rol,
         activo: formData.activo,
-        fecha_ingreso: formData.fecha_ingreso,
+        fecha_ingreso: startDate ? startDate.toISOString() : ""
       };
 
       const token = localStorage.getItem("token");
-      const response = await fetch(
-        Global.url + "user/usuario/" + formData._id,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: token || "",
-          },
-          body: JSON.stringify(payload),
-        }
-      );
+      const response = await fetch(Global.url + "user/usuario/" + formData._id, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: token || "",
+        },
+        body: JSON.stringify(payload),
+      });
 
       const data = await response.json();
 
@@ -151,20 +144,11 @@ const EditarUsuario: React.FC<Props> = ({
 
   return (
     <>
-      <form
-        onSubmit={handleSubmit}
-        className="card-panel p-4 shadow animate-fade-in"
-      >
+      <form onSubmit={handleSubmit} className="card-panel p-4 shadow animate-fade-in">
         <h3 className="text-lg font-semibold mb-4">Editar usuario</h3>
 
         {mensaje && (
-          <div
-            className={`mb-4 ${
-              status === "success" ? "text-green-600" : "text-red-600"
-            }`}
-          >
-            {mensaje}
-          </div>
+          <div className={`mb-4 ${status === "success" ? "text-green-600" : "text-red-600"}`}>{mensaje}</div>
         )}
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -204,43 +188,53 @@ const EditarUsuario: React.FC<Props> = ({
             onChange={handleChange}
             required
           />
-          <select
-            name="area"
-            className="input-field"
-            value={formData.area?._id || ""}
-            onChange={(e) => {
-              const selectedArea = areas.find((a) => a._id === e.target.value);
-              setFormData({
-                ...formData,
-                area: selectedArea || { _id: e.target.value, nombre: "" },
-              });
-            }}
-            required
-          >
-            <option value="">Seleccione un área</option>
-            {areas.map((a) => (
-              <option key={a._id} value={a._id}>
-                {a.nombre}
-              </option>
-            ))}
-          </select>
-          <select
-            name="rol"
-            className="input-field"
-            value={formData.rol}
-            onChange={handleChange}
-          >
-            <option value="empleado">Empleado</option>
-            <option value="gerente">Gerente</option>
-            <option value="admin">Administrador</option>
-          </select>
-          <input
-            type="date"
-            name="fecha_ingreso"
-            className="input-field"
-            value={formData.fecha_ingreso?.substring(0, 10) || ""}
-            onChange={handleChange}
-          />
+
+          <div>
+            <label className="form-label">Área:</label>
+            <Select
+              options={areas.map((a) => ({ value: a._id, label: a.nombre }))}
+              value={formData.area ? { value: formData.area._id, label: formData.area.nombre } : null}
+              onChange={(selected) => {
+                if (selected) {
+                  const selectedArea = areas.find((a) => a._id === selected.value);
+                  if (selectedArea) setFormData({ ...formData, area: selectedArea });
+                }
+              }}
+              classNamePrefix="react-select"
+              placeholder="Seleccione un área"
+            />
+          </div>
+
+          <div>
+            <label className="form-label">Rol:</label>
+            <Select
+              options={[
+                { value: "empleado", label: "Empleado" },
+                { value: "gerente", label: "Gerente" },
+                { value: "admin", label: "Administrador" },
+              ]}
+              value={{ value: formData.rol, label: formData.rol.charAt(0).toUpperCase() + formData.rol.slice(1) }}
+              onChange={(selected) => {
+                if (selected) setFormData({ ...formData, rol: selected.value });
+              }}
+              classNamePrefix="react-select"
+              placeholder="Seleccione un rol"
+            />
+          </div>
+
+          <div>
+            <label className="form-label">Fecha de ingreso:</label>
+            <DatePicker
+              selected={startDate}
+              onChange={(date: Date | null) => {
+                setStartDate(date);
+              }}
+              className="input-field"
+              placeholderText="Seleccione una fecha"
+              dateFormat="yyyy-MM-dd"
+            />
+          </div>
+
           <label className="flex items-center gap-2">
             <input
               type="checkbox"
@@ -253,20 +247,23 @@ const EditarUsuario: React.FC<Props> = ({
         </div>
 
         <div className="mt-4 flex justify-between">
-          <button type="button" className="btn-danger" onClick={onCancelar}>
-            Cancelar
-          </button>
-          <button type="submit" className="btn-primary">
-            Guardar
-          </button>
+          <BotonIcono
+            texto="Cancelar"
+            Icono={X}
+            onClick={onCancelar}
+            variante="peligro"
+          />
+          <BotonIcono
+            type="submit"
+            texto="Guardar"
+            Icono={Save}
+          />
         </div>
       </form>
 
       {incidencias.length > 0 && (
         <div className="mt-4 p-4 bg-gray-50 border rounded shadow">
-          <h4 className="text-sm font-semibold mb-2">
-            📋 Incidencias recientes
-          </h4>
+          <h4 className="text-sm font-semibold mb-2">📋 Incidencias recientes</h4>
           <ul className="text-sm list-disc list-inside text-gray-700">
             {incidencias.map((i) => (
               <li key={i._id}>

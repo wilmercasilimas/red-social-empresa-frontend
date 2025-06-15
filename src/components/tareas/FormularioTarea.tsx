@@ -1,7 +1,11 @@
-import { useEffect, useState } from "react";
-import type { TareaCompleta, UsuarioTarea } from "../../types/Tarea";
-import { fetchWithAuth } from "../../helpers/fetchWithAuth";
+import { useCallback, useEffect, useState } from "react";
+import Select from "react-select";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+import { useAuth } from "../../hooks/useAuth";
 import { showToast } from "../../helpers/showToast";
+import { fetchWithAuth } from "../../helpers/fetchWithAuth";
+import type { TareaCompleta, UsuarioTarea } from "../../types/Tarea";
 
 interface Props {
   onSuccess?: () => void;
@@ -22,70 +26,70 @@ type RespuestaCreacionTarea = {
 };
 
 const FormularioTarea: React.FC<Props> = ({ onSuccess }) => {
+  const { token } = useAuth();
   const [titulo, setTitulo] = useState("");
   const [descripcion, setDescripcion] = useState("");
-  const [fechaEntrega, setFechaEntrega] = useState("");
-  const [asignadoA, setAsignadoA] = useState("");
+  const [fechaEntrega, setFechaEntrega] = useState<Date | null>(null);
+  const [asignadoA, setAsignadoA] = useState<string>("");
   const [usuarios, setUsuarios] = useState<UsuarioTarea[]>([]);
 
-  const cargarUsuarios = async () => {
+  const cargarUsuarios = useCallback(async () => {
     try {
-      const token = localStorage.getItem("token");
       if (!token) return;
-
-      const data = await fetchWithAuth<RespuestaUsuarios>("user/usuarios", token);
-
+      const data = await fetchWithAuth<RespuestaUsuarios>(
+        "user/usuarios",
+        token
+      );
       if (Array.isArray(data.usuarios)) {
         setUsuarios(data.usuarios);
       } else {
-        console.error("[FormularioTarea] ❌ Formato inesperado:", data);
         showToast("Respuesta inesperada del servidor", "error");
       }
-    } catch (error) {
-      console.error("[FormularioTarea] ❌ Error al cargar usuarios", error);
-      showToast("Error al cargar usuarios", "error");
+    } catch {
+      console.error("Error al cargar usuarios");
     }
-  };
+  }, [token]);
 
   const manejarEnvio = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const token = localStorage.getItem("token");
       if (!token) return;
 
       const nuevaTarea: Partial<TareaCompleta> = {
         titulo,
         descripcion,
-        fecha_entrega: fechaEntrega,
+        fecha_entrega: fechaEntrega?.toISOString(),
         asignada_a: asignadoA,
       };
 
-      const respuesta = await fetchWithAuth<RespuestaCreacionTarea>("tarea/crear", token, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(nuevaTarea),
-      });
+      const respuesta = await fetchWithAuth<RespuestaCreacionTarea>(
+        "tarea/crear",
+        token,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(nuevaTarea),
+        }
+      );
 
       if (respuesta && respuesta.tarea && respuesta.tarea._id) {
         showToast("Tarea registrada correctamente", "success");
         setTitulo("");
         setDescripcion("");
-        setFechaEntrega("");
+        setFechaEntrega(null);
         setAsignadoA("");
         onSuccess?.();
       } else {
-        console.error("[FormularioTarea] ❌ Respuesta inesperada:", respuesta);
         showToast("No se pudo registrar la tarea", "error");
       }
-    } catch (error) {
-      console.error("[FormularioTarea] ❌ Error en envío:", error);
-      showToast("Error al registrar tarea", "error");
+    } catch {
+      console.error("Error al registrar tarea");
     }
   };
 
   useEffect(() => {
     cargarUsuarios();
-  }, []);
+  }, [cargarUsuarios]);
 
   return (
     <form onSubmit={manejarEnvio} className="bg-white rounded-xl shadow-md p-6">
@@ -112,35 +116,41 @@ const FormularioTarea: React.FC<Props> = ({ onSuccess }) => {
       </div>
       <div className="mb-4">
         <label className="block text-sm font-medium mb-1">Fecha límite</label>
-        <input
-          type="date"
-          value={fechaEntrega}
-          onChange={(e) => setFechaEntrega(e.target.value)}
-          className="w-full border rounded p-2"
-          required
+        <DatePicker
+          selected={fechaEntrega}
+          onChange={(date: Date | null) => setFechaEntrega(date)}
+          className="input-field"
+          placeholderText="Selecciona una fecha"
+          dateFormat="yyyy-MM-dd"
         />
       </div>
       <div className="mb-4">
         <label className="block text-sm font-medium mb-1">Asignar a:</label>
-        <select
-          value={asignadoA}
-          onChange={(e) => setAsignadoA(e.target.value)}
-          className="w-full border rounded p-2"
-          required
-        >
-          <option value="">-- Selecciona un empleado --</option>
-          {usuarios.map((usuario) => (
-            <option key={usuario._id} value={usuario._id}>
-              {usuario.nombre} ({usuario.email})
-            </option>
-          ))}
-        </select>
+        <Select
+          options={usuarios.map((u) => ({
+            value: u._id,
+            label: `${u.nombre} (${u.email})`,
+          }))}
+          value={
+            asignadoA
+              ? usuarios
+                  .map((u) => ({
+                    value: u._id,
+                    label: `${u.nombre} (${u.email})`,
+                  }))
+                  .find((op) => op.value === asignadoA)
+              : null
+          }
+          onChange={(op) => setAsignadoA(op?.value || "")}
+          classNamePrefix="react-select"
+          placeholder="Selecciona empleado"
+        />
       </div>
       <button
         type="submit"
         className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
       >
-        Registrar Tarea
+        Registra Tarea
       </button>
     </form>
   );

@@ -1,8 +1,13 @@
 import React, { useState } from "react";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+import Select from "react-select";
 import type { TareaCompleta } from "../../types/Tarea";
 import { showToast } from "../../helpers/showToast";
 import { fetchWithAuth } from "../../helpers/fetchWithAuth";
 import { useAuth } from "../../hooks/useAuth";
+import BotonIcono from "../ui/BotonIcono";
+import { Save, X } from "lucide-react"; // ✅ Íconos
 
 interface ModalEditarTareaProps {
   tarea: TareaCompleta;
@@ -25,8 +30,8 @@ const ModalEditarTarea: React.FC<ModalEditarTareaProps> = ({
   const [titulo, setTitulo] = useState(tarea.titulo);
   const [descripcion, setDescripcion] = useState(tarea.descripcion);
   const [estado, setEstado] = useState<TareaCompleta["estado"]>(tarea.estado);
-  const [fecha_entrega, setFechaEntrega] = useState(
-    tarea.fecha_entrega?.slice(0, 10) || ""
+  const [fechaEntrega, setFechaEntrega] = useState<Date | null>(
+    tarea.fecha_entrega ? new Date(tarea.fecha_entrega) : null
   );
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -44,8 +49,8 @@ const ModalEditarTarea: React.FC<ModalEditarTareaProps> = ({
           body: JSON.stringify({
             titulo,
             descripcion,
-            fecha_entrega,
             estado,
+            fecha_entrega: fechaEntrega?.toISOString(),
           }),
         }
       );
@@ -67,62 +72,76 @@ const ModalEditarTarea: React.FC<ModalEditarTareaProps> = ({
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white p-6 rounded-xl shadow-xl w-full max-w-md">
-        <h2 className="text-xl font-bold mb-4">Editar Tarea</h2>
+      <div className="bg-white p-6 rounded-xl shadow-xl w-full max-w-md relative z-[60]">
+        <h2 className="text-xl font-bold mb-4">Editar tarea</h2>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block font-medium">Título</label>
+            <label className="form-label">Título</label>
             <input
               type="text"
               value={titulo}
               onChange={(e) => setTitulo(e.target.value)}
-              className="w-full input"
+              className="input-field"
               required
             />
           </div>
 
           <div>
-            <label className="block font-medium">Descripción</label>
+            <label className="form-label">Descripción</label>
             <textarea
               value={descripcion}
               onChange={(e) => setDescripcion(e.target.value)}
-              className="w-full textarea"
+              className="input-field"
+              rows={3}
               required
             ></textarea>
           </div>
 
           <div>
-            <label className="block font-medium">Fecha de entrega</label>
-            <input
-              type="date"
-              value={fecha_entrega}
-              onChange={(e) => setFechaEntrega(e.target.value)}
-              className="w-full input"
+            <label className="form-label">Fecha de entrega</label>
+            <DatePicker
+              selected={fechaEntrega}
+              onChange={(date) => setFechaEntrega(date)}
+              dateFormat="dd-MM-yyyy"
+              placeholderText="Selecciona una fecha"
+              className="input-field"
             />
           </div>
 
           <div>
-            <label className="block font-medium">Estado</label>
-            <select
-              value={estado}
-              onChange={(e) =>
-                setEstado(e.target.value as TareaCompleta["estado"])
+            <label className="form-label">Estado</label>
+            <Select
+              options={[
+                { value: "pendiente", label: "Pendiente" },
+                { value: "en progreso", label: "En progreso" },
+                { value: "completada", label: "Completada" },
+              ]}
+              value={{
+                value: estado,
+                label: estado.charAt(0).toUpperCase() + estado.slice(1),
+              }}
+              onChange={(option) =>
+                setEstado(option?.value as TareaCompleta["estado"])
               }
-              className="w-full select"
-            >
-              <option value="pendiente">Pendiente</option>
-              <option value="en progreso">En progreso</option>
-              <option value="completada">Completada</option>
-            </select>
+              classNamePrefix="react-select"
+              placeholder="Selecciona estado"
+              menuPlacement="auto"
+              menuPosition="fixed"
+            />
           </div>
 
-          <div className="flex justify-end space-x-2">
-            <button type="button" onClick={onClose} className="btn">
-              Cancelar
-            </button>
-            <button type="submit" className="btn-primary">
-              Guardar
-            </button>
+          <div className="flex justify-end gap-2">
+            <BotonIcono
+              texto="Cancelar"
+              Icono={X}
+              onClick={onClose}
+              variante="secundario"
+            />
+            <BotonIcono
+              type="submit"
+              texto="Guardar"
+              Icono={Save}
+            />
           </div>
         </form>
       </div>

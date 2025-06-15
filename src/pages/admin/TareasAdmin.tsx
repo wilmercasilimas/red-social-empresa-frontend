@@ -81,9 +81,9 @@ const TareasAdmin: React.FC = () => {
           </button>
         </div>
 
-        <div className="card-panel animate-slide-up">
+        <div className="card-panel animate-slide-up relative z-10">
           <h1 className="text-xl font-bold mb-2">
-            <span role="img" aria-label="tareas">📝</span> Gestión de tareas
+            <span role="img" aria-label="tareas">🗘️</span> Gestión de tareas
           </h1>
           <p className="text-gray-600 mb-4">
             Aquí podrás crear, editar, eliminar y filtrar tareas por área, creador y usuario asignado.
@@ -119,10 +119,6 @@ const TareasAdmin: React.FC = () => {
               >
                 ← Anterior
               </button>
-
-              {/* <span className="text-gray-700">
-                Página {pagina} de {totalPaginas}
-              </span> */}
 
               <button
                 disabled={pagina === totalPaginas}

@@ -3,6 +3,10 @@ import Global from "../../helpers/Global";
 import { showToast } from "../../helpers/showToast";
 import type { Area } from "../../types/Area";
 
+// ✅ Importación de botones e íconos
+import BotonIcono from "../../components/ui/BotonIcono";
+import { X, Save } from "lucide-react";
+
 interface Props {
   area: Area;
   onAreaActualizada: () => void;
@@ -62,7 +66,7 @@ const EditarArea: React.FC<Props> = ({ area, onAreaActualizada, onCancelar }) =>
 
   return (
     <form onSubmit={handleSubmit} className="card-panel p-4 shadow animate-fade-in">
-      <h3 className="text-lg font-semibold mb-4">Editar Área</h3>
+      <h3 className="text-lg font-semibold mb-4">Editar área</h3>
 
       {mensaje && (
         <div className={`mb-4 ${status === "success" ? "text-green-600" : "text-red-600"}`}>
@@ -92,12 +96,17 @@ const EditarArea: React.FC<Props> = ({ area, onAreaActualizada, onCancelar }) =>
       </div>
 
       <div className="mt-4 flex justify-between">
-        <button type="button" className="btn-danger" onClick={onCancelar}>
-          Cancelar
-        </button>
-        <button type="submit" className="btn-primary">
-          Guardar cambios
-        </button>
+        <BotonIcono
+          texto="Cancelar"
+          Icono={X}
+          onClick={onCancelar}
+          variante="peligro"
+        />
+        <BotonIcono
+          texto="Guardar cambios"
+          Icono={Save}
+          type="submit"
+        />
       </div>
     </form>
   );
