@@ -82,7 +82,7 @@ const AdminPanel: React.FC = () => {
           <EditarPerfil salirEdicion={() => setModoEdicion(false)} />
         )}
 
-        {/* 🔁 Botones de navegación */}
+        {/* 🔁 Botones de navegación (centrados en móvil, línea en PC) */}
         <div className="w-full max-w-xl mx-auto">
           <div className="grid grid-cols-2 gap-4 sm:flex sm:flex-wrap sm:gap-4">
             <button
@@ -122,8 +122,10 @@ const AdminPanel: React.FC = () => {
               Tareas
             </button>
           </div>
+        </div>
 
-          {/* 📦 Contenido dinámico */}
+        {/* 📦 Contenido dinámico: sin restricción de ancho */}
+        <div className="w-full">
           {vista === "usuarios" && <UsuariosAdmin />}
           {vista === "areas" && <AreasAdmin />}
           {vista === "incidencias" && <IncidenciasAdmin />}

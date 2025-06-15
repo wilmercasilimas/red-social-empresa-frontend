@@ -1,4 +1,7 @@
 import React, { useState, useEffect } from "react";
+import Select from "react-select";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 import { showToast } from "../ui/showToast";
 
 interface Usuario {
@@ -13,6 +16,9 @@ interface Props {
 
 const FormularioIncidencia: React.FC<Props> = ({ onIncidenciaCreada }) => {
   const [usuarios, setUsuarios] = useState<Usuario[]>([]);
+  const [startDate, setStartDate] = useState<Date | null>(null);
+  const [endDate, setEndDate] = useState<Date | null>(null);
+
   const [form, setForm] = useState({
     tipo: "permiso",
     descripcion: "",
@@ -24,9 +30,12 @@ const FormularioIncidencia: React.FC<Props> = ({ onIncidenciaCreada }) => {
   const obtenerUsuarios = async () => {
     try {
       const token = localStorage.getItem("token");
-      const response = await fetch("https://red-social-empresa-backend.onrender.com/api/user/usuarios", {
-        headers: { Authorization: token || "" },
-      });
+      const response = await fetch(
+        "https://red-social-empresa-backend.onrender.com/api/user/usuarios",
+        {
+          headers: { Authorization: token || "" },
+        }
+      );
       const data = await response.json();
       if (data.status === "success") setUsuarios(data.usuarios);
     } catch {
@@ -34,7 +43,11 @@ const FormularioIncidencia: React.FC<Props> = ({ onIncidenciaCreada }) => {
     }
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >
+  ) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
@@ -45,24 +58,34 @@ const FormularioIncidencia: React.FC<Props> = ({ onIncidenciaCreada }) => {
 
       const payload = {
         ...form,
-        // ✅ Evitar toISOString: usar string con hora fija
-        fecha_inicio: `${form.fecha_inicio}T12:00:00`,
-        fecha_fin: `${form.fecha_fin}T23:59:59`,
+        fecha_inicio: startDate ? startDate.toISOString() : "",
+        fecha_fin: endDate ? endDate.toISOString() : "",
       };
 
-      const response = await fetch("https://red-social-empresa-backend.onrender.com/api/incidencia/crear", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: token || "",
-        },
-        body: JSON.stringify(payload),
-      });
+      const response = await fetch(
+        "https://red-social-empresa-backend.onrender.com/api/incidencia/crear",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: token || "",
+          },
+          body: JSON.stringify(payload),
+        }
+      );
 
       const data = await response.json();
       if (data.status === "success") {
         showToast("Incidencia registrada", "success");
-        setForm({ tipo: "permiso", descripcion: "", usuario: "", fecha_inicio: "", fecha_fin: "" });
+        setForm({
+          tipo: "permiso",
+          descripcion: "",
+          usuario: "",
+          fecha_inicio: "",
+          fecha_fin: "",
+        });
+        setStartDate(null);
+        setEndDate(null);
         onIncidenciaCreada();
       } else {
         showToast(data.message || "Error al registrar incidencia", "error");
@@ -77,63 +100,90 @@ const FormularioIncidencia: React.FC<Props> = ({ onIncidenciaCreada }) => {
   }, []);
 
   return (
-    <form onSubmit={handleSubmit} className="bg-white p-4 border rounded-md shadow-md space-y-4 mt-4">
+    <form
+      onSubmit={handleSubmit}
+      className="bg-white p-4 border rounded-md shadow-md space-y-4 mt-4"
+    >
       <div>
-        <label className="block font-medium">Empleado:</label>
-        <select name="usuario" value={form.usuario} onChange={handleChange} className="w-full p-2 border rounded">
-          <option value="">-- Selecciona un usuario --</option>
-          {usuarios.map((u) => (
-            <option key={u._id} value={u._id}>
-              {u.nombre} {u.apellidos}
-            </option>
-          ))}
-        </select>
+        <label className="form-label">Empleado:</label>
+        <Select
+          options={usuarios.map((u) => ({
+            value: u._id,
+            label: `${u.nombre} ${u.apellidos}`,
+          }))}
+          classNamePrefix="react-select"
+          onChange={(selected) => {
+            if (selected) {
+              setForm({ ...form, usuario: selected.value });
+            }
+          }}
+        />
       </div>
 
       <div>
-        <label className="block font-medium">Tipo de incidencia:</label>
-        <select name="tipo" value={form.tipo} onChange={handleChange} className="w-full p-2 border rounded">
-          <option value="permiso">Permiso</option>
-          <option value="reposo">Reposo</option>
-          <option value="falta">Falta</option>
-          <option value="cumpleaños">Cumpleaños</option>
-          <option value="aniversario">Aniversario</option>
-        </select>
+        <label className="form-label">Tipo de incidencia:</label>
+        <Select
+          classNamePrefix="react-select"
+          options={[
+            { value: "permiso", label: "Permiso" },
+            { value: "reposo", label: "Reposo" },
+            { value: "falta", label: "Falta" },
+            { value: "cumpleaños", label: "Cumpleaños" },
+            { value: "aniversario", label: "Aniversario" },
+          ]}
+          defaultValue={{
+            value: form.tipo,
+            label: form.tipo.charAt(0).toUpperCase() + form.tipo.slice(1),
+          }}
+          onChange={(selected) => {
+            if (selected) {
+              setForm({ ...form, tipo: selected.value });
+            }
+          }}
+        />
       </div>
 
       <div>
-        <label className="block font-medium">Descripción:</label>
+        <label className="form-label">Descripción:</label>
         <textarea
           name="descripcion"
           value={form.descripcion}
           onChange={handleChange}
-          className="w-full p-2 border rounded"
+          className="input-field"
         />
       </div>
 
       <div>
-        <label className="block font-medium">Fecha inicio:</label>
-        <input
-          type="date"
-          name="fecha_inicio"
-          value={form.fecha_inicio}
-          onChange={handleChange}
-          className="w-full p-2 border rounded"
+        <label className="form-label">Fecha inicio:</label>
+        <DatePicker
+          selected={startDate}
+          onChange={(date: Date | null) => {
+            if (!date) return;
+            setStartDate(date);
+            setForm({ ...form, fecha_inicio: date.toISOString() });
+          }}
+          className="input-field"
+          dateFormat="yyyy-MM-dd"
+          placeholderText="Selecciona una fecha"
         />
       </div>
 
       <div>
-        <label className="block font-medium">Fecha fin:</label>
-        <input
-          type="date"
-          name="fecha_fin"
-          value={form.fecha_fin}
-          onChange={handleChange}
-          className="w-full p-2 border rounded"
+        <label className="form-label">Fecha fin:</label>
+        <DatePicker
+          selected={endDate}
+          onChange={(date: Date | null) => {
+            if (!date) return;
+            setEndDate(date);
+            setForm({ ...form, fecha_fin: date.toISOString() });
+          }}
+          className="input-field"
+          dateFormat="yyyy-MM-dd"
+          placeholderText="Selecciona una fecha"
         />
       </div>
 
-      <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+      <button type="submit" className="btn-primary">
         Registrar Incidencia
       </button>
     </form>
