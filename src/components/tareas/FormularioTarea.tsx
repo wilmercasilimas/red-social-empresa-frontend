@@ -6,12 +6,13 @@ import { useAuth } from "../../hooks/useAuth";
 import { showToast } from "../../helpers/showToast";
 import { fetchWithAuth } from "../../helpers/fetchWithAuth";
 import type { TareaCompleta, UsuarioTarea } from "../../types/Tarea";
+import BotonIcono from "../ui/BotonIcono";
+import { CheckCircle } from "lucide-react";
 
 interface Props {
   onSuccess?: () => void;
 }
 
-// ✅ Tipos auxiliares para respuestas
 type RespuestaUsuarios = {
   status: string;
   message: string;
@@ -36,10 +37,7 @@ const FormularioTarea: React.FC<Props> = ({ onSuccess }) => {
   const cargarUsuarios = useCallback(async () => {
     try {
       if (!token) return;
-      const data = await fetchWithAuth<RespuestaUsuarios>(
-        "user/usuarios",
-        token
-      );
+      const data = await fetchWithAuth<RespuestaUsuarios>("user/usuarios", token);
       if (Array.isArray(data.usuarios)) {
         setUsuarios(data.usuarios);
       } else {
@@ -62,15 +60,11 @@ const FormularioTarea: React.FC<Props> = ({ onSuccess }) => {
         asignada_a: asignadoA,
       };
 
-      const respuesta = await fetchWithAuth<RespuestaCreacionTarea>(
-        "tarea/crear",
-        token,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(nuevaTarea),
-        }
-      );
+      const respuesta = await fetchWithAuth<RespuestaCreacionTarea>("tarea/crear", token, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(nuevaTarea),
+      });
 
       if (respuesta && respuesta.tarea && respuesta.tarea._id) {
         showToast("Tarea registrada correctamente", "success");
@@ -94,6 +88,7 @@ const FormularioTarea: React.FC<Props> = ({ onSuccess }) => {
   return (
     <form onSubmit={manejarEnvio} className="bg-white rounded-xl shadow-md p-6">
       <h2 className="text-xl font-semibold mb-4">Registrar nueva tarea</h2>
+
       <div className="mb-4">
         <label className="block text-sm font-medium mb-1">Título</label>
         <input
@@ -104,6 +99,7 @@ const FormularioTarea: React.FC<Props> = ({ onSuccess }) => {
           required
         />
       </div>
+
       <div className="mb-4">
         <label className="block text-sm font-medium mb-1">Descripción</label>
         <textarea
@@ -114,6 +110,7 @@ const FormularioTarea: React.FC<Props> = ({ onSuccess }) => {
           required
         />
       </div>
+
       <div className="mb-4">
         <label className="block text-sm font-medium mb-1">Fecha límite</label>
         <DatePicker
@@ -121,9 +118,10 @@ const FormularioTarea: React.FC<Props> = ({ onSuccess }) => {
           onChange={(date: Date | null) => setFechaEntrega(date)}
           className="input-field"
           placeholderText="Selecciona una fecha"
-          dateFormat="yyyy-MM-dd"
+          dateFormat="dd-MM-yyyy"
         />
       </div>
+
       <div className="mb-4">
         <label className="block text-sm font-medium mb-1">Asignar a:</label>
         <Select
@@ -146,12 +144,15 @@ const FormularioTarea: React.FC<Props> = ({ onSuccess }) => {
           placeholder="Selecciona empleado"
         />
       </div>
-      <button
-        type="submit"
-        className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-      >
-        Registra Tarea
-      </button>
+
+      <div className="pt-2">
+        <BotonIcono
+          type="submit"
+          texto="Registrar Tarea"
+          Icono={CheckCircle}
+          variante="primario"
+        />
+      </div>
     </form>
   );
 };

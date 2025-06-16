@@ -3,7 +3,7 @@ import { useAuth } from "../../hooks/useAuth";
 import { showToast } from "../../helpers/showToast";
 import Global from "../../helpers/Global";
 import Select from "react-select";
-import { Upload } from "lucide-react"; // 👈 Ícono para botón
+import { Upload } from "lucide-react";
 
 interface Tarea {
   _id: string;
@@ -123,8 +123,7 @@ const FormularioPublicacion = ({ onPublicacionCreada }: FormularioPublicacionPro
         ]}
         value={{
           value: tarea,
-          label:
-            tareas.find((t) => t._id === tarea)?.titulo || "Selecciona una tarea",
+          label: tareas.find((t) => t._id === tarea)?.titulo || "Selecciona una tarea",
         }}
         onChange={(op) => setTarea(op?.value || "")}
         className="react-select-container"
@@ -143,7 +142,7 @@ const FormularioPublicacion = ({ onPublicacionCreada }: FormularioPublicacionPro
             Seleccionar imagen
           </label>
           <span className="text-sm text-gray-600 truncate max-w-[160px]">
-            {imagen ? imagen.name : "Sín Imagen"}
+            {imagen ? imagen.name : "Sin imagen"}
           </span>
           <input
             id="imagenInput"

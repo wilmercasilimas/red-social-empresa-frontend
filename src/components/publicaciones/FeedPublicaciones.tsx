@@ -1,3 +1,4 @@
+// src/components/publicaciones/FeedPublicaciones.tsx
 import { useEffect, useState, useCallback } from "react";
 import type { Publicacion } from "../../types/Publicacion";
 import { fetchWithAuth } from "../../helpers/fetchWithAuth";
@@ -5,13 +6,13 @@ import { useAuth } from "../../hooks/useAuth";
 import { getAvatarUrl } from "../../helpers/getAvatarUrl";
 import { formatFecha } from "../../helpers/formatFecha";
 import ComentariosPublicacion from "../comentarios/ComentariosPublicacion";
+import BotonIcono from "../ui/BotonIcono";
+import { Eye, EyeOff } from "lucide-react";
 
 const FeedPublicaciones: React.FC = () => {
   const { token } = useAuth();
   const [publicaciones, setPublicaciones] = useState<Publicacion[]>([]);
-  const [comentariosVisibles, setComentariosVisibles] = useState<
-    Record<string, boolean>
-  >({});
+  const [comentariosVisibles, setComentariosVisibles] = useState<Record<string, boolean>>({});
   const [imagenAmpliada, setImagenAmpliada] = useState<string | null>(null);
 
   const cargarPublicaciones = useCallback(async () => {
@@ -35,17 +36,20 @@ const FeedPublicaciones: React.FC = () => {
   };
 
   return (
-    <div className="space-y-6 p-4">
+    <div className="space-y-6 p-4 fade-in">
       {publicaciones.map((pub) => (
-        <div key={pub._id} className="bg-white rounded shadow p-4 space-y-2">
+        <div
+          key={pub._id}
+          className="bg-white rounded-xl shadow p-4 space-y-3 border border-gray-200"
+        >
           <div className="flex items-center gap-3">
             <img
               src={getAvatarUrl(pub.autor?.imagen || "default.png")}
-              className="w-10 h-10 rounded-full object-cover"
+              className="w-10 h-10 rounded-full object-cover border"
               alt="Avatar"
             />
             <div>
-              <p className="font-semibold">
+              <p className="font-semibold text-gray-800 text-sm">
                 {pub.autor?.nombre} {pub.autor?.apellidos}
               </p>
               <p className="text-xs text-gray-500">
@@ -54,7 +58,7 @@ const FeedPublicaciones: React.FC = () => {
             </div>
           </div>
 
-          <p className="text-sm text-gray-800">{pub.texto}</p>
+          <p className="text-gray-700 text-sm whitespace-pre-wrap">{pub.texto}</p>
 
           {pub.imagen && (
             <img
@@ -65,27 +69,23 @@ const FeedPublicaciones: React.FC = () => {
               }
               alt="Imagen"
               onClick={() => setImagenAmpliada(pub.imagen ?? null)}
-              className="max-w-xs rounded border cursor-zoom-in hover:opacity-90 transition"
+              className="w-full max-w-md max-h-[400px] mx-auto rounded-lg object-cover border cursor-zoom-in hover:opacity-90 transition"
             />
           )}
 
-          <div className="text-right">
-            <button
+          <div className="flex justify-end">
+            <BotonIcono
+              texto={comentariosVisibles[pub._id] ? "Ocultar" : "Comentarios"}
+              Icono={comentariosVisibles[pub._id] ? EyeOff : Eye}
               onClick={() => toggleComentarios(pub._id)}
-              className="text-green-600 text-sm hover:underline"
-            >
-              {comentariosVisibles[pub._id]
-                ? "Ocultar comentarios"
-                : "Ver comentarios"}
-            </button>
+              variante="secundario"
+            />
           </div>
 
           {comentariosVisibles[pub._id] && (
             <ComentariosPublicacion
               publicacionId={pub._id}
-              onComentarioAgregado={async () => {
-                await cargarPublicaciones();
-              }}
+              onComentarioAgregado={cargarPublicaciones}
             />
           )}
         </div>

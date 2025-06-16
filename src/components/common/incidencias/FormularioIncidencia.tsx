@@ -174,7 +174,7 @@ const FormularioIncidencia: React.FC<Props> = ({ onIncidenciaCreada }) => {
             setForm({ ...form, fecha_inicio: date.toISOString() });
           }}
           className="input-field"
-          dateFormat="yyyy-MM-dd"
+          dateFormat="dd-MM-yyyy"
           placeholderText="Selecciona una fecha"
         />
       </div>
@@ -189,7 +189,7 @@ const FormularioIncidencia: React.FC<Props> = ({ onIncidenciaCreada }) => {
             setForm({ ...form, fecha_fin: date.toISOString() });
           }}
           className="input-field"
-          dateFormat="yyyy-MM-dd"
+          dateFormat="dd-MM-yyyy"
           placeholderText="Selecciona una fecha"
         />
       </div>

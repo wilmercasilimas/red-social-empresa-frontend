@@ -4,7 +4,8 @@ import { useAuth } from "../../hooks/useAuth";
 import Global from "../../helpers/Global";
 import type { Publicacion } from "../../types/Publicacion";
 import Select from "react-select";
-import { Save, X } from "lucide-react"; // ✅ Íconos añadidos
+import { Save, X } from "lucide-react";
+import BotonIcono from "../ui/BotonIcono";
 
 interface ModalEditarPublicacionProps {
   publicacion: Publicacion;
@@ -109,29 +110,20 @@ const ModalEditarPublicacion = ({
           />
 
           <div className="flex justify-end space-x-2">
-            <button
+            <BotonIcono
               type="button"
+              texto="Cancelar"
+              Icono={X}
               onClick={onClose}
-              className="px-4 py-2 bg-gray-300 text-gray-800 rounded hover:bg-gray-400 flex items-center gap-2"
-            >
-              <X className="w-4 h-4" />
-              <span className="hidden sm:inline">Cancelar</span>
-            </button>
-
-            <button
+              variante="secundario"
+            />
+            <BotonIcono
               type="submit"
+              texto="Guardar cambios"
+              Icono={Save}
+              cargando={cargando}
               disabled={cargando}
-              className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 flex items-center gap-2 disabled:opacity-50"
-            >
-              {cargando ? (
-                "Guardando..."
-              ) : (
-                <>
-                  <Save className="w-4 h-4" />
-                  <span className="hidden sm:inline">Guardar cambios</span>
-                </>
-              )}
-            </button>
+            />
           </div>
         </form>
       </div>

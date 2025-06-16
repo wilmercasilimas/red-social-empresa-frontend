@@ -1,6 +1,8 @@
 import React from "react";
 import type { TareaCompleta } from "../../types/Tarea";
 import { formatFecha } from "../../helpers/formatFecha";
+import BotonIcono from "../ui/BotonIcono";
+import { Edit3, Trash2 } from "lucide-react";
 
 type ListadoTareasProps = {
   tareas: TareaCompleta[];
@@ -42,22 +44,22 @@ const ListadoTareas: React.FC<ListadoTareasProps> = ({
               <p className="text-sm text-gray-600 break-words">{tarea.descripcion}</p>
             </div>
             {mostrarControles && (
-              <div className="flex flex-col items-end gap-2 min-w-[90px]">
+              <div className="flex flex-col items-end gap-2 min-w-[120px]">
                 {onEditar && (
-                  <button
+                  <BotonIcono
+                    texto="Editar"
+                    Icono={Edit3}
+                    variante="primario"
                     onClick={() => onEditar(tarea)}
-                    className="btn-sm btn-primary w-full"
-                  >
-                    Editar
-                  </button>
+                  />
                 )}
                 {onEliminar && (
-                  <button
+                  <BotonIcono
+                    texto="Eliminar"
+                    Icono={Trash2}
+                    variante="peligro"
                     onClick={() => onEliminar(tarea._id)}
-                    className="btn-sm btn-danger w-full"
-                  >
-                    Eliminar
-                  </button>
+                  />
                 )}
               </div>
             )}

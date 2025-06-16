@@ -6,6 +6,7 @@ interface BotonIconoProps {
   texto: string;
   Icono: LucideIcon;
   cargando?: boolean;
+  disabled?: boolean; // ✅ <--- AÑADIDO
   variante?: "primario" | "secundario" | "peligro";
   className?: string;
 }
@@ -16,6 +17,7 @@ const BotonIcono: React.FC<BotonIconoProps> = ({
   texto,
   Icono,
   cargando = false,
+  disabled = false,
   variante = "primario",
   className = "",
 }) => {
@@ -39,7 +41,7 @@ const BotonIcono: React.FC<BotonIconoProps> = ({
     <button
       type={type}
       onClick={onClick}
-      disabled={cargando}
+      disabled={cargando || disabled} // ✅ considera ambos estados
       className={`${estilosBase} ${estilosVariante} ${className}`}
     >
       {cargando ? (

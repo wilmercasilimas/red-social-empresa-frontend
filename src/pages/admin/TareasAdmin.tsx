@@ -9,6 +9,8 @@ import ModalEliminarTarea from "../../components/tareas/ModalEliminarTarea";
 import { fetchWithAuth } from "../../helpers/fetchWithAuth";
 import { useAuth } from "../../hooks/useAuth";
 import { showToast } from "../../helpers/showToast";
+import BotonIcono from "../../components/ui/BotonIcono";
+import { ArrowLeft, ArrowRight, LayoutDashboard } from "lucide-react";
 import type { TareaCompleta } from "../../types/Tarea";
 
 const TareasAdmin: React.FC = () => {
@@ -76,9 +78,12 @@ const TareasAdmin: React.FC = () => {
       <Topbar />
       <div className="min-h-screen bg-gray-100 p-8 fade-in space-y-6">
         <div className="flex justify-end">
-          <button onClick={() => navigate("/admin")} className="btn-secondary">
-            ← Volver al panel
-          </button>
+          <BotonIcono
+            texto="Volver al panel"
+            Icono={LayoutDashboard}
+            onClick={() => navigate("/admin")}
+            variante="secundario"
+          />
         </div>
 
         <div className="card-panel animate-slide-up relative z-10">
@@ -112,21 +117,21 @@ const TareasAdmin: React.FC = () => {
 
           {totalPaginas > 1 && (
             <div className="flex justify-center gap-4 mt-4">
-              <button
-                disabled={pagina === 1}
+              <BotonIcono
+                texto="← Anterior"
+                Icono={ArrowLeft}
                 onClick={() => setPagina(pagina - 1)}
-                className="btn-outline"
-              >
-                ← Anterior
-              </button>
+                disabled={pagina === 1}
+                variante="secundario"
+              />
 
-              <button
-                disabled={pagina === totalPaginas}
+              <BotonIcono
+                texto="Siguiente →"
+                Icono={ArrowRight}
                 onClick={() => setPagina(pagina + 1)}
-                className="btn-outline"
-              >
-                Siguiente →
-              </button>
+                disabled={pagina === totalPaginas}
+                variante="secundario"
+              />
             </div>
           )}
         </div>

@@ -231,7 +231,7 @@ const EditarUsuario: React.FC<Props> = ({ usuario, onUsuarioActualizado, onCance
               }}
               className="input-field"
               placeholderText="Seleccione una fecha"
-              dateFormat="yyyy-MM-dd"
+              dateFormat="dd-MM-yyyy"
             />
           </div>
 

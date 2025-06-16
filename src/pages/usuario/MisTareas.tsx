@@ -3,6 +3,8 @@ import { cargarTareasAsignadas } from "../../services/tareas";
 import type { TareaCompleta } from "../../types/Tarea";
 import TareaCard from "../../components/tareas/TareaCard";
 import { showToast } from "../../helpers/showToast";
+import BotonIcono from "../../components/ui/BotonIcono";
+import { ArrowLeft, ChevronLeft, ChevronRight } from "lucide-react";
 
 interface Props {
   volver: () => void;
@@ -47,12 +49,12 @@ const MisTareas: React.FC<Props> = ({ volver }) => {
   return (
     <div className="max-w-4xl mx-auto p-4">
       <div className="flex justify-end mb-4">
-        <button
+        <BotonIcono
+          texto="Volver al panel"
+          Icono={ArrowLeft}
           onClick={volver}
-          className="bg-gray-100 text-gray-800 px-4 py-2 rounded-lg shadow-sm hover:bg-gray-200 transition"
-        >
-          ← Volver al panel
-        </button>
+          variante="secundario"
+        />
       </div>
 
       <h1 className="text-2xl font-bold text-gray-800 mb-4">📋 Mis Tareas</h1>
@@ -67,24 +69,21 @@ const MisTareas: React.FC<Props> = ({ volver }) => {
             <TareaCard key={tarea._id} tarea={tarea} />
           ))}
 
-          <div className="flex justify-center mt-6 space-x-2">
-            <button
+          <div className="flex justify-center mt-6 gap-3">
+            <BotonIcono
+              texto="Anterior"
+              Icono={ChevronLeft}
               onClick={() => setPagina((prev) => Math.max(1, prev - 1))}
               disabled={pagina === 1}
-              className="btn-secondary"
-            >
-              ← Anterior
-            </button>
-            <span className="px-3 py-2 text-gray-700 bg-white border rounded">
-              Página {pagina} de {totalPaginas}
-            </span>
-            <button
+              variante="secundario"
+            />
+            <BotonIcono
+              texto="Siguiente"
+              Icono={ChevronRight}
               onClick={() => setPagina((prev) => prev + 1)}
               disabled={pagina === totalPaginas}
-              className="btn-secondary"
-            >
-              Siguiente →
-            </button>
+              variante="secundario"
+            />
           </div>
         </>
       )}

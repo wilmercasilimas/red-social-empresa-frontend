@@ -5,13 +5,18 @@ import { getAvatarUrl } from "../../helpers/getAvatarUrl";
 import { useAuth } from "../../hooks/useAuth";
 import { formatFecha } from "../../helpers/formatFecha";
 import { showToast } from "../../helpers/showToast";
+import BotonIcono from "../ui/BotonIcono";
+import { Send } from "lucide-react";
 
 interface Props {
   publicacionId: string;
   onComentarioAgregado?: () => Promise<void>;
 }
 
-const ComentariosPublicacion: React.FC<Props> = ({ publicacionId, onComentarioAgregado }) => {
+const ComentariosPublicacion: React.FC<Props> = ({
+  publicacionId,
+  onComentarioAgregado,
+}) => {
   const { token } = useAuth();
   const [comentarios, setComentarios] = useState<Comentario[]>([]);
   const [nuevoComentario, setNuevoComentario] = useState("");
@@ -67,7 +72,10 @@ const ComentariosPublicacion: React.FC<Props> = ({ publicacionId, onComentarioAg
       ) : (
         <ul className="space-y-2">
           {comentarios.map((comentario) => (
-            <li key={comentario._id} className="border p-2 rounded bg-white shadow-sm">
+            <li
+              key={comentario._id}
+              className="border p-2 rounded bg-white shadow-sm"
+            >
               <div className="flex items-center gap-2 mb-1">
                 <img
                   src={getAvatarUrl(comentario.autor.imagen || "default.png")}
@@ -96,9 +104,13 @@ const ComentariosPublicacion: React.FC<Props> = ({ publicacionId, onComentarioAg
           onChange={(e) => setNuevoComentario(e.target.value)}
           className="input-field"
         ></textarea>
-        <button onClick={enviarComentario} className="btn-primary mt-2">
-          Comentar
-        </button>
+        <BotonIcono
+          texto="Comentar"
+          Icono={Send}
+          onClick={enviarComentario}
+          variante="primario"
+          className="mt-2"
+        />
       </div>
     </div>
   );

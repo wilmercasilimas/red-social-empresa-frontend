@@ -1,4 +1,3 @@
-// src/pages/gerencia/PublicacionesGerencia.tsx
 import { useCallback, useEffect, useState } from "react";
 import type { Publicacion } from "../../types/Publicacion";
 import { fetchWithAuth } from "../../helpers/fetchWithAuth";
@@ -9,6 +8,8 @@ import ComentariosPublicacion from "../../components/comentarios/ComentariosPubl
 import FormularioPublicacion from "../../components/publicaciones/FormularioPublicacion";
 import FiltrosPublicaciones from "../../components/publicaciones/FiltrosPublicaciones";
 import ModalEditarPublicacion from "../../components/publicaciones/ModalEditarPublicacion";
+import BotonIcono from "../../components/ui/BotonIcono";
+import { ArrowLeft, ArrowRight, Eye, EyeOff, Edit3 } from "lucide-react";
 import type { Usuario } from "../../types/Usuario";
 import type { Tarea } from "../../types/Tarea";
 import type { Area } from "../../types/Area";
@@ -17,15 +18,11 @@ type PublicacionesGerenciaProps = {
   volver: () => void;
 };
 
-const PublicacionesGerencia: React.FC<PublicacionesGerenciaProps> = ({
-  volver,
-}) => {
+const PublicacionesGerencia: React.FC<PublicacionesGerenciaProps> = ({ volver }) => {
   const { token } = useAuth();
   const [publicaciones, setPublicaciones] = useState<Publicacion[]>([]);
   const [cargando, setCargando] = useState(true);
-  const [comentariosVisibles, setComentariosVisibles] = useState<{
-    [id: string]: boolean;
-  }>({});
+  const [comentariosVisibles, setComentariosVisibles] = useState<{ [id: string]: boolean }>({});
   const [paginaActual, setPaginaActual] = useState(1);
   const [totalPaginas, setTotalPaginas] = useState(1);
   const [filtroAutor, setFiltroAutor] = useState("");
@@ -34,8 +31,7 @@ const PublicacionesGerencia: React.FC<PublicacionesGerenciaProps> = ({
   const [autores, setAutores] = useState<Usuario[]>([]);
   const [tareas, setTareas] = useState<Tarea[]>([]);
   const [areas, setAreas] = useState<Area[]>([]);
-  const [publicacionSeleccionada, setPublicacionSeleccionada] =
-    useState<Publicacion | null>(null);
+  const [publicacionSeleccionada, setPublicacionSeleccionada] = useState<Publicacion | null>(null);
   const [imagenAmpliada, setImagenAmpliada] = useState<string | null>(null);
 
   const cargarPublicaciones = useCallback(async () => {
@@ -95,9 +91,7 @@ const PublicacionesGerencia: React.FC<PublicacionesGerenciaProps> = ({
     <div className="p-6 space-y-8">
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-semibold mb-2">📚 Publicaciones</h2>
-        <button onClick={volver} className="btn-secondary text-sm">
-          ←Regresar
-        </button>
+        <BotonIcono texto="Regresar" Icono={ArrowLeft} variante="secundario" onClick={volver} />
       </div>
 
       <FormularioPublicacion
@@ -127,10 +121,7 @@ const PublicacionesGerencia: React.FC<PublicacionesGerenciaProps> = ({
         <>
           <div className="space-y-6">
             {publicaciones.map((pub) => (
-              <div
-                key={pub._id}
-                className="bg-white rounded-lg shadow p-4 space-y-3"
-              >
+              <div key={pub._id} className="bg-white rounded-lg shadow p-4 space-y-3">
                 <div className="flex justify-between items-start">
                   <div className="flex items-center gap-3">
                     <img
@@ -148,39 +139,36 @@ const PublicacionesGerencia: React.FC<PublicacionesGerenciaProps> = ({
                     </div>
                   </div>
                   <div className="flex flex-col items-end gap-1">
-                    <button
+                    <BotonIcono
+                      texto="Editar"
+                      Icono={Edit3}
                       onClick={() => setPublicacionSeleccionada(pub)}
-                      className="text-blue-600 hover:underline text-sm"
-                    >
-                      Editar
-                    </button>
-                    <button
+                      variante="primario"
+                    />
+                    <BotonIcono
+                      texto={comentariosVisibles[pub._id] ? "Ocultar" : "Ver"}
+                      Icono={comentariosVisibles[pub._id] ? EyeOff : Eye}
                       onClick={() => toggleComentarios(pub._id)}
-                      className="text-green-600 hover:underline text-sm"
-                    >
-                      {comentariosVisibles[pub._id]
-                        ? "Ocultar comentarios"
-                        : "Ver"}
-                    </button>
+                      variante="secundario"
+                    />
                   </div>
                 </div>
 
-                <p className="text-gray-700 text-sm whitespace-pre-wrap">
-                  {pub.texto}
-                </p>
+                <p className="text-gray-700 text-sm whitespace-pre-wrap">{pub.texto}</p>
 
-                {pub.imagen && (
-                  <img
-                    src={
-                      pub.imagen.startsWith("http")
-                        ? pub.imagen
-                        : `/uploads/publicaciones/${pub.imagen}`
-                    }
-                    alt="Imagen"
-                    onClick={() => setImagenAmpliada(pub.imagen ?? null)}
-                    className="max-w-xs rounded border cursor-zoom-in hover:opacity-90 transition"
-                  />
-                )}
+               {pub.imagen && (
+  <img
+    src={
+      pub.imagen.startsWith("http")
+        ? pub.imagen
+        : `/uploads/publicaciones/${pub.imagen}`
+    }
+    alt="Imagen"
+    onClick={() => setImagenAmpliada(pub.imagen ?? null)}
+    className="w-full max-w-md max-h-[400px] mx-auto rounded-lg object-cover border cursor-zoom-in hover:opacity-90 transition"
+  />
+)}
+
 
                 {comentariosVisibles[pub._id] && (
                   <ComentariosPublicacion
@@ -192,34 +180,21 @@ const PublicacionesGerencia: React.FC<PublicacionesGerenciaProps> = ({
             ))}
           </div>
 
-          <div className="flex flex-col items-center justify-center space-y-2 pt-6 text-sm">
-            <button
-              className={`btn-outline px-4 py-1 rounded ${
-                paginaActual === 1
-                  ? "opacity-50 cursor-not-allowed"
-                  : "hover:bg-gray-200"
-              }`}
-              disabled={paginaActual === 1}
+          <div className="flex justify-center gap-4 pt-6">
+            <BotonIcono
+              texto="Anterior"
+              Icono={ArrowLeft}
               onClick={() => setPaginaActual((prev) => Math.max(1, prev - 1))}
-            >
-              « Anterior
-            </button>
-
-            <span className="text-gray-600 font-medium">
-              Página {paginaActual} de {totalPaginas}
-            </span>
-
-            <button
-              className={`btn-outline px-4 py-1 rounded ${
-                paginaActual === totalPaginas
-                  ? "opacity-50 cursor-not-allowed"
-                  : "hover:bg-gray-200"
-              }`}
-              disabled={paginaActual === totalPaginas}
+              variante="secundario"
+              disabled={paginaActual === 1}
+            />
+            <BotonIcono
+              texto="Siguiente"
+              Icono={ArrowRight}
               onClick={() => setPaginaActual((prev) => prev + 1)}
-            >
-              Siguiente »
-            </button>
+              variante="secundario"
+              disabled={paginaActual === totalPaginas}
+            />
           </div>
         </>
       )}

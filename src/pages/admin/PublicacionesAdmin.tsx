@@ -10,8 +10,12 @@ import ModalEditarPublicacion from "../../components/publicaciones/ModalEditarPu
 import { showToast } from "../../helpers/showToast";
 import ComentariosPublicacion from "../../components/comentarios/ComentariosPublicacion";
 import FiltrosPublicaciones from "../../components/publicaciones/FiltrosPublicaciones";
+import BotonIcono from "../../components/ui/BotonIcono";
+
+import { ArrowLeft, Eye, EyeOff, Edit3, Trash2, ArrowRight } from "lucide-react";
+
 import type { Usuario } from "../../types/Usuario";
-import type { Tarea } from "../../types/Tarea.ts";
+import type { Tarea } from "../../types/Tarea";
 import type { Area } from "../../types/Area";
 
 const PublicacionesAdmin = () => {
@@ -19,11 +23,8 @@ const PublicacionesAdmin = () => {
   const navigate = useNavigate();
   const [publicaciones, setPublicaciones] = useState<Publicacion[]>([]);
   const [cargando, setCargando] = useState(true);
-  const [publicacionSeleccionada, setPublicacionSeleccionada] =
-    useState<Publicacion | null>(null);
-  const [mostrarComentarios, setMostrarComentarios] = useState<string | null>(
-    null
-  );
+  const [publicacionSeleccionada, setPublicacionSeleccionada] = useState<Publicacion | null>(null);
+  const [mostrarComentarios, setMostrarComentarios] = useState<string | null>(null);
   const [paginaActual, setPaginaActual] = useState(1);
   const [totalPaginas, setTotalPaginas] = useState(1);
   const [filtroAutor, setFiltroAutor] = useState("");
@@ -77,15 +78,11 @@ const PublicacionesAdmin = () => {
   }, [token]);
 
   const eliminarPublicacion = async (id: string) => {
-    const confirmar = window.confirm(
-      "¿Seguro que deseas eliminar esta publicación?"
-    );
+    const confirmar = window.confirm("¿Seguro que deseas eliminar esta publicación?");
     if (!confirmar) return;
 
     try {
-      await fetchWithAuth(`publicacion/eliminar/${id}`, token, {
-        method: "DELETE",
-      });
+      await fetchWithAuth(`publicacion/eliminar/${id}`, token, { method: "DELETE" });
       showToast("Publicación eliminada", "success");
       setPaginaActual(1);
       await cargarPublicaciones();
@@ -111,12 +108,12 @@ const PublicacionesAdmin = () => {
     <div className="p-6 space-y-8">
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-semibold mb-2">📚 Publicaciones</h2>
-        <button
+        <BotonIcono
+          texto="Regresar"
+          Icono={ArrowLeft}
+          variante="secundario"
           onClick={() => navigate("/admin")}
-          className="btn-secondary text-sm"
-        >
-          ←Regresar
-        </button>
+        />
       </div>
 
       <FormularioPublicacion
@@ -145,10 +142,7 @@ const PublicacionesAdmin = () => {
       ) : (
         <div className="space-y-6">
           {publicaciones.map((pub) => (
-            <div
-              key={pub._id}
-              className="bg-white p-4 rounded shadow space-y-2"
-            >
+            <div key={pub._id} className="bg-white p-4 rounded shadow space-y-2">
               <div className="flex justify-between items-start">
                 <div className="flex items-center gap-3">
                   <img
@@ -166,35 +160,27 @@ const PublicacionesAdmin = () => {
                   </div>
                 </div>
                 <div className="flex flex-col items-end gap-1">
-                  {/* 1. Ver comentarios */}
-                  <button
+                  <BotonIcono
+                    texto={mostrarComentarios === pub._id ? "Ocultar" : "Ver"}
+                    Icono={mostrarComentarios === pub._id ? EyeOff : Eye}
+                    variante="secundario"
                     onClick={() =>
-                      setMostrarComentarios(
-                        pub._id === mostrarComentarios ? null : pub._id
-                      )
+                      setMostrarComentarios(pub._id === mostrarComentarios ? null : pub._id)
                     }
-                    className="text-green-600 hover:underline text-sm"
-                  >
-                    {mostrarComentarios === pub._id
-                      ? "Ocultar comentarios"
-                      : "Ver"}
-                  </button>
-
-                  {/* 2. Editar */}
-                  <button
+                  />
+                  <BotonIcono
+                    texto="Editar"
+                    Icono={Edit3}
+                    variante="primario"
                     onClick={() => setPublicacionSeleccionada(pub)}
-                    className="text-blue-600 hover:underline text-sm"
-                  >
-                    Editar
-                  </button>
-
-                  {/* 3. Eliminar separado */}
-                  <button
+                  />
+                  <BotonIcono
+                    texto="Eliminar"
+                    Icono={Trash2}
+                    variante="peligro"
                     onClick={() => eliminarPublicacion(pub._id)}
-                    className="text-red-600 hover:underline text-sm mt-2"
-                  >
-                    Eliminar
-                  </button>
+                    className="mt-2"
+                  />
                 </div>
               </div>
               <p className="text-sm text-gray-800">{pub.texto}</p>
@@ -207,7 +193,8 @@ const PublicacionesAdmin = () => {
                   }
                   alt="Imagen"
                   onClick={() => setImagenAmpliada(pub.imagen ?? null)}
-                  className="rounded border max-w-xs mt-2 cursor-zoom-in hover:opacity-90 transition"
+                 className="w-full max-w-md max-h-[400px] mx-auto rounded-lg object-cover border cursor-zoom-in hover:opacity-90 transition"
+
                 />
               )}
               {mostrarComentarios === pub._id && (
@@ -220,33 +207,25 @@ const PublicacionesAdmin = () => {
           ))}
 
           <div className="flex flex-col items-center justify-center space-y-2 pt-6 text-sm">
-            <button
-              className={`btn-outline px-4 py-1 rounded ${
-                paginaActual === 1
-                  ? "opacity-50 cursor-not-allowed"
-                  : "hover:bg-gray-200"
-              }`}
-              disabled={paginaActual === 1}
+            <BotonIcono
+              texto=""
+              Icono={ArrowLeft}
               onClick={() => setPaginaActual((prev) => Math.max(1, prev - 1))}
-            >
-              « Anterior
-            </button>
-
+              variante="secundario"
+              className="!px-3 !py-3 rounded-full"
+              cargando={paginaActual === 1}
+            />
             <span className="text-gray-600 font-medium">
               Página {paginaActual} de {totalPaginas}
             </span>
-
-            <button
-              className={`btn-outline px-4 py-1 rounded ${
-                paginaActual === totalPaginas
-                  ? "opacity-50 cursor-not-allowed"
-                  : "hover:bg-gray-200"
-              }`}
-              disabled={paginaActual === totalPaginas}
+            <BotonIcono
+              texto=""
+              Icono={ArrowRight}
               onClick={() => setPaginaActual((prev) => prev + 1)}
-            >
-              Siguiente »
-            </button>
+              variante="secundario"
+              className="!px-3 !py-3 rounded-full"
+              cargando={paginaActual === totalPaginas}
+            />
           </div>
         </div>
       )}

@@ -1,4 +1,3 @@
-// src/pages/gerencia/TareasGerencia.tsx
 import React, { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import Topbar from "../../components/common/Topbar";
@@ -10,6 +9,8 @@ import { fetchWithAuth } from "../../helpers/fetchWithAuth";
 import type { TareaCompleta } from "../../types/Tarea";
 import { useAuth } from "../../hooks/useAuth";
 import { showToast } from "../../helpers/showToast";
+import BotonIcono from "../../components/ui/BotonIcono";
+import { ArrowLeft, ChevronLeft, ChevronRight } from "lucide-react";
 
 const TareasGerencia: React.FC = () => {
   const navigate = useNavigate();
@@ -23,9 +24,7 @@ const TareasGerencia: React.FC = () => {
   const [pagina, setPagina] = useState(1);
   const [limite, setLimite] = useState(10);
   const [totalPaginas, setTotalPaginas] = useState(1);
-  const [tareaEditando, setTareaEditando] = useState<TareaCompleta | null>(
-    null
-  );
+  const [tareaEditando, setTareaEditando] = useState<TareaCompleta | null>(null);
 
   const cargarTareas = useCallback(async () => {
     try {
@@ -84,15 +83,14 @@ const TareasGerencia: React.FC = () => {
       <Topbar />
       <div className="min-h-screen bg-gray-100 p-8 fade-in space-y-6 relative z-0">
         <div className="flex justify-end">
-          <button
+          <BotonIcono
+            texto="Volver al panel"
+            Icono={ArrowLeft}
             onClick={() => navigate("/gerencia")}
-            className="btn-secondary"
-          >
-            ← Volver al panel
-          </button>
+            variante="secundario"
+          />
         </div>
 
-        {/* 🛠 Panel de registro con z-10 para desplegables */}
         <div className="relative z-10">
           <div className="card-panel animate-slide-up">
             <h1 className="text-xl font-bold mb-2">
@@ -106,7 +104,6 @@ const TareasGerencia: React.FC = () => {
           </div>
         </div>
 
-        {/* 👇 Panel de filtros sin interferencia */}
         <div className="card-panel animate-slide-up relative z-0">
           <FiltrosTareas onFiltrar={handleFiltrar} />
         </div>
@@ -121,21 +118,20 @@ const TareasGerencia: React.FC = () => {
 
           {totalPaginas > 1 && (
             <div className="flex justify-center gap-4 mt-4">
-              <button
-                disabled={pagina === 1}
+              <BotonIcono
+                texto="Anterior"
+                Icono={ChevronLeft}
                 onClick={() => setPagina(pagina - 1)}
-                className="btn-outline"
-              >
-                ← Anterior
-              </button>
-
-              <button
-                disabled={pagina === totalPaginas}
+                disabled={pagina === 1}
+                variante="secundario"
+              />
+              <BotonIcono
+                texto="Siguiente"
+                Icono={ChevronRight}
                 onClick={() => setPagina(pagina + 1)}
-                className="btn-outline"
-              >
-                Siguiente →
-              </button>
+                disabled={pagina === totalPaginas}
+                variante="secundario"
+              />
             </div>
           )}
         </div>
