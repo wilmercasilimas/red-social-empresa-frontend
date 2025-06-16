@@ -18,11 +18,15 @@ type PublicacionesGerenciaProps = {
   volver: () => void;
 };
 
-const PublicacionesGerencia: React.FC<PublicacionesGerenciaProps> = ({ volver }) => {
+const PublicacionesGerencia: React.FC<PublicacionesGerenciaProps> = ({
+  volver,
+}) => {
   const { token } = useAuth();
   const [publicaciones, setPublicaciones] = useState<Publicacion[]>([]);
   const [cargando, setCargando] = useState(true);
-  const [comentariosVisibles, setComentariosVisibles] = useState<{ [id: string]: boolean }>({});
+  const [comentariosVisibles, setComentariosVisibles] = useState<{
+    [id: string]: boolean;
+  }>({});
   const [paginaActual, setPaginaActual] = useState(1);
   const [totalPaginas, setTotalPaginas] = useState(1);
   const [filtroAutor, setFiltroAutor] = useState("");
@@ -31,7 +35,8 @@ const PublicacionesGerencia: React.FC<PublicacionesGerenciaProps> = ({ volver })
   const [autores, setAutores] = useState<Usuario[]>([]);
   const [tareas, setTareas] = useState<Tarea[]>([]);
   const [areas, setAreas] = useState<Area[]>([]);
-  const [publicacionSeleccionada, setPublicacionSeleccionada] = useState<Publicacion | null>(null);
+  const [publicacionSeleccionada, setPublicacionSeleccionada] =
+    useState<Publicacion | null>(null);
   const [imagenAmpliada, setImagenAmpliada] = useState<string | null>(null);
 
   const cargarPublicaciones = useCallback(async () => {
@@ -91,7 +96,12 @@ const PublicacionesGerencia: React.FC<PublicacionesGerenciaProps> = ({ volver })
     <div className="p-6 space-y-8">
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-semibold mb-2">📚 Publicaciones</h2>
-        <BotonIcono texto="Regresar" Icono={ArrowLeft} variante="secundario" onClick={volver} />
+        <BotonIcono
+          texto="Regresar"
+          Icono={ArrowLeft}
+          variante="secundario"
+          onClick={volver}
+        />
       </div>
 
       <FormularioPublicacion
@@ -121,7 +131,10 @@ const PublicacionesGerencia: React.FC<PublicacionesGerenciaProps> = ({ volver })
         <>
           <div className="space-y-6">
             {publicaciones.map((pub) => (
-              <div key={pub._id} className="bg-white rounded-lg shadow p-4 space-y-3">
+              <div
+                key={pub._id}
+                className="bg-white rounded-lg shadow p-4 space-y-3"
+              >
                 <div className="flex justify-between items-start">
                   <div className="flex items-center gap-3">
                     <img
@@ -154,21 +167,22 @@ const PublicacionesGerencia: React.FC<PublicacionesGerenciaProps> = ({ volver })
                   </div>
                 </div>
 
-                <p className="text-gray-700 text-sm whitespace-pre-wrap">{pub.texto}</p>
+                <p className="text-gray-700 text-sm whitespace-pre-wrap">
+                  {pub.texto}
+                </p>
 
-               {pub.imagen && (
-  <img
-    src={
-      pub.imagen.startsWith("http")
-        ? pub.imagen
-        : `/uploads/publicaciones/${pub.imagen}`
-    }
-    alt="Imagen"
-    onClick={() => setImagenAmpliada(pub.imagen ?? null)}
-    className="w-full max-w-md max-h-[400px] mx-auto rounded-lg object-cover border cursor-zoom-in hover:opacity-90 transition"
-  />
-)}
-
+                {pub.imagen && (
+                  <img
+                    src={
+                      pub.imagen.startsWith("http")
+                        ? pub.imagen
+                        : `/uploads/publicaciones/${pub.imagen}`
+                    }
+                    alt="Imagen"
+                    onClick={() => setImagenAmpliada(pub.imagen ?? null)}
+                    className="w-full max-w-md max-h-[400px] mx-auto rounded-lg object-cover border cursor-zoom-in hover:opacity-90 transition"
+                  />
+                )}
 
                 {comentariosVisibles[pub._id] && (
                   <ComentariosPublicacion

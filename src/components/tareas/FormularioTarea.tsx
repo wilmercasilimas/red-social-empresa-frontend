@@ -37,7 +37,10 @@ const FormularioTarea: React.FC<Props> = ({ onSuccess }) => {
   const cargarUsuarios = useCallback(async () => {
     try {
       if (!token) return;
-      const data = await fetchWithAuth<RespuestaUsuarios>("user/usuarios", token);
+      const data = await fetchWithAuth<RespuestaUsuarios>(
+        "user/usuarios",
+        token
+      );
       if (Array.isArray(data.usuarios)) {
         setUsuarios(data.usuarios);
       } else {
@@ -60,11 +63,15 @@ const FormularioTarea: React.FC<Props> = ({ onSuccess }) => {
         asignada_a: asignadoA,
       };
 
-      const respuesta = await fetchWithAuth<RespuestaCreacionTarea>("tarea/crear", token, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(nuevaTarea),
-      });
+      const respuesta = await fetchWithAuth<RespuestaCreacionTarea>(
+        "tarea/crear",
+        token,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(nuevaTarea),
+        }
+      );
 
       if (respuesta && respuesta.tarea && respuesta.tarea._id) {
         showToast("Tarea registrada correctamente", "success");
