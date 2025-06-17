@@ -8,7 +8,13 @@ import ComentariosPublicacion from "../../components/comentarios/ComentariosPubl
 import FormularioPublicacion from "../../components/publicaciones/FormularioPublicacion";
 import FiltrosPublicaciones from "../../components/publicaciones/FiltrosPublicaciones";
 import BotonIcono from "../../components/ui/BotonIcono";
-import { ArrowLeft, ChevronLeft, ChevronRight, Eye, EyeOff } from "lucide-react";
+import {
+  ArrowLeft,
+  ChevronLeft,
+  ChevronRight,
+  Eye,
+  EyeOff,
+} from "lucide-react";
 import type { Usuario } from "../../types/Usuario";
 import type { Tarea } from "../../types/Tarea";
 import type { Area } from "../../types/Area";
@@ -17,11 +23,15 @@ interface PublicacionesEmpleadoProps {
   volver: () => void;
 }
 
-const PublicacionesEmpleado: React.FC<PublicacionesEmpleadoProps> = ({ volver }) => {
+const PublicacionesEmpleado: React.FC<PublicacionesEmpleadoProps> = ({
+  volver,
+}) => {
   const { token } = useAuth();
   const [publicaciones, setPublicaciones] = useState<Publicacion[]>([]);
   const [cargando, setCargando] = useState(true);
-  const [comentariosVisibles, setComentariosVisibles] = useState<Record<string, boolean>>({});
+  const [comentariosVisibles, setComentariosVisibles] = useState<
+    Record<string, boolean>
+  >({});
   const [paginaActual, setPaginaActual] = useState(1);
   const [totalPaginas, setTotalPaginas] = useState(1);
   const [imagenAmpliada, setImagenAmpliada] = useState<string | null>(null);
@@ -89,7 +99,7 @@ const PublicacionesEmpleado: React.FC<PublicacionesEmpleadoProps> = ({ volver })
   };
 
   return (
-    <div className="p-6 space-y-8">
+    <div className="px-1 sm:px-2 py-6 space-y-8">
       <div className="flex justify-between items-center flex-wrap gap-2">
         <h2 className="text-2xl font-semibold">📚 Publicaciones</h2>
         <BotonIcono
@@ -126,7 +136,10 @@ const PublicacionesEmpleado: React.FC<PublicacionesEmpleadoProps> = ({ volver })
       ) : (
         <>
           {publicaciones.map((pub) => (
-            <div key={pub._id} className="bg-white rounded shadow p-4 space-y-2">
+            <div
+              key={pub._id}
+              className="bg-white rounded shadow p-4 space-y-2"
+            >
               <div className="flex items-center gap-2">
                 <img
                   src={getAvatarUrl(pub.autor?.imagen || "default.png")}
@@ -137,7 +150,9 @@ const PublicacionesEmpleado: React.FC<PublicacionesEmpleadoProps> = ({ volver })
                   <p className="font-semibold">
                     {pub.autor?.nombre} {pub.autor?.apellidos}
                   </p>
-                  <p className="text-xs text-gray-500">{formatFecha(pub.creado_en)}</p>
+                  <p className="text-xs text-gray-500">
+                    {formatFecha(pub.creado_en)}
+                  </p>
                 </div>
               </div>
 

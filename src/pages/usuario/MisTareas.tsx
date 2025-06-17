@@ -47,7 +47,7 @@ const MisTareas: React.FC<Props> = ({ volver }) => {
   const totalPaginas = Math.ceil(total / limite);
 
   return (
-    <div className="max-w-4xl mx-auto p-4">
+    <div className="px-1 sm:px-2 py-4 space-y-6">
       <div className="flex justify-end mb-4">
         <BotonIcono
           texto="Volver al panel"

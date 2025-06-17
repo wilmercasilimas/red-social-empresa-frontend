@@ -36,79 +36,79 @@ const FeedPublicaciones: React.FC = () => {
   };
 
   return (
-    <div className="space-y-6 p-4 fade-in">
-      {publicaciones.map((pub) => (
-        <div
-          key={pub._id}
-          className="bg-white rounded-xl shadow p-4 space-y-3 border border-gray-200"
-        >
-          <div className="flex items-center gap-3">
-            <img
-              src={getAvatarUrl(pub.autor?.imagen || "default.png")}
-              className="w-10 h-10 rounded-full object-cover border"
-              alt="Avatar"
-            />
-            <div>
-              <p className="font-semibold text-gray-800 text-sm">
-                {pub.autor?.nombre} {pub.autor?.apellidos}
-              </p>
-              <p className="text-xs text-gray-500">
-                {formatFecha(pub.creado_en)}
-              </p>
-            </div>
+  <div className="space-y-6 px-1 sm:px-2 fade-in"> {/* Ajuste aquí */}
+    {publicaciones.map((pub) => (
+      <div
+        key={pub._id}
+        className="bg-white rounded-xl shadow p-4 space-y-3 border border-gray-200"
+      >
+        <div className="flex items-center gap-3">
+          <img
+            src={getAvatarUrl(pub.autor?.imagen || "default.png")}
+            className="w-10 h-10 rounded-full object-cover border"
+            alt="Avatar"
+          />
+          <div>
+            <p className="font-semibold text-gray-800 text-sm">
+              {pub.autor?.nombre} {pub.autor?.apellidos}
+            </p>
+            <p className="text-xs text-gray-500">
+              {formatFecha(pub.creado_en)}
+            </p>
           </div>
-
-          <p className="text-gray-700 text-sm whitespace-pre-wrap">{pub.texto}</p>
-
-          {pub.imagen && (
-            <img
-              src={
-                pub.imagen.startsWith("http")
-                  ? pub.imagen
-                  : `/uploads/publicaciones/${pub.imagen}`
-              }
-              alt="Imagen"
-              onClick={() => setImagenAmpliada(pub.imagen ?? null)}
-              className="w-full max-w-md max-h-[400px] mx-auto rounded-lg object-cover border cursor-zoom-in hover:opacity-90 transition"
-            />
-          )}
-
-          <div className="flex justify-end">
-            <BotonIcono
-              texto={comentariosVisibles[pub._id] ? "Ocultar" : "Comentarios"}
-              Icono={comentariosVisibles[pub._id] ? EyeOff : Eye}
-              onClick={() => toggleComentarios(pub._id)}
-              variante="secundario"
-            />
-          </div>
-
-          {comentariosVisibles[pub._id] && (
-            <ComentariosPublicacion
-              publicacionId={pub._id}
-              onComentarioAgregado={cargarPublicaciones}
-            />
-          )}
         </div>
-      ))}
 
-      {imagenAmpliada && (
-        <div
-          className="fixed inset-0 z-50 bg-black bg-opacity-70 flex items-center justify-center"
-          onClick={() => setImagenAmpliada(null)}
-        >
+        <p className="text-gray-700 text-sm whitespace-pre-wrap">{pub.texto}</p>
+
+        {pub.imagen && (
           <img
             src={
-              imagenAmpliada.startsWith("http")
-                ? imagenAmpliada
-                : `/uploads/publicaciones/${imagenAmpliada}`
+              pub.imagen.startsWith("http")
+                ? pub.imagen
+                : `/uploads/publicaciones/${pub.imagen}`
             }
-            className="w-full h-full object-contain p-4"
-            alt="Ampliada"
+            alt="Imagen"
+            onClick={() => setImagenAmpliada(pub.imagen ?? null)}
+            className="w-full max-w-md max-h-[400px] mx-auto rounded-lg object-cover border cursor-zoom-in hover:opacity-90 transition"
+          />
+        )}
+
+        <div className="flex justify-end">
+          <BotonIcono
+            texto={comentariosVisibles[pub._id] ? "Ocultar" : "Comentarios"}
+            Icono={comentariosVisibles[pub._id] ? EyeOff : Eye}
+            onClick={() => toggleComentarios(pub._id)}
+            variante="secundario"
           />
         </div>
-      )}
-    </div>
-  );
+
+        {comentariosVisibles[pub._id] && (
+          <ComentariosPublicacion
+            publicacionId={pub._id}
+            onComentarioAgregado={cargarPublicaciones}
+          />
+        )}
+      </div>
+    ))}
+
+    {imagenAmpliada && (
+      <div
+        className="fixed inset-0 z-50 bg-black bg-opacity-70 flex items-center justify-center"
+        onClick={() => setImagenAmpliada(null)}
+      >
+        <img
+          src={
+            imagenAmpliada.startsWith("http")
+              ? imagenAmpliada
+              : `/uploads/publicaciones/${imagenAmpliada}`
+          }
+          className="w-full h-full object-contain p-4"
+          alt="Ampliada"
+        />
+      </div>
+    )}
+  </div>
+);
 };
 
 export default FeedPublicaciones;

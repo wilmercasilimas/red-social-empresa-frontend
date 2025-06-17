@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { showToast } from "../../components/common/ui/showToast";
 import FormularioIncidencia from "../../components/common/incidencias/FormularioIncidencia";
-import { formatFecha } from "../../helpers/formatFecha"; // ✅ Importar helper
+import { formatFecha } from "../../helpers/formatFecha";
 import BotonIcono from "../../components/ui/BotonIcono";
 import { Plus, X, Trash2 } from "lucide-react";
 
@@ -84,7 +84,7 @@ const IncidenciasAdmin: React.FC = () => {
   }, []);
 
   return (
-    <div className="p-6">
+    <div className="py-6 px-2 sm:px-4 md:px-6 lg:px-8 xl:px-10 2xl:px-12">
       <h2 className="text-2xl font-semibold mb-4">Incidencias activas</h2>
 
       <div className="mb-4">
@@ -106,42 +106,44 @@ const IncidenciasAdmin: React.FC = () => {
           No hay incidencias activas actualmente.
         </p>
       ) : (
-        <table className="min-w-full border border-gray-300 mt-6">
-          <thead className="bg-gray-100">
-            <tr>
-              <th className="p-2 border">Empleado</th>
-              <th className="p-2 border">Tipo</th>
-              <th className="p-2 border">Fecha inicio</th>
-              <th className="p-2 border">Fecha fin</th>
-              <th className="p-2 border">Asignada por</th>
-              <th className="p-2 border">Acciones</th>
-            </tr>
-          </thead>
-          <tbody>
-            {incidencias.map((incidencia) => (
-              <tr key={incidencia._id} className="text-center">
-                <td className="p-2 border">
-                  {incidencia.usuario?.nombre} {incidencia.usuario?.apellidos}
-                </td>
-                <td className="p-2 border capitalize">{incidencia.tipo}</td>
-                <td className="p-2 border">{formatFecha(incidencia.fecha_inicio)}</td>
-                <td className="p-2 border">{formatFecha(incidencia.fecha_fin)}</td>
-                <td className="p-2 border">
-                  {incidencia.asignada_por?.nombre} {incidencia.asignada_por?.apellidos}
-                </td>
-                <td className="p-2 border">
-                  <BotonIcono
-                    texto="Eliminar"
-                    Icono={Trash2}
-                    onClick={() => eliminarIncidencia(incidencia._id)}
-                    variante="peligro"
-                    className="text-sm"
-                  />
-                </td>
+        <div className="overflow-x-auto">
+          <table className="min-w-full border border-gray-300 mt-6">
+            <thead className="bg-gray-100">
+              <tr>
+                <th className="p-2 border">Empleado</th>
+                <th className="p-2 border">Tipo</th>
+                <th className="p-2 border">Fecha inicio</th>
+                <th className="p-2 border">Fecha fin</th>
+                <th className="p-2 border">Asignada por</th>
+                <th className="p-2 border">Acciones</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {incidencias.map((incidencia) => (
+                <tr key={incidencia._id} className="text-center">
+                  <td className="p-2 border">
+                    {incidencia.usuario?.nombre} {incidencia.usuario?.apellidos}
+                  </td>
+                  <td className="p-2 border capitalize">{incidencia.tipo}</td>
+                  <td className="p-2 border">{formatFecha(incidencia.fecha_inicio)}</td>
+                  <td className="p-2 border">{formatFecha(incidencia.fecha_fin)}</td>
+                  <td className="p-2 border">
+                    {incidencia.asignada_por?.nombre} {incidencia.asignada_por?.apellidos}
+                  </td>
+                  <td className="p-2 border">
+                    <BotonIcono
+                      texto="Eliminar"
+                      Icono={Trash2}
+                      onClick={() => eliminarIncidencia(incidencia._id)}
+                      variante="peligro"
+                      className="text-sm"
+                    />
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       )}
     </div>
   );

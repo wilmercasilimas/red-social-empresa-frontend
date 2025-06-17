@@ -81,7 +81,7 @@ const TareasGerencia: React.FC = () => {
   return (
     <>
       <Topbar />
-      <div className="min-h-screen bg-gray-100 p-8 fade-in space-y-6 relative z-0">
+      <div className="min-h-screen bg-gray-100 py-6 px-2 sm:px-4 md:px-6 lg:px-8 xl:px-10 2xl:px-12 fade-in space-y-6 relative z-0">
         <div className="flex justify-end">
           <BotonIcono
             texto="Volver al panel"
@@ -94,7 +94,7 @@ const TareasGerencia: React.FC = () => {
         <div className="relative z-10">
           <div className="card-panel animate-slide-up">
             <h1 className="text-xl font-bold mb-2">
-              <span role="img" aria-label="tareas">📝</span> Gestión de tareas
+              <span role="img" aria-label="tareas">🗘️</span> Gestión de tareas
             </h1>
             <p className="text-gray-600 mb-4">
               Aquí podrás crear, editar, eliminar y filtrar tareas por área,

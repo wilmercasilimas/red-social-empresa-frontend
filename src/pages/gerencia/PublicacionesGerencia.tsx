@@ -93,7 +93,8 @@ const PublicacionesGerencia: React.FC<PublicacionesGerenciaProps> = ({
   };
 
   return (
-    <div className="p-6 space-y-8">
+    <div className="px-1 sm:px-2 py-6 space-y-8">
+
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-semibold mb-2">📚 Publicaciones</h2>
         <BotonIcono

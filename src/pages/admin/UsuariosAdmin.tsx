@@ -129,19 +129,22 @@ const UsuariosAdmin: React.FC = () => {
                     key={usuario._id}
                     className="hover:bg-gray-100 transition"
                   >
-                    <td className="py-2 px-4 flex items-center gap-3">
-                      <img
-                        src={getAvatarUrl(usuario.imagen ?? "")}
-                        alt="Avatar"
-                        className="w-10 h-10 rounded-full object-cover border"
-                        onError={(e) => {
-                          e.currentTarget.src = "/img/user.png";
-                        }}
-                      />
-                      <span>
-                        {usuario.nombre} {usuario.apellidos}
-                      </span>
-                    </td>
+                   <td className="py-2 px-0">
+  <div className="flex items-center gap-2">
+    <img
+      src={getAvatarUrl(usuario.imagen ?? "")}
+      alt="Avatar"
+      className="w-10 h-10 rounded-full object-cover border"
+      onError={(e) => {
+        e.currentTarget.src = "/img/user.png";
+      }}
+    />
+    <span className="text-sm font-medium">
+      {usuario.nombre} {usuario.apellidos}
+    </span>
+  </div>
+</td>
+
                     <td className="py-2 px-4">{usuario.email}</td>
                     <td className="py-2 px-4">{usuario.cargo}</td>
                     <td className="py-2 px-4">
