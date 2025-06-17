@@ -24,7 +24,10 @@ const TareasGerencia: React.FC = () => {
   const [pagina, setPagina] = useState(1);
   const [limite, setLimite] = useState(10);
   const [totalPaginas, setTotalPaginas] = useState(1);
-  const [tareaEditando, setTareaEditando] = useState<TareaCompleta | null>(null);
+  const [tareaEditando, setTareaEditando] = useState<TareaCompleta | null>(
+    null
+  );
+  const [recargar, setRecargar] = useState(false); // ✅ Estado para forzar recarga
 
   const cargarTareas = useCallback(async () => {
     try {
@@ -58,7 +61,7 @@ const TareasGerencia: React.FC = () => {
   }, [token, filtros, pagina, limite]);
 
   const handleSuccess = () => {
-    cargarTareas();
+    setRecargar((prev) => !prev); // ✅ Forzar recarga
   };
 
   const handleFiltrar = (nuevosFiltros: typeof filtros) => {
@@ -76,7 +79,7 @@ const TareasGerencia: React.FC = () => {
 
   useEffect(() => {
     cargarTareas();
-  }, [cargarTareas]);
+  }, [cargarTareas, recargar]); // ✅ Incluye recargar
 
   return (
     <>
@@ -94,7 +97,10 @@ const TareasGerencia: React.FC = () => {
         <div className="relative z-10">
           <div className="card-panel animate-slide-up">
             <h1 className="text-xl font-bold mb-2">
-              <span role="img" aria-label="tareas">🗘️</span> Gestión de tareas
+              <span role="img" aria-label="tareas">
+                🗘️
+              </span>{" "}
+              Gestión de tareas
             </h1>
             <p className="text-gray-600 mb-4">
               Aquí podrás crear, editar, eliminar y filtrar tareas por área,

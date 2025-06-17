@@ -7,7 +7,7 @@ import { showToast } from "../../helpers/showToast";
 import { fetchWithAuth } from "../../helpers/fetchWithAuth";
 import { useAuth } from "../../hooks/useAuth";
 import BotonIcono from "../ui/BotonIcono";
-import { Save, X } from "lucide-react"; // ✅ Íconos
+import { Save, X } from "lucide-react";
 
 interface ModalEditarTareaProps {
   tarea: TareaCompleta;
@@ -21,6 +21,28 @@ interface RespuestaApi {
   tarea?: TareaCompleta;
 }
 
+// Convierte ISO a fecha local sin desfase horario visual
+const convertirAFechaLocal = (iso: string): Date => {
+  const fecha = new Date(iso);
+  return new Date(fecha.getFullYear(), fecha.getMonth(), fecha.getDate());
+};
+
+// Ajusta la fecha con hora UTC 23:59:59.999
+const ajustarFechaUTC = (fecha: Date): string => {
+  const ajustada = new Date(
+    Date.UTC(
+      fecha.getFullYear(),
+      fecha.getMonth(),
+      fecha.getDate(),
+      23,
+      59,
+      59,
+      999
+    )
+  );
+  return ajustada.toISOString();
+};
+
 const ModalEditarTarea: React.FC<ModalEditarTareaProps> = ({
   tarea,
   onClose,
@@ -31,7 +53,7 @@ const ModalEditarTarea: React.FC<ModalEditarTareaProps> = ({
   const [descripcion, setDescripcion] = useState(tarea.descripcion);
   const [estado, setEstado] = useState<TareaCompleta["estado"]>(tarea.estado);
   const [fechaEntrega, setFechaEntrega] = useState<Date | null>(
-    tarea.fecha_entrega ? new Date(tarea.fecha_entrega) : null
+    tarea.fecha_entrega ? convertirAFechaLocal(tarea.fecha_entrega) : null
   );
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -50,7 +72,9 @@ const ModalEditarTarea: React.FC<ModalEditarTareaProps> = ({
             titulo,
             descripcion,
             estado,
-            fecha_entrega: fechaEntrega?.toISOString(),
+            fecha_entrega: fechaEntrega
+              ? ajustarFechaUTC(fechaEntrega)
+              : undefined,
           }),
         }
       );
@@ -66,7 +90,7 @@ const ModalEditarTarea: React.FC<ModalEditarTareaProps> = ({
       }
     } catch (err) {
       console.error("Error al actualizar tarea:", err);
-      showToast("Error de red o del servidor", "error");
+      showToast("Error de red solo creadores & administradores", "error");
     }
   };
 
@@ -137,11 +161,7 @@ const ModalEditarTarea: React.FC<ModalEditarTareaProps> = ({
               onClick={onClose}
               variante="secundario"
             />
-            <BotonIcono
-              type="submit"
-              texto="Guardar"
-              Icono={Save}
-            />
+            <BotonIcono type="submit" texto="Guardar" Icono={Save} />
           </div>
         </form>
       </div>

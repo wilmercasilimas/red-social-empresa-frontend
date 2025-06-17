@@ -34,6 +34,19 @@ const FormularioTarea: React.FC<Props> = ({ onSuccess }) => {
   const [asignadoA, setAsignadoA] = useState<string>("");
   const [usuarios, setUsuarios] = useState<UsuarioTarea[]>([]);
 
+  // ✅ Corrección: generar fecha sin desfase horario
+  const ajustarFechaFin = (fecha: Date): string => {
+    const fechaUTC = new Date(
+      Date.UTC(
+        fecha.getFullYear(),
+        fecha.getMonth(),
+        fecha.getDate(),
+        23, 59, 59, 999
+      )
+    );
+    return fechaUTC.toISOString();
+  };
+
   const cargarUsuarios = useCallback(async () => {
     try {
       if (!token) return;
@@ -59,7 +72,7 @@ const FormularioTarea: React.FC<Props> = ({ onSuccess }) => {
       const nuevaTarea: Partial<TareaCompleta> = {
         titulo,
         descripcion,
-        fecha_entrega: fechaEntrega?.toISOString(),
+        fecha_entrega: fechaEntrega ? ajustarFechaFin(fechaEntrega) : undefined,
         asignada_a: asignadoA,
       };
 

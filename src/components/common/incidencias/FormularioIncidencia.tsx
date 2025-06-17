@@ -45,6 +45,25 @@ const FormularioIncidencia: React.FC<Props> = ({ onIncidenciaCreada }) => {
     }
   };
 
+  const ajustarFechaZonaHoraria = (fecha: Date, tipo: "inicio" | "fin") => {
+    const fechaLocal = new Date(fecha);
+    fechaLocal.setHours(
+      tipo === "inicio" ? 0 : 23,
+      tipo === "inicio" ? 0 : 59,
+      tipo === "inicio" ? 0 : 59,
+      tipo === "inicio" ? 0 : 999
+    );
+
+    const yyyy = fechaLocal.getFullYear();
+    const mm = String(fechaLocal.getMonth() + 1).padStart(2, "0");
+    const dd = String(fechaLocal.getDate()).padStart(2, "0");
+    const hh = String(fechaLocal.getHours()).padStart(2, "0");
+    const mi = String(fechaLocal.getMinutes()).padStart(2, "0");
+    const ss = String(fechaLocal.getSeconds()).padStart(2, "0");
+
+    return `${yyyy}-${mm}-${dd}T${hh}:${mi}:${ss}.999`;
+  };
+
   const handleChange = (
     e: React.ChangeEvent<
       HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
@@ -56,7 +75,6 @@ const FormularioIncidencia: React.FC<Props> = ({ onIncidenciaCreada }) => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Validación previa
     if (!form.usuario || !startDate || !endDate) {
       showToast("Todos los campos son obligatorios", "error");
       return;
@@ -66,8 +84,8 @@ const FormularioIncidencia: React.FC<Props> = ({ onIncidenciaCreada }) => {
       tipo: form.tipo,
       descripcion: form.descripcion,
       usuario: form.usuario,
-      fecha_inicio: startDate.toISOString(),
-      fecha_fin: endDate.toISOString(),
+      fecha_inicio: ajustarFechaZonaHoraria(startDate, "inicio"),
+      fecha_fin: ajustarFechaZonaHoraria(endDate, "fin"),
     };
 
     try {
@@ -144,7 +162,8 @@ const FormularioIncidencia: React.FC<Props> = ({ onIncidenciaCreada }) => {
           ]}
           defaultValue={{
             value: form.tipo,
-            label: form.tipo.charAt(0).toUpperCase() + form.tipo.slice(1),
+            label:
+              form.tipo.charAt(0).toUpperCase() + form.tipo.slice(1),
           }}
           onChange={(selected) => {
             if (selected) {
@@ -171,7 +190,6 @@ const FormularioIncidencia: React.FC<Props> = ({ onIncidenciaCreada }) => {
           onChange={(date: Date | null) => {
             if (!date) return;
             setStartDate(date);
-            setForm({ ...form, fecha_inicio: date.toISOString() });
           }}
           className="input-field"
           dateFormat="dd-MM-yyyy"
@@ -186,7 +204,6 @@ const FormularioIncidencia: React.FC<Props> = ({ onIncidenciaCreada }) => {
           onChange={(date: Date | null) => {
             if (!date) return;
             setEndDate(date);
-            setForm({ ...form, fecha_fin: date.toISOString() });
           }}
           className="input-field"
           dateFormat="dd-MM-yyyy"
