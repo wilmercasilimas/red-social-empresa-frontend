@@ -1,4 +1,3 @@
-// src/pages/UsuariosAdmin.tsx
 import React, { useEffect, useState } from "react";
 import type { Usuario } from "../../types/Usuario";
 import AgregarUsuario from "./AgregarUsuario";
@@ -7,12 +6,23 @@ import { getAvatarUrl } from "../../helpers/getAvatarUrl";
 import { Info, Edit, Trash2, Plus, X } from "lucide-react";
 import { formatFecha } from "../../helpers/formatFecha";
 import BotonIcono from "../../components/ui/BotonIcono";
+import FiltrosUsuarios from "../usuario/FiltrosUsuarios";
+import type { Area } from "../../types/Area";
 
 const UsuariosAdmin: React.FC = () => {
   const [usuarios, setUsuarios] = useState<Usuario[]>([]);
+  const [areas, setAreas] = useState<Area[]>([]);
   const [loading, setLoading] = useState(true);
   const [mostrarFormulario, setMostrarFormulario] = useState(false);
   const [usuarioEditando, setUsuarioEditando] = useState<Usuario | null>(null);
+  const [filtroNombre, setFiltroNombre] = useState("");
+  const [filtroArea, setFiltroArea] = useState("");
+
+  const usuariosFiltrados = usuarios.filter((u) => {
+    const coincideNombre = `${u.nombre} ${u.apellidos}`.toLowerCase().includes(filtroNombre.toLowerCase());
+    const coincideArea = !filtroArea || u.area?._id === filtroArea;
+    return coincideNombre && coincideArea;
+  });
 
   const obtenerUsuarios = async () => {
     try {
@@ -29,6 +39,22 @@ const UsuariosAdmin: React.FC = () => {
       console.error("Error al obtener usuarios:", error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const obtenerAreas = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      const response = await fetch(
+        "https://red-social-empresa-backend.onrender.com/api/area/listar",
+        {
+          headers: { Authorization: token || "" },
+        }
+      );
+      const data = await response.json();
+      if (data.status === "success") setAreas(data.areas);
+    } catch (error) {
+      console.error("Error al obtener áreas:", error);
     }
   };
 
@@ -56,6 +82,7 @@ const UsuariosAdmin: React.FC = () => {
 
   useEffect(() => {
     obtenerUsuarios();
+    obtenerAreas();
   }, []);
 
   return (
@@ -76,6 +103,17 @@ const UsuariosAdmin: React.FC = () => {
             setMostrarFormulario(!mostrarFormulario);
             setUsuarioEditando(null);
           }}
+        />
+      </div>
+
+      {/* Filtros reutilizables */}
+      <div className="mb-6">
+        <FiltrosUsuarios
+          filtroNombre={filtroNombre}
+          setFiltroNombre={setFiltroNombre}
+          filtroArea={filtroArea}
+          setFiltroArea={setFiltroArea}
+          areas={areas}
         />
       </div>
 
@@ -120,7 +158,7 @@ const UsuariosAdmin: React.FC = () => {
               </tr>
             </thead>
             <tbody>
-              {usuarios.map((usuario) => {
+              {usuariosFiltrados.map((usuario) => {
                 const estaAusente =
                   usuario.incidencias_activas &&
                   usuario.incidencias_activas.length > 0;
@@ -129,21 +167,21 @@ const UsuariosAdmin: React.FC = () => {
                     key={usuario._id}
                     className="hover:bg-gray-100 transition"
                   >
-                   <td className="py-2 px-0">
-  <div className="flex items-center gap-2">
-    <img
-      src={getAvatarUrl(usuario.imagen ?? "")}
-      alt="Avatar"
-      className="w-10 h-10 rounded-full object-cover border"
-      onError={(e) => {
-        e.currentTarget.src = "/img/user.png";
-      }}
-    />
-    <span className="text-sm font-medium">
-      {usuario.nombre} {usuario.apellidos}
-    </span>
-  </div>
-</td>
+                    <td className="py-2 px-0">
+                      <div className="flex items-center gap-2">
+                        <img
+                          src={getAvatarUrl(usuario.imagen ?? "")}
+                          alt="Avatar"
+                          className="w-10 h-10 rounded-full object-cover border"
+                          onError={(e) => {
+                            e.currentTarget.src = "/img/user.png";
+                          }}
+                        />
+                        <span className="text-sm font-medium">
+                          {usuario.nombre} {usuario.apellidos}
+                        </span>
+                      </div>
+                    </td>
 
                     <td className="py-2 px-4">{usuario.email}</td>
                     <td className="py-2 px-4">{usuario.cargo}</td>
@@ -181,11 +219,7 @@ const UsuariosAdmin: React.FC = () => {
                                   <span className="font-semibold">
                                     {i.tipo}
                                   </span>
-                                  : {" "}
-                                  <span>
-                                    {formatFecha(i.fecha_inicio)} - {" "}
-                                    {formatFecha(i.fecha_fin)}
-                                  </span>
+                                  : {formatFecha(i.fecha_inicio)} - {formatFecha(i.fecha_fin)}
                                 </div>
                               ))}
                             </div>

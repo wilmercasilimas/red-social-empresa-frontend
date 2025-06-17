@@ -2,10 +2,10 @@ import React, { useState } from "react";
 import Topbar from "../../components/common/Topbar";
 import IncidenciasAdmin from "../admin/IncidenciasAdmin";
 import { useAuth } from "../../hooks/useAuth";
-import { Navigate } from "react-router-dom";
+import { Navigate, useNavigate } from "react-router-dom";
 import EditarPerfil from "../empleado/EditarPerfil";
 import PublicacionesGerencia from "./PublicacionesGerencia";
-import { useNavigate } from "react-router-dom";
+import UsuariosVisibles from "./UsuariosVisibles"; // ✅ Nuevo import
 import { getAvatarUrl } from "../../helpers/getAvatarUrl";
 import FeedPublicaciones from "../../components/publicaciones/FeedPublicaciones";
 
@@ -13,6 +13,7 @@ const GerenciaPanel: React.FC = () => {
   const { user } = useAuth();
   const [modoEdicion, setModoEdicion] = useState(false);
   const [verPublicaciones, setVerPublicaciones] = useState(false);
+  const [verUsuarios, setVerUsuarios] = useState(false); // ✅ Nuevo estado
   const navigate = useNavigate();
 
   if (!user) return null;
@@ -26,7 +27,7 @@ const GerenciaPanel: React.FC = () => {
       <Topbar />
       <div className="min-h-screen bg-gray-100 px-1 sm:px-2 py-6">
         <div className="w-full space-y-6 fade-in">
-          {!modoEdicion && !verPublicaciones ? (
+          {!modoEdicion && !verPublicaciones && !verUsuarios ? (
             <>
               <div className="card-panel animate-slide-up flex flex-col md:flex-row items-start md:items-center gap-6">
                 <img
@@ -65,6 +66,12 @@ const GerenciaPanel: React.FC = () => {
                     Editar perfil
                   </button>
                   <button
+                    onClick={() => setVerUsuarios(true)}
+                    className="btn-secondary"
+                  >
+                    👥 Ver usuarios
+                  </button>
+                  <button
                     onClick={() => setVerPublicaciones(true)}
                     className="btn-secondary"
                   >
@@ -89,6 +96,8 @@ const GerenciaPanel: React.FC = () => {
             </>
           ) : modoEdicion ? (
             <EditarPerfil salirEdicion={() => setModoEdicion(false)} />
+          ) : verUsuarios ? (
+            <UsuariosVisibles volver={() => setVerUsuarios(false)} />
           ) : (
             <PublicacionesGerencia volver={() => setVerPublicaciones(false)} />
           )}

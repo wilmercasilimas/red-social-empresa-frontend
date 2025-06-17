@@ -1,17 +1,19 @@
 import React, { useState } from "react";
 import { useAuth } from "../hooks/useAuth";
-import Topbar from "../components/common/Topbar";
 import { getAvatarUrl } from "../helpers/getAvatarUrl";
+import Topbar from "../components/common/Topbar";
 import EditarPerfil from "./empleado/EditarPerfil";
 import PublicacionesEmpleado from "./empleado/PublicacionesEmpleado";
 import MisTareas from "./usuario/MisTareas";
 import FeedPublicaciones from "../components/publicaciones/FeedPublicaciones";
+import UsuariosVisibles from "./gerencia/UsuariosVisibles"; // ✅ Import nuevo
 
 const EmpleadoPanel: React.FC = () => {
   const { user } = useAuth();
   const [modoEdicion, setModoEdicion] = useState(false);
   const [verPublicaciones, setVerPublicaciones] = useState(false);
   const [verTareas, setVerTareas] = useState(false);
+  const [verUsuarios, setVerUsuarios] = useState(false); // ✅ Nuevo estado
   const [imagenAmpliada, setImagenAmpliada] = useState<string | null>(null);
 
   if (!user) return null;
@@ -23,6 +25,8 @@ const EmpleadoPanel: React.FC = () => {
         <div className="w-full space-y-6 fade-in">
           {modoEdicion ? (
             <EditarPerfil salirEdicion={() => setModoEdicion(false)} />
+          ) : verUsuarios ? (
+            <UsuariosVisibles volver={() => setVerUsuarios(false)} /> // ✅ Vista nueva
           ) : verPublicaciones ? (
             <PublicacionesEmpleado volver={() => setVerPublicaciones(false)} />
           ) : verTareas ? (
@@ -40,15 +44,9 @@ const EmpleadoPanel: React.FC = () => {
                   <h1 className="title-main mb-4 animate-slide-up-slow">
                     Panel del Empleado
                   </h1>
-                  <p>
-                    <strong>Nombre:</strong> {user.nombre} {user.apellidos}
-                  </p>
-                  <p>
-                    <strong>Correo:</strong> {user.email}
-                  </p>
-                  <p>
-                    <strong>Cargo:</strong> {user.cargo}
-                  </p>
+                  <p><strong>Nombre:</strong> {user.nombre} {user.apellidos}</p>
+                  <p><strong>Correo:</strong> {user.email}</p>
+                  <p><strong>Cargo:</strong> {user.cargo}</p>
                   <p>
                     <strong>Área:</strong>{" "}
                     {user.area && typeof user.area === "object"
@@ -66,22 +64,16 @@ const EmpleadoPanel: React.FC = () => {
                 </div>
 
                 <div className="flex flex-col gap-2">
-                  <button
-                    onClick={() => setModoEdicion(true)}
-                    className="btn-primary"
-                  >
+                  <button onClick={() => setModoEdicion(true)} className="btn-primary">
                     Editar perfil
                   </button>
-                  <button
-                    onClick={() => setVerPublicaciones(true)}
-                    className="btn-secondary"
-                  >
+                  <button onClick={() => setVerUsuarios(true)} className="btn-secondary">
+                    👥 Ver usuarios
+                  </button>
+                  <button onClick={() => setVerPublicaciones(true)} className="btn-secondary">
                     📚 Ver publicaciones
                   </button>
-                  <button
-                    onClick={() => setVerTareas(true)}
-                    className="btn-secondary"
-                  >
+                  <button onClick={() => setVerTareas(true)} className="btn-secondary">
                     📋 Ver tareas
                   </button>
                 </div>
