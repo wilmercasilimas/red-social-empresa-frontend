@@ -1,37 +1,41 @@
-# Logs
-logs
+# 📦 Dependencias
+node_modules/
+
+# 🏗️ Archivos de compilación
+dist/
+build/
+.vite/
+
+# 🔧 Configuración de entorno
+.env
+.env.*
+
+# 📝 Archivos de log
 *.log
 npm-debug.log*
 yarn-debug.log*
-yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
-# Dependency directories
-node_modules
-
-# Build outputs
-dist
-dist-ssr
-
-# Miscellaneous
-*.local
-
-# Editor directories and files
-.vscode/*
-!.vscode/extensions.json
-.idea
-.DS_Store
+# 💻 Configuración del editor
+.vscode/
+.idea/
 *.suo
 *.ntvs*
 *.njsproj
 *.sln
 *.sw?
 
-# Environment files
-.env
-.env.*
+# 🖼️ Archivos del sistema operativo
+.DS_Store
+Thumbs.db
 
-# 🔒 Archivos personales o de sistema local
+# 🧪 Archivos temporales
+*.local
+*.tmp
+*.bak
+*.zip
+
+# 🚫 Archivos manuales o auxiliares que no deben subirse
 iniciar-proyecto.bat
-utils/wakeRender.js
+../utils/wakeRender.js
