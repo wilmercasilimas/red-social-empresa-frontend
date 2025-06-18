@@ -1,54 +1,57 @@
-# React + TypeScript + Vite
+README.md para despliegue en Vercel
+md
+Copiar código
+# Red Social Empresarial – Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Este proyecto es el frontend de una red social empresarial desarrollado con **React + Vite + TypeScript**, utilizando una arquitectura moderna, modular y profesional. El backend está desplegado en **Render** y se conecta automáticamente a través de `vercel.json`.
 
-Currently, two official plugins are available:
+## 🛠 Tecnologías
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- React 18 + Vite
+- TypeScript
+- Tailwind CSS
+- React Router
+- Cloudinary (para gestión de imágenes)
+- Vercel (despliegue)
+- Render (backend)
 
-## Expanding the ESLint configuration
+---
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## 🚀 Despliegue en Vercel
 
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
-```
+### 1. **Prepara tu repositorio en GitHub**
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+- Asegúrate de tener este frontend subido en un repositorio público o privado.
+- Estructura recomendada:
+/src
+/public
+vite.config.ts
+vercel.json
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+markdown
+Copiar código
 
-export default tseslint.config({
-  plugins: {
-    // Add the react-x and react-dom plugins
-    'react-x': reactX,
-    'react-dom': reactDom,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended typescript rules
-    ...reactX.configs['recommended-typescript'].rules,
-    ...reactDom.configs.recommended.rules,
-  },
-})
-```
+### 2. **Conecta Vercel a tu GitHub**
+
+- Ve a [https://vercel.com](https://vercel.com)
+- Inicia sesión con tu cuenta de GitHub.
+- Haz clic en **"Add New Project"**
+- Selecciona tu repositorio del frontend.
+- Configura así:
+- Framework: **Vite**
+- Build Command: `vite build`
+- Output Directory: `dist`
+
+### 3. **Agrega el archivo `vercel.json`**
+
+Este archivo redirige automáticamente las llamadas API al backend:
+
+```json
+{
+"rewrites": [
+  {
+    "source": "/api/:path*",
+    "destination": "https://red-social-empresa-backend.onrender.com/api/:path*"
+  }
+]
+}
