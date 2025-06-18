@@ -26,7 +26,7 @@ const Topbar: React.FC = () => {
             className="w-10 h-10 object-cover rounded-full bg-white shadow"
           />
           <span className="text-lg font-semibold tracking-wide text-center sm:text-left">
-            Red Social Empresarial
+            Red Empresarial
           </span>
         </div>
 

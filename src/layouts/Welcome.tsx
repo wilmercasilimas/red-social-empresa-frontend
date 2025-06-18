@@ -5,7 +5,7 @@ const welcome: React.FC = () => {
     <div className="min-h-screen bg-gray-100 flex items-center justify-center p-6">
       <div className="text-center space-y-4">
         <h1 className="text-3xl font-bold text-gray-800">
-          Red Social Empresarial
+          Red Empresarial
         </h1>
         <p className="text-gray-600">
           Bienvenido al sistema de gestión interna de empleados, tareas e incidencias.

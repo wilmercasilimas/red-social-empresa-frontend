@@ -72,7 +72,7 @@ const Login = () => {
             className="w-10 h-10 object-cover rounded-full bg-white shadow"
           />
           <span className="text-base sm:text-lg md:text-xl font-bold text-white tracking-wide">
-            Red Social Empresarial
+            Red Empresarial
           </span>
         </div>
       </header>
