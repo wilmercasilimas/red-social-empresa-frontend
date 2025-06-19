@@ -1,3 +1,4 @@
+// IncidenciasAdmin.tsx con columna fija "Empleado"
 import React, { useEffect, useState } from "react";
 import { showToast } from "../../components/common/ui/showToast";
 import FormularioIncidencia from "../../components/common/incidencias/FormularioIncidencia";
@@ -110,7 +111,7 @@ const IncidenciasAdmin: React.FC = () => {
           <table className="min-w-full border border-gray-300 mt-6">
             <thead className="bg-gray-100">
               <tr>
-                <th className="p-2 border">Empleado</th>
+                <th className="p-2 border sticky left-0 z-10 bg-gray-100">Empleado</th>
                 <th className="p-2 border">Tipo</th>
                 <th className="p-2 border">Fecha inicio</th>
                 <th className="p-2 border">Fecha fin</th>
@@ -121,7 +122,7 @@ const IncidenciasAdmin: React.FC = () => {
             <tbody>
               {incidencias.map((incidencia) => (
                 <tr key={incidencia._id} className="text-center">
-                  <td className="p-2 border">
+                  <td className="p-2 border sticky left-0 z-0 bg-white">
                     {incidencia.usuario?.nombre} {incidencia.usuario?.apellidos}
                   </td>
                   <td className="p-2 border capitalize">{incidencia.tipo}</td>

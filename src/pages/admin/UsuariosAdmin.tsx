@@ -1,3 +1,4 @@
+// UsuariosAdmin.tsx (modificado con columna fija "Usuario")
 import React, { useEffect, useState } from "react";
 import type { Usuario } from "../../types/Usuario";
 import AgregarUsuario from "./AgregarUsuario";
@@ -89,9 +90,7 @@ const UsuariosAdmin: React.FC = () => {
     <div className="card-panel animate-slide-up">
       <div className="flex justify-between items-center mb-4">
         <div>
-          <h2 className="title-main animate-slide-right">
-            Gestión de usuarios
-          </h2>
+          <h2 className="title-main animate-slide-right">Gestión de usuarios</h2>
           <p className="text-gray-600">
             Aquí puedes ver, editar y eliminar usuarios registrados.
           </p>
@@ -106,7 +105,6 @@ const UsuariosAdmin: React.FC = () => {
         />
       </div>
 
-      {/* Filtros reutilizables */}
       <div className="mb-6">
         <FiltrosUsuarios
           filtroNombre={filtroNombre}
@@ -146,7 +144,7 @@ const UsuariosAdmin: React.FC = () => {
           <table className="min-w-full text-left border border-gray-200 shadow rounded">
             <thead className="bg-blue-600 text-white">
               <tr>
-                <th className="py-2 px-4">Usuario</th>
+                <th className="py-2 px-4 sticky left-0 z-10 bg-blue-600">Usuario</th>
                 <th className="py-2 px-4">Correo</th>
                 <th className="py-2 px-4">Cargo</th>
                 <th className="py-2 px-4">Área</th>
@@ -163,11 +161,8 @@ const UsuariosAdmin: React.FC = () => {
                   usuario.incidencias_activas &&
                   usuario.incidencias_activas.length > 0;
                 return (
-                  <tr
-                    key={usuario._id}
-                    className="hover:bg-gray-100 transition"
-                  >
-                    <td className="py-2 px-0">
+                  <tr key={usuario._id} className="hover:bg-gray-100 transition">
+                    <td className="py-2 px-0 sticky left-0 z-0 bg-white">
                       <div className="flex items-center gap-2">
                         <img
                           src={getAvatarUrl(usuario.imagen ?? "")}
@@ -185,9 +180,7 @@ const UsuariosAdmin: React.FC = () => {
 
                     <td className="py-2 px-4">{usuario.email}</td>
                     <td className="py-2 px-4">{usuario.cargo}</td>
-                    <td className="py-2 px-4">
-                      {usuario.area?.nombre || "Sin área"}
-                    </td>
+                    <td className="py-2 px-4">{usuario.area?.nombre || "Sin área"}</td>
                     <td className="py-2 px-4">
                       <span
                         className={`badge ${
@@ -205,20 +198,12 @@ const UsuariosAdmin: React.FC = () => {
                           <span className="badge bg-yellow-100 text-yellow-800">
                             Ausente
                           </span>
-                          <span
-                            className="relative group cursor-pointer"
-                            aria-hidden="true"
-                          >
-                            <Info
-                              className="w-4 h-4 text-gray-500"
-                              focusable="false"
-                            />
+                          <span className="relative group cursor-pointer" aria-hidden="true">
+                            <Info className="w-4 h-4 text-gray-500" />
                             <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 hidden group-hover:block bg-white text-gray-800 border border-gray-300 rounded p-2 shadow text-xs z-10 whitespace-nowrap">
                               {usuario.incidencias_activas?.map((i, idx) => (
                                 <div key={idx}>
-                                  <span className="font-semibold">
-                                    {i.tipo}
-                                  </span>
+                                  <span className="font-semibold">{i.tipo}</span>
                                   : {formatFecha(i.fecha_inicio)} - {formatFecha(i.fecha_fin)}
                                 </div>
                               ))}

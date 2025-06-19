@@ -153,7 +153,7 @@ const AreasAdmin: React.FC = () => {
           <table className="min-w-full text-left border border-gray-200 shadow rounded">
             <thead className="bg-blue-600 text-white">
               <tr>
-                <th className="py-2 px-4">Nombre</th>
+                <th className="py-2 px-4 sticky left-0 z-10 bg-blue-600">Nombre</th>
                 <th className="py-2 px-4">Descripción</th>
                 <th className="py-2 px-4">Creado en</th>
                 <th className="py-2 px-4">Estado</th>
@@ -167,7 +167,7 @@ const AreasAdmin: React.FC = () => {
                     onClick={() => toggleExpand(area._id)}
                     className="hover:bg-gray-100 transition cursor-pointer"
                   >
-                    <td className="py-2 px-4">{area.nombre}</td>
+                    <td className="py-2 px-4 sticky left-0 z-0 bg-white">{area.nombre}</td>
                     <td className="py-2 px-4">{area.descripcion}</td>
                     <td className="py-2 px-4 text-sm text-gray-600">
                       {new Date(area.creado_en).toLocaleDateString("es-ES")}
